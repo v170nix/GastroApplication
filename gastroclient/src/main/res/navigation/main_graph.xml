@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_graph"
+    app:startDestination="@id/mainClientFragment">
+
+    <fragment
+        android:id="@+id/mainClientFragment"
+        android:name="net.arwix.gastro.client.ui.MainClientFragment"
+        android:label="fragment_main_client"
+        tools:layout="@layout/fragment_main_client" >
+        <action
+            android:id="@+id/action_mainClientFragment_to_chooseFragment"
+            app:destination="@id/orderTableFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/orderTableFragment"
+        android:name="net.arwix.gastro.client.ui.order.OrderTableFragment"
+        android:label="fragment_choose"
+        tools:layout="@layout/fragment_order_table" >
+        <action
+            android:id="@+id/action_orderTableFragment_to_orderListFragment"
+            app:destination="@id/orderListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/orderListFragment"
+        android:name="net.arwix.gastro.client.ui.order.OrderListFragment"
+        android:label="fragment_order_list"
+        tools:layout="@layout/fragment_order_list" />
+</navigation>
