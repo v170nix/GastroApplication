@@ -3,6 +3,10 @@ package net.arwix.gastro.client.ui.order
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import net.arwix.gastro.client.data.OrderData
 import net.arwix.gastro.client.data.OrderItem
 import net.arwix.mvi.SimpleIntentViewModel
 
@@ -18,6 +22,21 @@ class OrderViewModel: SimpleIntentViewModel<OrderViewModel.Action, OrderViewMode
         when (action) {
             is Action.AddItem -> {
                 emit(Result.AddItem(action.item))
+            }
+            is Action.SubmitOrder -> {
+                withContext(Dispatchers.Main) {
+                    val orders = action.firebase.collection("orders")
+                    val orderData = OrderData(6969, internalViewState.table, internalViewState.orderItems)
+//                    runBlocking {
+                        orders.document().set(orderData).addOnCompleteListener {
+                            Log.e("complete", "1")
+                        }.addOnSuccessListener {
+                            Log.e("sus", "1")
+                        }.addOnFailureListener {
+                            Log.e("fat", it.toString())
+                        }
+//                    }
+                }
             }
         }
     }
@@ -42,6 +61,7 @@ class OrderViewModel: SimpleIntentViewModel<OrderViewModel.Action, OrderViewMode
 
     sealed class Action {
         data class AddItem(val item: OrderItem): Action()
+        data class SubmitOrder(val firebase: FirebaseFirestore): Action()
     }
     sealed class Result {
         object Clear: Result()

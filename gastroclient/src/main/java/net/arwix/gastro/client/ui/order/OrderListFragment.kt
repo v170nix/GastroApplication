@@ -2,7 +2,6 @@ package net.arwix.gastro.client.ui.order
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +12,7 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_order_list.*
 import kotlinx.android.synthetic.main.item_order_list.view.*
 import net.arwix.gastro.client.R
@@ -44,6 +44,14 @@ class OrderListFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             adapter = this@OrderListFragment.adapter
         }
+        order_list_submit_button.setOnClickListener {
+            putToDb()
+        }
+    }
+
+    private fun putToDb() {
+        val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+        orderViewModel.nonCancelableIntent(OrderViewModel.Action.SubmitOrder(db))
     }
 
     private fun render(state: OrderViewModel.State) {
@@ -54,11 +62,10 @@ class OrderListFragment : Fragment() {
         private val items = mutableListOf<OrderItem>()
 
         fun setItems(newList: List<OrderItem>) {
-            Log.e("list", newList.toString())
             val diffCallback = ItemDiffCallback(items, newList)
             val diffResult = DiffUtil.calculateDiff(diffCallback)
             items.clear()
-            items.addAll(newList)
+            items.addAll(newList.asReversed())
             diffResult.dispatchUpdatesTo(this)
         }
 
