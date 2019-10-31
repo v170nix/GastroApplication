@@ -1,20 +1,25 @@
 package net.arwix.gastro.client.ui.order
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.observe
+import androidx.navigation.Navigation
 import kotlinx.android.synthetic.main.fragment_order_table.*
 
 import net.arwix.gastro.client.R
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
 class OrderTableFragment : Fragment() {
 
+    private val orderViewModel: OrderViewModel by sharedViewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        orderViewModel.liveState.observe(this, ::render)
     }
 
     override fun onCreateView(
@@ -30,16 +35,16 @@ class OrderTableFragment : Fragment() {
             val tableNumber = runCatching {
                 order_table_custom_edit_text.editableText.toString().toInt()
             }.getOrNull() ?: return@setOnClickListener
-
+            orderViewModel.nonCancelableIntent(OrderViewModel.Action.SelectTable(tableNumber))
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
-    override fun onDetach() {
-        super.onDetach()
+    private fun render(state: OrderViewModel.State) {
+        if (state.isTableSelect) {
+            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(
+                R.id.orderListFragment
+            )
+        }
     }
 
 }

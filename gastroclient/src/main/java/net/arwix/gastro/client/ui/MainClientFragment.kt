@@ -11,10 +11,13 @@ import androidx.navigation.Navigation
 import kotlinx.android.synthetic.main.fragment_main_client.*
 
 import net.arwix.gastro.client.R
+import net.arwix.gastro.client.ui.order.OrderViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class MainClientFragment : Fragment() {
 
     private lateinit var navController: NavController
+    private val orderViewModel: OrderViewModel by sharedViewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,6 +30,7 @@ class MainClientFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
         client_main_add_button.setOnClickListener {
+            orderViewModel.clear()
             navController.navigate(R.id.orderTableFragment)
         }
     }
