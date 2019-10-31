@@ -1,3 +1,3 @@
 package net.arwix.gastro.client.data
 
-data class OrderItem(val name: String, val price: Long)
+data class OrderItem(val name: String, val price: Long, val count: Int)

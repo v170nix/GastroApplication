@@ -27,14 +27,10 @@
         android:id="@+id/orderListFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderListFragment"
         android:label="fragment_order_list"
-        tools:layout="@layout/fragment_order_list" >
-        <action
-            android:id="@+id/action_orderListFragment_to_orderListAddFragment"
-            app:destination="@id/orderListAddFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_order_list" />
     <fragment
-        android:id="@+id/orderListAddFragment"
-        android:name="net.arwix.gastro.client.ui.order.OrderListAddFragment"
+        android:id="@+id/orderListAddItemFragment"
+        android:name="net.arwix.gastro.client.ui.order.OrderListAddItemFragment"
         android:label="fragment_order_list_add"
-        tools:layout="@layout/fragment_order_list_add" />
+        tools:layout="@layout/fragment_order_list_add_item" /><action android:id="@+id/action_global_orderListAddItemFragment" app:destination="@id/orderListAddItemFragment"/>
 </navigation>
