@@ -1,4 +1,4 @@
-package net.arwix.gastro.client.data
+package net.arwix.gastro.library.data
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp

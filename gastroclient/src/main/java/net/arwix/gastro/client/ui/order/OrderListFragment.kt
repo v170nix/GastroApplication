@@ -16,7 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.android.synthetic.main.fragment_order_list.*
 import kotlinx.android.synthetic.main.item_order_list.view.*
 import net.arwix.gastro.client.R
-import net.arwix.gastro.client.data.OrderItem
+import net.arwix.gastro.library.data.OrderItem
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class OrderListFragment : Fragment() {

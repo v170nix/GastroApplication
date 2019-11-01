@@ -6,8 +6,8 @@ import androidx.lifecycle.liveData
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.arwix.gastro.client.data.OrderData
-import net.arwix.gastro.client.data.OrderItem
+import net.arwix.gastro.library.data.OrderData
+import net.arwix.gastro.library.data.OrderItem
 import net.arwix.mvi.SimpleIntentViewModel
 
 class OrderViewModel: SimpleIntentViewModel<OrderViewModel.Action, OrderViewModel.Result, OrderViewModel.State>() {

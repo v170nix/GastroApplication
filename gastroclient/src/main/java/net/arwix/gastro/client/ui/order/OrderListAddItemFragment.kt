@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import kotlinx.android.synthetic.main.fragment_order_list_add_item.*
 import net.arwix.gastro.client.R
-import net.arwix.gastro.client.data.OrderItem
+import net.arwix.gastro.library.data.OrderItem
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class OrderListAddItemFragment : Fragment() {
