@@ -6,6 +6,7 @@ import androidx.lifecycle.liveData
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.OrderData
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.mvi.SimpleIntentViewModel
@@ -27,15 +28,7 @@ class OrderViewModel: SimpleIntentViewModel<OrderViewModel.Action, OrderViewMode
                 withContext(Dispatchers.Main) {
                     val orders = action.firebase.collection("orders")
                     val orderData = OrderData(6969, internalViewState.table, internalViewState.orderItems)
-//                    runBlocking {
-                        orders.document().set(orderData).addOnCompleteListener {
-                            Log.e("complete", "1")
-                        }.addOnSuccessListener {
-                            Log.e("sus", "1")
-                        }.addOnFailureListener {
-                            Log.e("fat", it.toString())
-                        }
-//                    }
+                    orders.document().set(orderData).await()
                 }
             }
         }
