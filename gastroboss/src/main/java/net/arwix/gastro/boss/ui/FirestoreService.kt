@@ -6,11 +6,18 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
+import android.print.PrintAttributes
+import android.print.PrintManager
 import android.util.Log
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.squareup.okhttp.OkHttpClient
+import com.squareup.okhttp.Request
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -20,6 +27,7 @@ import kotlinx.coroutines.launch
 import net.arwix.gastro.boss.MainBossActivity
 import net.arwix.gastro.boss.R
 import net.arwix.gastro.library.snapshotFlow
+import org.json.JSONObject
 
 class FirestoreService : Service(), CoroutineScope by MainScope() {
 
@@ -73,6 +81,7 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
             }
             .collect {
                 Log.e("docs", it.documents.toString())
+                doPrint()
             }
     }
 
@@ -85,5 +94,52 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         service.createNotificationChannel(chan)
         return channelId
+    }
+
+    private var mWebView: WebView? = null
+
+    private fun doPrint() {
+        val webView = WebView(this)
+        webView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?) = false
+
+            override fun onPageFinished(view: WebView, url: String?) {
+                Log.e("onPageFinished", "page finished loading $url")
+                super.onPageFinished(view, url)
+                createWebPrintJob(view)
+                mWebView = null
+            }
+        }
+        val htmlDocument =  "<html><body><h1>Test Content</h1><p>Testing, testing, testing...</p></body></html>"
+        webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null)
+        mWebView = webView
+
+    }
+
+    private fun createWebPrintJob(webView: WebView) {
+        (getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
+            val jobName = "Doc"
+            val printAdapter = webView.createPrintDocumentAdapter(jobName)
+           val printJob = printManager.print(
+                jobName,
+                printAdapter,
+                PrintAttributes.Builder().build()
+            )
+        }
+    }
+
+    private fun getPrinters(token: String) {
+        val req = Request.Builder()
+            .url("https://www.google.com/cloudprint/search")
+            .get()
+            .addHeader("Authorization", "Bearer $token")
+            .build()
+        val client = OkHttpClient()
+        launch {
+            val response = client.newCall(req).execute()
+            val json = JSONObject(response.body().string())
+            Log.e("result", json.toString(5))
+        }
+
     }
 }
