@@ -3,11 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/boss_graph"
-    app:startDestination="@id/mainBossFragment">
+    app:startDestination="@id/signInBossFragment">
 
     <fragment
-        android:id="@+id/mainBossFragment"
-        android:name="net.arwix.gastro.boss.ui.MainBossFragment"
+        android:id="@+id/signInBossFragment"
+        android:name="net.arwix.gastro.boss.ui.SignInBossFragment"
         android:label="fragment_main_boss"
-        tools:layout="@layout/fragment_main_boss" />
+        tools:layout="@layout/fragment_sign_in_boss" >
+        <action
+            android:id="@+id/action_signInBossFragment_to_summaryBossFragment"
+            app:destination="@id/summaryBossFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/summaryBossFragment"
+        android:name="net.arwix.gastro.boss.ui.SummaryBossFragment"
+        android:label="fragment_summary_boss"
+        tools:layout="@layout/fragment_summary_boss" />
 </navigation>

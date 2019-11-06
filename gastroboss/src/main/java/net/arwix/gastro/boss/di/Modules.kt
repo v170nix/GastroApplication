@@ -1,13 +1,20 @@
 package net.arwix.gastro.boss.di
 
 import android.content.Context
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.Scope
 import com.google.gson.GsonBuilder
 import net.arwix.gastro.boss.R
 import net.arwix.gastro.boss.data.GoogleCloudPrintApi
 import net.arwix.gastro.boss.data.auth.AccessTokenProvider
 import net.arwix.gastro.boss.data.auth.GoogleAuth2Api
+import net.arwix.gastro.boss.ui.ProfileViewModel
 import okhttp3.OkHttpClient
+import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
+import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -27,6 +34,19 @@ val mainModule = module {
 //                level = HttpLoggingInterceptor.Level.BODY
 //            })
             .build()
+    }
+
+    single<GoogleSignInOptions> {
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(get(named("app_client_id")))
+            .requestEmail()
+            .requestServerAuthCode(get(named("app_client_id")))
+            .requestScopes(Scope("https://www.googleapis.com/auth/cloudprint"))
+            .build()
+    }
+
+    single<GoogleSignInClient> {
+        GoogleSignIn.getClient(androidApplication(), get())
     }
 
     single<GoogleAuth2Api> {
@@ -55,5 +75,9 @@ val mainModule = module {
             get(),
             get()
         )
+    }
+
+    viewModel {
+        ProfileViewModel(androidContext(), get(), get())
     }
 }

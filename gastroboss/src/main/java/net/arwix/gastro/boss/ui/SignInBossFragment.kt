@@ -1,42 +1,37 @@
 package net.arwix.gastro.boss.ui
 
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.print.PrintAttributes
-import android.print.PrintManager
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.common.api.Scope
-import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.GsonBuilder
 import com.squareup.okhttp.OkHttpClient
 import com.squareup.okhttp.Request
-import kotlinx.android.synthetic.main.fragment_main_boss.*
+import kotlinx.android.synthetic.main.fragment_sign_in_boss.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import mjson.Json
+import net.arwix.extension.gone
+import net.arwix.extension.visible
+import net.arwix.extension.weak
 import net.arwix.gastro.boss.R
 import net.arwix.gastro.boss.data.GoogleCloudPrintApi
 import net.arwix.gastro.boss.data.auth.AccessTokenProvider
 import net.arwix.gastro.boss.data.auth.CloudPrintInterceptor
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.android.inject
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -45,15 +40,13 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 /**
  * A simple [Fragment] subclass.
  */
-class MainBossFragment : Fragment(), CoroutineScope by MainScope() {
+class SignInBossFragment : Fragment(), CoroutineScope by MainScope() {
 
     private val accessTokenProvider: AccessTokenProvider by inject()
     private val googlePrintApi: GoogleCloudPrintApi by inject()
-    private var mWebView: WebView? = null
-    private lateinit var gso: GoogleSignInOptions
-    private lateinit var gsi: GoogleSignInClient
-    private lateinit var firebaseAuth: FirebaseAuth
-    private lateinit var authListener: FirebaseAuth.AuthStateListener
+    private val profileViewModel: ProfileViewModel by sharedViewModel()
+//    private lateinit var gso: GoogleSignInOptions
+//    private lateinit var gsi: GoogleSignInClient
     private var retryError = 0
 
     override fun onCreateView(
@@ -61,35 +54,45 @@ class MainBossFragment : Fragment(), CoroutineScope by MainScope() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main_boss, container, false)
+        return inflater.inflate(R.layout.fragment_sign_in_boss, container, false)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        profileViewModel.liveState.observe(this,  Observer(::renderProfile))
+    }
+
+    private fun renderProfile(state: ProfileViewModel.State) {
+        Log.e("render state", state.toString())
+        if (state.account != null) {
+            findNavController(this).navigate(R.id.summaryBossFragment)
+            profile_state_login.visible()
+            profile_state_logout.gone()
+        } else {
+            profile_state_login.gone()
+            profile_state_logout.visible()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        firebaseAuth = FirebaseAuth.getInstance()
-        gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.app_client_id))
-            .requestEmail()
-            .requestServerAuthCode(getString(R.string.app_client_secret))
-            .requestScopes(Scope("https://www.googleapis.com/auth/cloudprint"))
-            .build()
-
-        gsi = GoogleSignIn.getClient(requireActivity(), gso)
-
-        authListener = FirebaseAuth.AuthStateListener {
-            val user = firebaseAuth.currentUser
-            if (user != null) {
-                Log.e("onAuthStateChanged", "signed_in " + user.uid)
-            } else {
-                Log.e("onAuthStateChanged", "signed_out")
-            }
-        }
+        profile_state_login.gone()
+        profile_state_logout.visible()
+//        gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//            .requestIdToken(getString(R.string.app_client_id))
+//            .requestEmail()
+//            .requestServerAuthCode(getString(R.string.app_client_id))
+//            .requestScopes(Scope("https://www.googleapis.com/auth/cloudprint"))
+//            .build()
+//
+//        gsi = GoogleSignIn.getClient(requireActivity(), gso)
 
         start_button.setOnClickListener {
 //            getPrinters("3424")
-            launch {
-                getPrs()
-            }
+            profileViewModel.nonCancelableIntent(ProfileViewModel.Action.LoginStart(this.weak()))
+//            launch {
+//                getPrs()
+//            }
 //            val account = GoogleSignIn.getLastSignedInAccount(requireContext())
 //            if (account == null) {
 //                signIn()
@@ -105,16 +108,19 @@ class MainBossFragment : Fragment(), CoroutineScope by MainScope() {
 //            }
         }
         stop_button.setOnClickListener {
-            val account = GoogleSignIn.getLastSignedInAccount(requireContext())
+            val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(requireContext())
             if (account != null) {
                 Log.e("account", account.serverAuthCode.toString())
                 Log.e("account", account.idToken.toString())
                 Log.e("account", account.isExpired.toString())
-                if (account.isExpired) {
-                    gsi.signOut()
-                } else {
-                    gsi.signOut()
-                }
+                Log.e("acc.displ", account.displayName.toString())
+                Log.e("acc.displ", account.email.toString())
+                Log.e("acc.displ", account.photoUrl.toString())
+//                if (account.isExpired) {
+//                    gsi.signOut()
+//                } else {
+//                    gsi.signOut()
+//                }
             }
 //            gsi.silentSignIn()
         }
@@ -122,70 +128,39 @@ class MainBossFragment : Fragment(), CoroutineScope by MainScope() {
 
     override fun onStart() {
         super.onStart()
-        firebaseAuth.addAuthStateListener(authListener)
     }
 
     override fun onStop() {
         super.onStop()
-        firebaseAuth.removeAuthStateListener(authListener)
-    }
-
-    private fun doPrint() {
-        val webView = WebView(requireContext())
-        webView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?) = false
-
-            override fun onPageFinished(view: WebView, url: String?) {
-                Log.e("onPageFinished", "page finished loading $url")
-                super.onPageFinished(view, url)
-                createWebPrintJob(view)
-                mWebView = null
-            }
-        }
-        val htmlDocument =  "<html><body><h1>Test Content</h1><p>Testing, testing, testing...</p></body></html>"
-        webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null)
-        mWebView = webView
-
-    }
-
-    private fun createWebPrintJob(webView: WebView) {
-        (requireActivity().getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            val jobName = "Doc"
-            val printAdapter = webView.createPrintDocumentAdapter(jobName)
-            val printJob = printManager.print(
-                jobName,
-                printAdapter,
-                PrintAttributes.Builder().build()
-            )
-        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode != RC_SIGN_IN) return
-        val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-        try {
-            val account: GoogleSignInAccount? = task.getResult(ApiException::class.java)
-            launch {
-                runCatching {
-                    accessTokenProvider.updateToken(account!!.serverAuthCode)
-                }.onFailure {
-                    Log.e("throw onactivity", it.message.toString())
-                }.onSuccess {
-                    Log.e("sus", it.toString())
-                }
-                getPrs()
-            }
-//            firebaseAuthWithGoogle(account!!)
-        } catch (e: ApiException) {
-            Log.e("Google sign in failed", e.toString())
-        }
+        profileViewModel.nonCancelableIntent(ProfileViewModel.Action.LoginDoActivityResult(requestCode, data))
+//        if (requestCode != RC_SIGN_IN) return
+//        val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+//        try {
+//            val account: GoogleSignInAccount? = task.getResult(ApiException::class.java)
+//            launch {
+//                runCatching {
+//                    accessTokenProvider.updateToken(account!!.serverAuthCode)
+//                }.onFailure {
+//                    Log.e("throw onactivity", it.message.toString())
+//                }.onSuccess {
+//                    Log.e("sus", it.toString())
+//                }
+//                getPrs()
+//            }
+////            firebaseAuthWithGoogle(account!!)
+//        } catch (e: ApiException) {
+//            Log.e("Google sign in failed", e.toString())
+//        }
     }
 
     private fun signIn() {
 //        val t = gsi.silentSignIn()
 //        val ac = t.getResult(ApiException::class.java)!!
-        startActivityForResult(gsi.signInIntent, RC_SIGN_IN)
+//        startActivityForResult(gsi.signInIntent, RC_SIGN_IN)
     }
 
     private suspend fun getPrs() {
@@ -307,7 +282,7 @@ class MainBossFragment : Fragment(), CoroutineScope by MainScope() {
 
 //            withContext(Dispatchers.Main)
 //            {
-//                Ion.with(this@MainBossFragment)
+//                Ion.with(this@SignInBossFragment)
 //                    .load("POST", "https://www.google.com/cloudprint/submit")
 //                    .addHeader("Authorization", "Bearer $token")
 //                    .setMultipartParameter("printerid", printer.id!!)

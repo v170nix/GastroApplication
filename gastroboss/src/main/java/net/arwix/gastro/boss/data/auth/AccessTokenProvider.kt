@@ -14,11 +14,13 @@ class AccessTokenProvider(
 
     private var token: AccessToken? = null
 
-    init {
-        loadFromPreferences()
-    }
+    init { loadFromPreferences() }
 
     fun getAccessToken(): String? = token?.accessToken
+
+    fun clearToken() {
+        //TODO
+    }
 
     suspend fun updateToken(authCode: String? = null): AccessToken = withContext(Dispatchers.Main) {
         val result = if (authCode == null) {
