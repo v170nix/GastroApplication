@@ -11,8 +11,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment.findNavController
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.gson.GsonBuilder
 import com.squareup.okhttp.OkHttpClient
 import com.squareup.okhttp.Request
@@ -22,8 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import mjson.Json
-import net.arwix.extension.gone
-import net.arwix.extension.visible
 import net.arwix.extension.weak
 import net.arwix.gastro.boss.R
 import net.arwix.gastro.boss.data.GoogleCloudPrintApi
@@ -66,18 +62,11 @@ class SignInBossFragment : Fragment(), CoroutineScope by MainScope() {
         Log.e("render state", state.toString())
         if (state.account != null) {
             findNavController(this).navigate(R.id.summaryBossFragment)
-            profile_state_login.visible()
-            profile_state_logout.gone()
-        } else {
-            profile_state_login.gone()
-            profile_state_logout.visible()
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        profile_state_login.gone()
-        profile_state_logout.visible()
 //        gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
 //            .requestIdToken(getString(R.string.app_client_id))
 //            .requestEmail()
@@ -87,9 +76,13 @@ class SignInBossFragment : Fragment(), CoroutineScope by MainScope() {
 //
 //        gsi = GoogleSignIn.getClient(requireActivity(), gso)
 
-        start_button.setOnClickListener {
-//            getPrinters("3424")
+        sign_in_attach_button.setOnClickListener {
             profileViewModel.nonCancelableIntent(ProfileViewModel.Action.LoginStart(this.weak()))
+        }
+//
+//        start_button.setOnClickListener {
+//            getPrinters("3424")
+//            profileViewModel.nonCancelableIntent(ProfileViewModel.Action.LoginStart(this.weak()))
 //            launch {
 //                getPrs()
 //            }
@@ -106,24 +99,24 @@ class SignInBossFragment : Fragment(), CoroutineScope by MainScope() {
 //                    gsi.signOut()
 //                }
 //            }
-        }
-        stop_button.setOnClickListener {
-            val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(requireContext())
-            if (account != null) {
-                Log.e("account", account.serverAuthCode.toString())
-                Log.e("account", account.idToken.toString())
-                Log.e("account", account.isExpired.toString())
-                Log.e("acc.displ", account.displayName.toString())
-                Log.e("acc.displ", account.email.toString())
-                Log.e("acc.displ", account.photoUrl.toString())
-//                if (account.isExpired) {
-//                    gsi.signOut()
-//                } else {
-//                    gsi.signOut()
-//                }
-            }
-//            gsi.silentSignIn()
-        }
+//        }
+//        stop_button.setOnClickListener {
+//            val account: GoogleSignInAccount? = GoogleSignIn.getLastSignedInAccount(requireContext())
+//            if (account != null) {
+//                Log.e("account", account.serverAuthCode.toString())
+//                Log.e("account", account.idToken.toString())
+//                Log.e("account", account.isExpired.toString())
+//                Log.e("acc.displ", account.displayName.toString())
+//                Log.e("acc.displ", account.email.toString())
+//                Log.e("acc.displ", account.photoUrl.toString())
+////                if (account.isExpired) {
+////                    gsi.signOut()
+////                } else {
+////                    gsi.signOut()
+////                }
+//            }
+////            gsi.silentSignIn()
+//        }
     }
 
     override fun onStart() {
