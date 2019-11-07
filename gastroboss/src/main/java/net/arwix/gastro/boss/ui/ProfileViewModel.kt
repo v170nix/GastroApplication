@@ -38,7 +38,10 @@ class ProfileViewModel(
     override fun dispatchAction(action: Action): LiveData<Result> = liveData {
         when (action) {
             Action.Logout -> {
-                runCatching { googleSignInClient.signOut().await() }
+                runCatching {
+                    googleSignInClient.revokeAccess().await()
+                    googleSignInClient.signOut().await()
+                }
                 emit(
                     Result.UpdateAccount(GoogleSignIn.getLastSignedInAccount(applicationContext))
                 )
@@ -83,7 +86,10 @@ class ProfileViewModel(
                 account = result.account,
                 error = null
             )
-            is Result.LoginError -> internalViewState.copy(result.account, result.error)
+            is Result.LoginError -> internalViewState.copy(
+                account = result.account,
+                error = result.error
+            )
         }
     }
 

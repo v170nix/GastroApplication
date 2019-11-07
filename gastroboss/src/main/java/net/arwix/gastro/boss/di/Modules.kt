@@ -7,9 +7,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.Scope
 import com.google.gson.GsonBuilder
 import net.arwix.gastro.boss.R
-import net.arwix.gastro.boss.data.GoogleCloudPrintApi
 import net.arwix.gastro.boss.data.auth.AccessTokenProvider
 import net.arwix.gastro.boss.data.auth.GoogleAuth2Api
+import net.arwix.gastro.boss.data.printer.GoogleCloudPrintApi
+import net.arwix.gastro.boss.data.printer.PrinterRepository
 import net.arwix.gastro.boss.ui.ProfileViewModel
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
@@ -75,6 +76,10 @@ val mainModule = module {
             get(),
             get()
         )
+    }
+
+    single {
+        PrinterRepository(get(), get())
     }
 
     viewModel {

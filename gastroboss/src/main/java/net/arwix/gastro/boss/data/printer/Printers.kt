@@ -1,4 +1,4 @@
-package net.arwix.gastro.boss.data
+package net.arwix.gastro.boss.data.printer
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName

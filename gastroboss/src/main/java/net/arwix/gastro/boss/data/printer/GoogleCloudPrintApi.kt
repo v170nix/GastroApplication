@@ -1,5 +1,6 @@
-package net.arwix.gastro.boss.data
+package net.arwix.gastro.boss.data.printer
 
+import net.arwix.gastro.boss.data.Me
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*

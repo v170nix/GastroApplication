@@ -22,9 +22,9 @@ import kotlinx.coroutines.launch
 import mjson.Json
 import net.arwix.extension.weak
 import net.arwix.gastro.boss.R
-import net.arwix.gastro.boss.data.GoogleCloudPrintApi
 import net.arwix.gastro.boss.data.auth.AccessTokenProvider
 import net.arwix.gastro.boss.data.auth.CloudPrintInterceptor
+import net.arwix.gastro.boss.data.printer.GoogleCloudPrintApi
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -157,12 +157,13 @@ class SignInBossFragment : Fragment(), CoroutineScope by MainScope() {
     }
 
     private suspend fun getPrs() {
-        val token = accessTokenProvider.getAccessToken()
-        if (token == null) {
+        val token = accessTokenProvider.getOrUpdateAccessToken()
+        if (token is AccessTokenProvider.AccessTokenResult.Error) {
             signIn()
         } else {
+            token as AccessTokenProvider.AccessTokenResult.Token
             runCatching {
-                googlePrintApi.getPrinters("Bearer $token")
+                googlePrintApi.getPrinters("Bearer ${token.value}")
             }.onSuccess {
                 Log.e("prs sus", "1")
                 val printer = it.printers?.firstOrNull() ?: return
