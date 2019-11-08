@@ -51,6 +51,7 @@ class PrintersFragment : Fragment() {
         )
         printers_submit_selected_button.setOnClickListener {
             printersViewModel.submit(adapter.getSelectedItems())
+            findNavController(this).navigateUp()
         }
     }
 

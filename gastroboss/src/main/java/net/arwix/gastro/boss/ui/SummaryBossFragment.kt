@@ -1,6 +1,7 @@
 package net.arwix.gastro.boss.ui
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -51,6 +52,16 @@ class SummaryBossFragment : Fragment(), CoroutineScope by MainScope() {
         main_select_printer_button.setOnClickListener {
             findNavController(this).navigate(R.id.printersFragment)
         }
+
+
+
+        main_start_service.setOnClickListener {
+            requireActivity().startService(Intent(context, FirestoreService::class.java))
+        }
+
+        main_stop_service.setOnClickListener {
+            requireActivity().stopService(Intent(context, FirestoreService::class.java))
+        }
 //        launch {
 //            printerRepository.getOrUpdatePrinters()?.printers?.forEach {
 //                Log.e("printer", it.toString())
@@ -67,4 +78,5 @@ class SummaryBossFragment : Fragment(), CoroutineScope by MainScope() {
             ProfileHelper.updateProfileInfo(this.view!!, state.account)
         }
     }
+
 }

@@ -9,9 +9,7 @@ import android.os.IBinder
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.util.Log
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.CollectionReference
@@ -99,20 +97,20 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
     private var mWebView: WebView? = null
 
     private fun doPrint() {
-        val webView = WebView(this)
-        webView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?) = false
-
-            override fun onPageFinished(view: WebView, url: String?) {
-                Log.e("onPageFinished", "page finished loading $url")
-                super.onPageFinished(view, url)
-                createWebPrintJob(view)
-                mWebView = null
-            }
-        }
-        val htmlDocument =  "<html><body><h1>Test Content</h1><p>Testing, testing, testing...</p></body></html>"
-        webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null)
-        mWebView = webView
+//        val webView = WebView(this)
+//        webView.webViewClient = object : WebViewClient() {
+//            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?) = false
+//
+//            override fun onPageFinished(view: WebView, url: String?) {
+//                Log.e("onPageFinished", "page finished loading $url")
+//                super.onPageFinished(view, url)
+//                createWebPrintJob(view)
+//                mWebView = null
+//            }
+//        }
+//        val htmlDocument =  "<html><body><h1>Test Content</h1><p>Testing, testing, testing...</p></body></html>"
+//        webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null)
+//        mWebView = webView
 
     }
 
