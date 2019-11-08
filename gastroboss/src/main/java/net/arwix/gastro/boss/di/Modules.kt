@@ -12,6 +12,7 @@ import net.arwix.gastro.boss.data.auth.GoogleAuth2Api
 import net.arwix.gastro.boss.data.printer.GoogleCloudPrintApi
 import net.arwix.gastro.boss.data.printer.PrinterRepository
 import net.arwix.gastro.boss.ui.ProfileViewModel
+import net.arwix.gastro.boss.ui.printers.PrintersViewModel
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -82,7 +83,6 @@ val mainModule = module {
         PrinterRepository(get(), get(), get())
     }
 
-    viewModel {
-        ProfileViewModel(androidContext(), get(), get())
-    }
+    viewModel { ProfileViewModel(androidContext(), get(), get()) }
+    viewModel { PrintersViewModel(get()) }
 }

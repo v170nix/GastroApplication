@@ -18,5 +18,14 @@
         android:id="@+id/summaryBossFragment"
         android:name="net.arwix.gastro.boss.ui.SummaryBossFragment"
         android:label="fragment_summary_boss"
-        tools:layout="@layout/fragment_summary_boss" />
+        tools:layout="@layout/fragment_summary_boss">
+        <action
+            android:id="@+id/action_summaryBossFragment_to_printersFragment"
+            app:destination="@id/printersFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/printersFragment"
+        android:name="net.arwix.gastro.boss.ui.printers.PrintersFragment"
+        android:label="fragment_printer_list"
+        tools:layout="@layout/fragment_printer_list" />
 </navigation>
