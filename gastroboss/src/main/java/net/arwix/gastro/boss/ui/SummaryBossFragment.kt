@@ -10,11 +10,14 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment.findNavController
 import kotlinx.android.synthetic.main.merge_profile_data.*
+import kotlinx.android.synthetic.main.merge_toolbar.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import net.arwix.gastro.boss.R
+import net.arwix.gastro.boss.common.setupToolbar
 import net.arwix.gastro.boss.data.printer.PrinterRepository
 import net.arwix.gastro.boss.ui.helper.ProfileHelper
 import org.koin.android.ext.android.inject
@@ -47,6 +50,7 @@ class SummaryBossFragment : Fragment(), CoroutineScope by MainScope() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        main_toolbar.setupToolbar(findNavController(this), showHome = false, homeAsUp = false)
         profile_logout_button.setOnClickListener {
             profileViewModel.nonCancelableIntent(ProfileViewModel.Action.Logout)
         }

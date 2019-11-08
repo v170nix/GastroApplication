@@ -27,4 +27,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_toolbar_layout" />
 
+    <Button
+        android:id="@+id/main_select_printer_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:text="Select Printers"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_profile" />
+
+    <Button
+        android:id="@+id/main_change_service"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start print service"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_select_printer_button" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

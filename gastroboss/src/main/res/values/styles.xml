@@ -6,6 +6,26 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorSecondary">@color/colorAccent</item>
+        <item name="actionBarStyle">@style/ToolbarStyle</item>
+        <item name="toolbarStyle">@style/ToolbarStyle</item>
+        <item name="actionOverflowButtonStyle">@style/ToolbarStyle.Overflow</item>
+        <item name="toolbarNavigationButtonStyle">@style/Toolbar.Button.Navigation.Tinted</item>
+    </style>
+
+    <style name="ToolbarStyle" parent="@style/Widget.MaterialComponents.Toolbar">
+        <!-- Makes the toolbar text whatever color you want for both light/dark-->
+        <!--        <item name="titleTextColor">#FF00FF</item>-->
+        <!--        <item name="android:background">?attr/colorPrimary</item>-->
+    </style>
+
+    <style name="ToolbarStyle.Overflow" parent="Widget.AppCompat.ActionButton.Overflow">
+        <!-- For toolbar menu -->
+        <!--        <item name="android:tint">#FF00FF</item>-->
+    </style>
+
+    <style name="Toolbar.Button.Navigation.Tinted" parent="Widget.AppCompat.Toolbar.Button.Navigation">
+        <!-- For the hamburger menu, back button, etc -->
+        <!--        <item name="tint">#FF00FF</item>-->
     </style>
 
 </resources>

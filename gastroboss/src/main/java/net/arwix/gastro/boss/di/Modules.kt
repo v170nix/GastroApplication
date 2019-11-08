@@ -79,7 +79,7 @@ val mainModule = module {
     }
 
     single {
-        PrinterRepository(get(), get())
+        PrinterRepository(get(), get(), get())
     }
 
     viewModel {
