@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/signInBossFragment"
         android:name="net.arwix.gastro.boss.ui.SignInBossFragment"
-        android:label="fragment_main_boss"
+        android:label="Sign in"
         tools:layout="@layout/fragment_sign_in_boss" >
         <action
             android:id="@+id/action_signInBossFragment_to_summaryBossFragment"
@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/summaryBossFragment"
         android:name="net.arwix.gastro.boss.ui.SummaryBossFragment"
-        android:label="fragment_summary_boss"
+        android:label="Overall"
         tools:layout="@layout/fragment_summary_boss">
         <action
             android:id="@+id/action_summaryBossFragment_to_printersFragment"
@@ -26,6 +26,6 @@
     <fragment
         android:id="@+id/printersFragment"
         android:name="net.arwix.gastro.boss.ui.printers.PrintersFragment"
-        android:label="fragment_printer_list"
+        android:label="Printer list"
         tools:layout="@layout/fragment_printer_list" />
 </navigation>
