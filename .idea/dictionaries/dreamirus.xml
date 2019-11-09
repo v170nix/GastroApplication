@@ -3,6 +3,7 @@
     <words>
       <w>firebase</w>
       <w>firestore</w>
+      <w>xsrf</w>
     </words>
   </dictionary>
 </component>

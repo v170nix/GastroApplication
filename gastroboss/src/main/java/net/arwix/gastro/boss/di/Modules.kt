@@ -11,6 +11,7 @@ import net.arwix.gastro.boss.data.auth.AccessTokenProvider
 import net.arwix.gastro.boss.data.auth.GoogleAuth2Api
 import net.arwix.gastro.boss.data.printer.GoogleCloudPrintApi
 import net.arwix.gastro.boss.data.printer.PrinterRepository
+import net.arwix.gastro.boss.domain.PrintJobUseCase
 import net.arwix.gastro.boss.ui.ProfileViewModel
 import net.arwix.gastro.boss.ui.printers.PrintersViewModel
 import okhttp3.OkHttpClient
@@ -81,6 +82,10 @@ val mainModule = module {
 
     single {
         PrinterRepository(get(), get(), get())
+    }
+
+    single {
+        PrintJobUseCase(get(), get(), get())
     }
 
     viewModel { ProfileViewModel(androidContext(), get(), get()) }

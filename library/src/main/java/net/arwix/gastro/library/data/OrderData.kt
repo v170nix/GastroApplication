@@ -4,10 +4,12 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
 
 
-data class OrderData(
-    val waiterId: Int? = null,
-    val table: Int? = null,
-    val orderItems: List<OrderItem>? = null,
+data class OrderData constructor(
+    var waiterId: Int? = null,
+    var table: Int? = null,
+    var orderItems: List<OrderItem>? = null,
     @ServerTimestamp
-    val timestampCreated: Timestamp? = null
-)
+    var timestampCreated: Timestamp? = null
+) {
+    constructor() : this(null, null, null, null)
+}

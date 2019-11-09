@@ -1,5 +1,6 @@
 package net.arwix.gastro.library
 
+import android.util.Log
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.CancellationException
@@ -23,6 +24,7 @@ fun CollectionReference.snapshotFlow() = callbackFlow<QuerySnapshot> {
 //        }
         awaitClose {
             cancel()
+            Log.e("snapshotFlow", "cancel")
             registration.remove()
         }
     }

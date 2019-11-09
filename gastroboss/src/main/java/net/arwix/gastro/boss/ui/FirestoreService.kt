@@ -6,16 +6,18 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
+import android.print.PdfPrint
 import android.print.PrintAttributes
-import android.print.PrintManager
+import android.print.PrintDocumentAdapter
 import android.util.Log
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.squareup.okhttp.OkHttpClient
-import com.squareup.okhttp.Request
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -24,19 +26,28 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.arwix.gastro.boss.MainBossActivity
 import net.arwix.gastro.boss.R
+import net.arwix.gastro.boss.domain.PrintJobUseCase
+import net.arwix.gastro.library.data.OrderData
 import net.arwix.gastro.library.snapshotFlow
-import org.json.JSONObject
+import org.koin.android.ext.android.inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
+
 
 class FirestoreService : Service(), CoroutineScope by MainScope() {
 
+    private val printJobUseCase: PrintJobUseCase by inject()
+
     override fun onCreate() {
         super.onCreate()
+        printJobUseCase.attachScope(this)
         val channelId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel("firestore_service", "Firestore Service")
         } else {
             ""
         }
-        val notification =  NotificationCompat.Builder(this, channelId)
+        val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_print)
             .setTicker("ticker text")
             .build()
@@ -65,7 +76,7 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        cancel()
+//        cancel()
         Log.e("Test", "Service: onTaskRemoved")
     }
 
@@ -79,14 +90,16 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
             }
             .collect {
                 Log.e("docs", it.documents.toString())
-                doPrint()
+                doPrint(it.documents.first())
             }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createNotificationChannel(channelId: String, channelName: String): String{
-        val chan = NotificationChannel(channelId,
-            channelName, NotificationManager.IMPORTANCE_NONE)
+    private fun createNotificationChannel(channelId: String, channelName: String): String {
+        val chan = NotificationChannel(
+            channelId,
+            channelName, NotificationManager.IMPORTANCE_NONE
+        )
         chan.lightColor = Color.BLUE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -94,50 +107,113 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
         return channelId
     }
 
-    private var mWebView: WebView? = null
-
-    private fun doPrint() {
-//        val webView = WebView(this)
-//        webView.webViewClient = object : WebViewClient() {
-//            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?) = false
-//
-//            override fun onPageFinished(view: WebView, url: String?) {
-//                Log.e("onPageFinished", "page finished loading $url")
-//                super.onPageFinished(view, url)
-//                createWebPrintJob(view)
-//                mWebView = null
-//            }
-//        }
-//        val htmlDocument =  "<html><body><h1>Test Content</h1><p>Testing, testing, testing...</p></body></html>"
-//        webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null)
-//        mWebView = webView
-
+    private fun doPrint(document: DocumentSnapshot) {
+        val orderData = document.toObject(OrderData::class.java)
+        Log.e("order data", orderData.toString())
+        orderData ?: return
+//        val pdf = PdfDocument()
+//        val a4Width = (210 / 25.4 * 72).toInt()
+//        val a4Height = (297 / 25.4 * 72).toInt()
+//        val page = pdf.startPage(PdfDocument.PageInfo.Builder(a4Width, a4Height, 1).create())
+//        val canvas = page.canvas
+//        canvas.drawText("раз два три", a4Width / 2f, a4Height / 2f, Paint().apply {
+//            textSize = a4Width / 10f
+//            color = Color.BLACK
+//        })
+//        pdf.finishPage(page)
+        launch {
+            //            printJobUseCase.print(pdf)
+            val adapter = createDoc(document.id, orderData)
+            val path = createFile(adapter)
+            printJobUseCase.print(path)
+        }
     }
 
-    private fun createWebPrintJob(webView: WebView) {
-        (getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            val jobName = "Doc"
-            val printAdapter = webView.createPrintDocumentAdapter(jobName)
-           val printJob = printManager.print(
-                jobName,
-                printAdapter,
-                PrintAttributes.Builder().build()
+    private suspend fun createFile(adapter: PrintDocumentAdapter) =
+        suspendCoroutine<String> { cont ->
+            PdfPrint(
+                PrintAttributes
+                    .Builder()
+                    .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                    .setResolution(PrintAttributes.Resolution("pdf", "pdf", 600, 600))
+                    .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                    .build()
+            ).print(adapter,
+                this@FirestoreService.cacheDir, "test.pdf", object : PdfPrint.CallbackPrint {
+                    override fun success(path: String) {
+                        Log.e("success", "create file $path")
+                        cont.resume(path)
+                    }
+
+                    override fun onFailure(errorMsg: String) {
+                        Log.e("error", "create file")
+                        cont.resumeWithException(Error(errorMsg))
+                    }
+                }
             )
         }
-    }
 
-    private fun getPrinters(token: String) {
-        val req = Request.Builder()
-            .url("https://www.google.com/cloudprint/search")
-            .get()
-            .addHeader("Authorization", "Bearer $token")
-            .build()
-        val client = OkHttpClient()
-        launch {
-            val response = client.newCall(req).execute()
-            val json = JSONObject(response.body().string())
-            Log.e("result", json.toString(5))
+    private suspend fun createDoc(documentName: String, orderData: OrderData) =
+        suspendCoroutine<PrintDocumentAdapter> { cont ->
+            val webView = WebView(this)
+            webView.clearCache(true)
+            webView.webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(
+                    view: WebView?,
+                    request: WebResourceRequest?
+                ) =
+                    false
+
+                override fun onPageFinished(view: WebView, url: String?) {
+                    val printAdapter = view.createPrintDocumentAdapter(documentName)
+                    cont.resume(printAdapter)
+                }
+            }
+            val items = orderData.orderItems!!.joinToString("") {
+                "<tr><td width=\"50%\">${it.name}</td><td>${it.count}</td><td>${it.price / 100.0}</td></tr>"
+            }
+
+            val htmlDocument =
+                "<html><body><h3>table №${orderData.table}</h3>" +
+                        "<table width=\"100%\">" +
+                        "<tr><td width=\"50%\">item</td><td>count</td><td>price</td></tr>" +
+                        "$items</table>" +
+                        "<p style=\"font-size:0.8em\" align=\"right\">${orderData.timestampCreated!!.toDate()}<br>" +
+                        "order - $documentName</p>" +
+                        "</body></html>"
+            webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null)
         }
 
+    private suspend fun toDoc(printAdapter: PrintDocumentAdapter) =
+        suspendCoroutine<String> { cont ->
+            val printAttributes = PrintAttributes.Builder().build()
+            PdfPrint(printAttributes).print(
+                printAdapter,
+                this.cacheDir, "test.pdf", object : PdfPrint.CallbackPrint {
+                    override fun success(path: String) {
+                        cont.resume(path)
+                    }
+
+                    override fun onFailure(errorMsg: String) {
+                        cont.resumeWithException(Error(errorMsg))
+                    }
+
+                }
+            )
+
+        }
+
+
+    private fun createWebPrintJob(webView: WebView) {
+//        (getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
+//            val jobName = "Doc"
+//            val printAdapter = webView.createPrintDocumentAdapter(jobName)
+//           val printJob = printManager.print(
+//                jobName,
+//                printAdapter,
+//                PrintAttributes.Builder().build()
+//            )
+//        }
     }
+
 }

@@ -318,7 +318,7 @@ class SignInBossFragment : Fragment(), CoroutineScope by MainScope() {
 //                b,
 //                "application/pdf"
 //                )
-
+//
 //            api1.submitPrintJob("Bearer $token",
 ////                r.xsrfToken!!,
 //                "printer.id!!",
