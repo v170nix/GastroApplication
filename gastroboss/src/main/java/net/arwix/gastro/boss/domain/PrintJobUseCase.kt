@@ -39,7 +39,7 @@ class PrintJobUseCase(
         }
     }
 
-    suspend fun print(path: String) {
+    suspend fun print(path: String, title: String) {
         try {
             Log.e("context", "-1")
             val file = File(path)
@@ -58,7 +58,7 @@ class PrintJobUseCase(
             Log.e("context", "4")
             if (result is AccessTokenProvider.AccessTokenResult.Token) {
                 Log.e("context", "5")
-                print(printer, result.value.accessToken!!, "title", base64Context)
+                print(printer, result.value.accessToken!!, title, base64Context)
                 Log.e("context", "6")
             }
         } catch (e: Exception) {

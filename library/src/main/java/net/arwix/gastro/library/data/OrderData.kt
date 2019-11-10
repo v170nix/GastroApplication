@@ -8,8 +8,8 @@ data class OrderData constructor(
     var waiterId: Int? = null,
     var table: Int? = null,
     var orderItems: List<OrderItem>? = null,
-    @ServerTimestamp
-    var timestampCreated: Timestamp? = null
+    @ServerTimestamp var timestampCreated: Timestamp? = null,
+    @field:JvmField var isPrinted: Boolean = false
 ) {
-    constructor() : this(null, null, null, null)
+    constructor() : this(null, null, null, null, false)
 }

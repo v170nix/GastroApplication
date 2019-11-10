@@ -15,9 +15,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -27,8 +27,9 @@ import kotlinx.coroutines.launch
 import net.arwix.gastro.boss.MainBossActivity
 import net.arwix.gastro.boss.R
 import net.arwix.gastro.boss.domain.PrintJobUseCase
+import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.OrderData
-import net.arwix.gastro.library.snapshotFlow
+import net.arwix.gastro.library.toFlow
 import org.koin.android.ext.android.inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -82,15 +83,28 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
 
     private suspend fun pending() {
         val db: FirebaseFirestore = FirebaseFirestore.getInstance()
-        val orders: CollectionReference = db.collection("orders")
-        orders
-            .snapshotFlow()
+        val orders = db.collection("orders")
+        val printedOrders = db.collection("printed")
+        val query = orders
+            .orderBy("timestampCreated", Query.Direction.DESCENDING)
+
+        query
+            .toFlow()
             .catch { e ->
                 Log.e("catch", e.toString())
             }
             .collect {
                 Log.e("docs", it.documents.toString())
-                doPrint(it.documents.first())
+                it.documents.forEach { doc ->
+                    val orderData = doc.toObject(OrderData::class.java)!!
+                    Log.e("for each", orderData.toString())
+                    val isPrinted = printedOrders.document(doc.id).get().await()?.exists() ?: false
+                    if (!isPrinted) {
+                        Log.e("for each", "print")
+                        doPrint(doc)
+                        printedOrders.document(doc.id).set(orderData).await()
+                    }
+                }
             }
     }
 
@@ -125,7 +139,7 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
             //            printJobUseCase.print(pdf)
             val adapter = createDoc(document.id, orderData)
             val path = createFile(adapter)
-            printJobUseCase.print(path)
+            printJobUseCase.print(path, document.id)
         }
     }
 
