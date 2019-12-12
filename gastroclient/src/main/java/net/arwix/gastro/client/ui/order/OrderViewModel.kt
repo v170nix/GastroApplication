@@ -30,6 +30,7 @@ class OrderViewModel: SimpleIntentViewModel<OrderViewModel.Action, OrderViewMode
                     val orderData = OrderData(6969, internalViewState.table, internalViewState.orderItems)
                     orders.document().set(orderData).await()
                 }
+                emit(Result.SubmitOrder)
             }
         }
     }
@@ -45,9 +46,16 @@ class OrderViewModel: SimpleIntentViewModel<OrderViewModel.Action, OrderViewMode
     override fun reduce(result: Result): State {
         return when (result) {
             is Result.TableSelect -> internalViewState.copy(table = result.table)
-            Result.Clear -> internalViewState.copy(table = null, orderItems = mutableListOf())
+            Result.Clear -> internalViewState.copy(
+                table = null,
+                orderItems = mutableListOf(),
+                isSubmit = false
+            )
             is Result.AddItem -> {
                 internalViewState.copy(orderItems =  internalViewState.orderItems.apply { add(result.item) })
+            }
+            is Result.SubmitOrder -> {
+                internalViewState.copy(isSubmit = true)
             }
         }
     }
@@ -60,12 +68,14 @@ class OrderViewModel: SimpleIntentViewModel<OrderViewModel.Action, OrderViewMode
         object Clear: Result()
         data class TableSelect(val table: Int): Result()
         data class AddItem(val item: OrderItem): Result()
+        object SubmitOrder : Result()
     }
 
 
     data class State(
         val table: Int? = null,
-        val orderItems: MutableList<OrderItem> = mutableListOf()
+        val orderItems: MutableList<OrderItem> = mutableListOf(),
+        val isSubmit: Boolean = false
     )
 
 }

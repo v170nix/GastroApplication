@@ -55,7 +55,13 @@ class OrderListFragment : Fragment() {
     }
 
     private fun render(state: OrderViewModel.State) {
-        adapter.setItems(state.orderItems)
+        if (state.isSubmit) {
+            orderViewModel.clear()
+            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+                .popBackStack(R.id.mainClientFragment, true)
+        } else {
+            adapter.setItems(state.orderItems)
+        }
     }
 
     private class ListAdapter: RecyclerView.Adapter<ListAdapter.ListItemHolder>() {

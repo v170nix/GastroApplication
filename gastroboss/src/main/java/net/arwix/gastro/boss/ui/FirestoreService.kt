@@ -31,6 +31,8 @@ import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.OrderData
 import net.arwix.gastro.library.toFlow
 import org.koin.android.ext.android.inject
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -148,8 +150,8 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
             PdfPrint(
                 PrintAttributes
                     .Builder()
-                    .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
-                    .setResolution(PrintAttributes.Resolution("pdf", "pdf", 600, 600))
+                    .setMediaSize(PrintAttributes.MediaSize.ISO_C8)
+                    .setResolution(PrintAttributes.Resolution("pdf", "pdf", 203, 203))
                     .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
                     .build()
             ).print(adapter,
@@ -184,15 +186,22 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
                 }
             }
             val items = orderData.orderItems!!.joinToString("") {
-                "<tr><td width=\"50%\">${it.name}</td><td>${it.count}</td><td>${it.price / 100.0}</td></tr>"
+                "<tr><td width=\"100%\" style=\"font-size: 10px\">${it.count}x ${it.name}</td><td style=\"font-size: 10px\">${it.price / 100.0}</td></tr>"
             }
 
+//            val cal = Calendar.getInstance().apply {
+//                this.timeInMillis = orderData.timestampCreated!!.seconds * 1000L
+//            }
+            val dateFormat = SimpleDateFormat("MM.dd hh:mm:ss", Locale.getDefault())
+
             val htmlDocument =
-                "<html><body><h3>table №${orderData.table}</h3>" +
+                "<html><head><style>" +
+                        "h3 {font-size: 12px;};" +
+                        "</style></head>" +
+                        "<body><h3>table №${orderData.table}</br>${dateFormat.format(orderData.timestampCreated!!.toDate())}</h3>" +
                         "<table width=\"100%\">" +
-                        "<tr><td width=\"50%\">item</td><td>count</td><td>price</td></tr>" +
                         "$items</table>" +
-                        "<p style=\"font-size:0.8em\" align=\"right\">${orderData.timestampCreated!!.toDate()}<br>" +
+                        "<p style=\"font-size:5px\" align=\"right\">" +
                         "order - $documentName</p>" +
                         "</body></html>"
             webView.loadDataWithBaseURL(null, htmlDocument, "text/HTML", "UTF-8", null)
