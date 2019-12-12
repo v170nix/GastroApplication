@@ -59,6 +59,9 @@ class SignInBossFragment : Fragment(), CoroutineScope by MainScope(), ReceiveLis
         test_epson_printer.setOnClickListener {
             testClick()
         }
+        button_discovery_printer.setOnClickListener {
+            findNavController(this).navigate(R.id.discoveryFragment)
+        }
     }
 
     override fun onStart() {
@@ -154,8 +157,7 @@ class SignInBossFragment : Fragment(), CoroutineScope by MainScope(), ReceiveLis
         val prt = printer ?: return false
         try {
             val tcp = editText_tcp.text.toString().trim()
-            val port = editText_port.text.toString().trim()
-            prt.connect("TCP:$tcp:$port", Printer.PARAM_DEFAULT)
+            prt.connect(tcp, Printer.PARAM_DEFAULT)
         } catch (e: Exception) {
             ShowMsg.showException(e, "connect", requireContext())
             Crashlytics.logException(e)

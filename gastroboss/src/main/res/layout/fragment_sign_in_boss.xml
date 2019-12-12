@@ -29,25 +29,22 @@
 
     <EditText
         android:id="@+id/editText_tcp"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="192.168.0.101"
-        app:layout_constraintBottom_toTopOf="@+id/editText_port"
+        android:text="TCP:192.168.0.101:9100"
+        app:layout_constraintBottom_toTopOf="@+id/test_epson_printer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <EditText
-        android:id="@+id/editText_port"
+    <Button
+        android:id="@+id/button_discovery_printer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:ems="10"
-        android:inputType="number"
-        android:text="9100"
-        app:layout_constraintBottom_toTopOf="@+id/test_epson_printer"
+        android:text="discovery printers"
+        app:layout_constraintBottom_toTopOf="@+id/editText_tcp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

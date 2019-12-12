@@ -33,7 +33,7 @@ class MainBossActivity : AppCompatActivity() {
         val permissionStorage =
             ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         val permissionLocation =
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
 
         val requestPermissions: MutableList<String> = ArrayList()
 
@@ -41,7 +41,7 @@ class MainBossActivity : AppCompatActivity() {
             requestPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
         if (permissionLocation == PackageManager.PERMISSION_DENIED) {
-            requestPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            requestPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
         }
 
         if (requestPermissions.isNotEmpty()) {

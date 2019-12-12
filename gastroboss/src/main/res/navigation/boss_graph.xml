@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_signInBossFragment_to_summaryBossFragment"
             app:destination="@id/summaryBossFragment" />
+        <action
+            android:id="@+id/action_signInBossFragment_to_discoveryFragment"
+            app:destination="@id/discoveryFragment" />
     </fragment>
     <fragment
         android:id="@+id/summaryBossFragment"
@@ -28,4 +31,9 @@
         android:name="net.arwix.gastro.boss.ui.printers.PrintersFragment"
         android:label="Printer list"
         tools:layout="@layout/fragment_printer_list" />
+    <fragment
+        android:id="@+id/discoveryFragment"
+        android:name="net.arwix.gastro.boss.ui.DiscoveryFragment"
+        android:label="fragment_discovery"
+        tools:layout="@layout/fragment_discovery" />
 </navigation>
