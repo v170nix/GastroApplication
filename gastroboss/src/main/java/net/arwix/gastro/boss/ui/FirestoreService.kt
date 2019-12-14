@@ -41,6 +41,7 @@ import kotlin.coroutines.suspendCoroutine
 class FirestoreService : Service(), CoroutineScope by MainScope() {
 
     private val printJobUseCase: PrintJobUseCase by inject()
+    private var counter = 0
 
     override fun onCreate() {
         super.onCreate()
@@ -86,8 +87,8 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
     private suspend fun pending() {
         val db: FirebaseFirestore = FirebaseFirestore.getInstance()
         val orders = db.collection("orders")
-        val printedOrders = db.collection("printed")
         val query = orders
+            .whereEqualTo("isPrinted", false)
             .orderBy("timestampCreated", Query.Direction.DESCENDING)
 
         query
@@ -97,15 +98,13 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
             }
             .collect {
                 Log.e("docs", it.documents.toString())
-                it.documents.forEach { doc ->
+                it.documents.lastOrNull()?.let { doc ->
                     val orderData = doc.toObject(OrderData::class.java)!!
                     Log.e("for each", orderData.toString())
-                    val isPrinted = printedOrders.document(doc.id).get().await()?.exists() ?: false
-                    if (!isPrinted) {
-                        Log.e("for each", "print")
-                        doPrint(doc)
-                        printedOrders.document(doc.id).set(orderData).await()
-                    }
+                    orders.document(doc.id).update("isPrinted", true).await()
+                    Log.e("for each", "isPrinted = true")
+                    //        orderData.isPrinted = true
+
                 }
             }
     }

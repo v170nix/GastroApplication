@@ -203,10 +203,10 @@ class SignInBossFragment : Fragment(), CoroutineScope by MainScope(), ReceiveLis
     }
 
     override fun onPtrReceive(
-        printerObj: Printer,
+        printerObj: Printer?,
         code: Int,
         status: PrinterStatusInfo?,
-        printJobId: String
+        printJobId: String?
     ) {
         requireActivity().runOnUiThread {
             ShowMsg.showResult(code, "onPtrReceive", requireContext())
