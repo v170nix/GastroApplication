@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_graph"
-    app:startDestination="@id/mainClientFragment">
+    app:startDestination="@id/signInFragment">
 
     <fragment
         android:id="@+id/mainClientFragment"
@@ -33,4 +33,9 @@
         android:name="net.arwix.gastro.client.ui.order.OrderListAddItemFragment"
         android:label="fragment_order_list_add"
         tools:layout="@layout/fragment_order_list_add_item" /><action android:id="@+id/action_global_orderListAddItemFragment" app:destination="@id/orderListAddItemFragment"/>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="net.arwix.gastro.client.ui.profile.SignInFragment"
+        android:label="fragment_sign_in"
+        tools:layout="@layout/fragment_sign_in" />
 </navigation>
