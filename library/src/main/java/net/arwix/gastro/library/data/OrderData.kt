@@ -7,8 +7,8 @@ import com.google.firebase.firestore.ServerTimestamp
 data class OrderData constructor(
     var waiterId: Int? = null,
     var table: Int? = null,
-    var orderItems: List<OrderItem>? = null,
-    @ServerTimestamp var timestampCreated: Timestamp? = null,
+    var orderItems: Map<String, List<OrderItem>>? = null,
+    @ServerTimestamp var created: Timestamp? = null,
     @field:JvmField var isPrinted: Boolean = false
 ) {
     constructor() : this(null, null, null, null, false)

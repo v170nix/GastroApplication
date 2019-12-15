@@ -197,7 +197,7 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
                 "<html><head><style>" +
                         "h3 {font-size: 12px;};" +
                         "</style></head>" +
-                        "<body><h3>table №${orderData.table}</br>${dateFormat.format(orderData.timestampCreated!!.toDate())}</h3>" +
+                        "<body><h3>table №${orderData.table}</br>${dateFormat.format(orderData.created!!.toDate())}</h3>" +
                         "<table width=\"100%\">" +
                         "$items</table>" +
                         "<p style=\"font-size:5px\" align=\"right\">" +

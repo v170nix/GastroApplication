@@ -33,7 +33,7 @@ class OrderListAddItemFragment : Fragment() {
             val priceString = order_list_add_item_price_layout.editText?.editableText?.toString() ?: return@setOnClickListener
             val priceDouble = priceString.toDoubleOrNull() ?: return@setOnClickListener
             val item = OrderItem(name, (priceDouble * 100).toLong(), 1)
-            orderViewModel.nonCancelableIntent(OrderViewModel.Action.AddItem(item))
+            //   orderViewModel.nonCancelableIntent(OrderViewModel.Action.AddItem(item))
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigateUp()
         }
 

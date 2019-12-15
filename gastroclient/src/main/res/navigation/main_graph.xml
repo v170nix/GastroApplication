@@ -37,5 +37,9 @@
         android:id="@+id/signInFragment"
         android:name="net.arwix.gastro.client.ui.profile.SignInFragment"
         android:label="fragment_sign_in"
-        tools:layout="@layout/fragment_sign_in" />
+        tools:layout="@layout/fragment_sign_in">
+        <action
+            android:id="@+id/action_signInFragment_to_mainClientFragment"
+            app:destination="@id/mainClientFragment" />
+    </fragment>
 </navigation>
