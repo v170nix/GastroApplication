@@ -6,10 +6,10 @@
     app:startDestination="@id/signInFragment">
 
     <fragment
-        android:id="@+id/mainClientFragment"
-        android:name="net.arwix.gastro.client.ui.MainClientFragment"
-        android:label="fragment_main_client"
-        tools:layout="@layout/fragment_main_client" >
+        android:id="@+id/openTablesFragment"
+        android:name="net.arwix.gastro.client.ui.table.OpenTablesFragment"
+        android:label="Open tables list"
+        tools:layout="@layout/fragment_open_tables">
         <action
             android:id="@+id/action_mainClientFragment_to_chooseFragment"
             app:destination="@id/orderTableFragment" />
@@ -27,19 +27,23 @@
         android:id="@+id/orderListFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderListFragment"
         android:label="order list"
-        tools:layout="@layout/fragment_order_list" />
+        tools:layout="@layout/fragment_order_list">
+        <action
+            android:id="@+id/action_orderListFragment_to_orderListAddItemFragment"
+            app:destination="@id/orderListAddItemFragment" />
+    </fragment>
     <fragment
         android:id="@+id/orderListAddItemFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderListAddItemFragment"
         android:label="fragment_order_list_add"
-        tools:layout="@layout/fragment_order_list_add_item" /><action android:id="@+id/action_global_orderListAddItemFragment" app:destination="@id/orderListAddItemFragment"/>
+        tools:layout="@layout/fragment_order_list_add_item" />
     <fragment
         android:id="@+id/signInFragment"
         android:name="net.arwix.gastro.client.ui.profile.SignInFragment"
-        android:label="fragment_sign_in"
+        android:label="Sign in"
         tools:layout="@layout/fragment_sign_in">
         <action
-            android:id="@+id/action_signInFragment_to_mainClientFragment"
-            app:destination="@id/mainClientFragment" />
+            android:id="@+id/action_signInFragment_to_openTablesFragment"
+            app:destination="@id/openTablesFragment" />
     </fragment>
 </navigation>

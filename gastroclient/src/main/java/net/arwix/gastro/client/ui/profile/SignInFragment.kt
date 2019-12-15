@@ -30,7 +30,7 @@ class SignInFragment : Fragment() {
         signin_button.setOnClickListener {
             profileViewModel.intent(
                 ProfileViewModel.Action.Login(
-                    password_text_edit.editableText.toString().toInt()
+                    password_text_edit.editableText.toString().toIntOrNull() ?: -1
                 )
             )
         }
@@ -38,7 +38,7 @@ class SignInFragment : Fragment() {
 
     private fun renderProfile(state: ProfileViewModel.State) {
         if (state.isLogin) {
-            findNavController(this).navigate(R.id.mainClientFragment)
+            findNavController(this).navigate(R.id.openTablesFragment)
         }
         if (state.error != null) {
             password_input_layout.error = null

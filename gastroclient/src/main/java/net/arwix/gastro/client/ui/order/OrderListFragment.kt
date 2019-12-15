@@ -80,7 +80,7 @@ class OrderListFragment : Fragment() {
         if (state.isSubmit) {
             orderViewModel.clear()
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                .popBackStack(R.id.mainClientFragment, true)
+                .popBackStack(R.id.openTablesFragment, true)
         } else {
             adapterOrder.setItems(state.orderParts[0].orderItems)
             state.orderParts[0].table?.run {

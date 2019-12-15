@@ -56,9 +56,20 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
                             internalViewState.orderParts[0].table!!,
                             internalViewState.orderParts[0].orderItems.filter {
                                 it.value.isNotEmpty()
+                            }.let { filterMap ->
+                                mutableMapOf<String, List<OrderItem>>().apply {
+                                    filterMap.forEach { (key, list) ->
+                                        val filterList = list.filter { it.count > 0 }
+                                        if (filterList.isNotEmpty()) {
+                                            this[key] = filterList
+                                        }
+                                    }
+                                }
                             }
                         )
-                    orders.document().set(orderData).await()
+                    if (!orderData.orderItems.isNullOrEmpty()) {
+                        orders.document().set(orderData).await()
+                    }
                 }
                 emit(Result.SubmitOrder)
             }
