@@ -11,7 +11,7 @@ suspend fun <T> Task<T>.await(): T? {
         val e = exception
         return if (e == null) {
             if (isCanceled)
-                throw CancellationException("Task $this was canelled normally")
+                throw CancellationException("Task $this was cancelled normally")
             else result
         } else throw e
     }

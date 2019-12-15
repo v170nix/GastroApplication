@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/orderTableFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderTableFragment"
-        android:label="fragment_choose"
+        android:label="add table"
         tools:layout="@layout/fragment_order_table" >
         <action
             android:id="@+id/action_orderTableFragment_to_orderListFragment"
@@ -26,7 +26,7 @@
     <fragment
         android:id="@+id/orderListFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderListFragment"
-        android:label="fragment_order_list"
+        android:label="order list"
         tools:layout="@layout/fragment_order_list" />
     <fragment
         android:id="@+id/orderListAddItemFragment"

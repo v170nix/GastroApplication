@@ -9,6 +9,7 @@
     <!-- TODO: Update blank fragment layout -->
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/TextInputLayoutAppearance"
         android:id="@+id/password_input_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

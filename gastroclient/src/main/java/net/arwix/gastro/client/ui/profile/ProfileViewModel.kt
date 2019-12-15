@@ -33,15 +33,15 @@ class ProfileViewModel :
         return when (result) {
             is Result.LoginAssert -> internalViewState.copy(
                 isLogin = true,
-                password = result.password,
+                userId = result.password,
                 error = null
             )
             is Result.LoginError -> internalViewState.copy(
                 isLogin = false,
-                password = result.password,
+                userId = result.password,
                 error = true
             )
-            Result.Logout -> internalViewState.copy(isLogin = false, password = null, error = null)
+            Result.Logout -> internalViewState.copy(isLogin = false, userId = null, error = null)
         }
     }
 
@@ -58,7 +58,7 @@ class ProfileViewModel :
 
     data class State(
         val isLogin: Boolean = false,
-        val password: Int? = null,
+        val userId: Int? = null,
         val error: Boolean? = null
     )
 }
