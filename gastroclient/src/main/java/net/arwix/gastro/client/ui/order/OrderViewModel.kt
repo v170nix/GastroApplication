@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.arwix.gastro.library.await
+import net.arwix.gastro.library.data.OpenTableData
 import net.arwix.gastro.library.data.OrderData
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.mvi.SimpleIntentViewModel
@@ -68,7 +69,19 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
                             }
                         )
                     if (!orderData.orderItems.isNullOrEmpty()) {
-                        orders.document().set(orderData).await()
+                        //   orders.add(orderData).await()!!
+                        val doc = orders.document()
+                        val table = orderData.table!!
+                        firestore.runTransaction {
+                            val openTableDoc =
+                                it.get(firestore.collection("open tables").document(table.toString()))
+                            val openTableData = openTableDoc.toObject(OpenTableData::class.java)
+                            val newOpenTableData = OpenTableData(
+                                parts = openTableData?.parts?.run { this + doc } ?: listOf(doc)
+                            )
+                            it.set(doc, orderData)
+                            it.set(openTableDoc.reference, newOpenTableData)
+                        }.await()
                     }
                 }
                 emit(Result.SubmitOrder)
