@@ -1,5 +1,6 @@
 package net.arwix.gastro.client.ui.pay
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,13 +22,12 @@ class PayListItemAdapter(
 
     private val doPlusCountClick = View.OnClickListener { view ->
         val item = view.tag as PayAdapterOrderItem.Item
-        val count = item.order.orderItem.count - item.order.orderItem.checkout
-        if (item.order.payCount >= count) return@OnClickListener
+        if (item.order.payCount >= item.order.orderItem.count) return@OnClickListener
         onChangeCount(item.type, item.order, 1)
     }
     private val doMinusCountClick = View.OnClickListener { view ->
         val item = view.tag as PayAdapterOrderItem.Item
-        if (item.order.payCount == 0) return@OnClickListener
+        if (item.order.payCount <= 0) return@OnClickListener
         onChangeCount(item.type, item.order, -1)
     }
 
@@ -68,9 +68,10 @@ class PayListItemAdapter(
         return TYPE_ID_ITEM_DEFAULT
     }
 
-    fun setItems(payOrderData: PayViewModel.PayOrderData) {
+    fun setItems(payOrderData: MutableMap<String, MutableList<PayViewModel.PayOrderItem>>) {
+        Log.e("setItems", payOrderData.toString())
         val newList = mutableListOf<PayAdapterOrderItem>()
-        payOrderData.payOrderItems.forEach { (type, list) ->
+        payOrderData.forEach { (type, list) ->
             val typeItem = PayAdapterOrderItem.Type(type)
             newList.add(typeItem)
             newList.addAll(list.map { PayAdapterOrderItem.Item(type, it) })
@@ -97,11 +98,10 @@ class PayListItemAdapter(
 
         fun bindTo(item: PayAdapterOrderItem.Item) {
             val formatter = NumberFormat.getCurrencyInstance()
-            val count = item.order.orderItem.count - item.order.orderItem.checkout
-            name.text = "${count}x ${item.order.orderItem.name}"
+            name.text = "${item.order.orderItem.count}x ${item.order.orderItem.name}"
             price.text =
                 formatter.format(item.order.orderItem.price / 100.0).toString() // + "\u20ac"
-            plusItemButton.isEnabled = item.order.payCount < count
+            plusItemButton.isEnabled = item.order.payCount < item.order.orderItem.count
             minusItemButton.isEnabled = item.order.payCount > 0
             payText.text = "${item.order.payCount} items(s)"
             if (item.order.payCount > 0) {

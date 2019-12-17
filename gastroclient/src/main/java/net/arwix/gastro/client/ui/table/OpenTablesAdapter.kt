@@ -9,15 +9,16 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_open_tables.view.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.data.OpenTableData
+import net.arwix.gastro.library.data.TableGroup
 
 class OpenTablesAdapter(
-    onItemClick: (table: Int) -> Unit
+    onItemClick: (tableGroup: TableGroup) -> Unit
 ) : RecyclerView.Adapter<OpenTablesAdapter.ItemsHolder>() {
 
     private val items = mutableListOf<OpenTableAdapterItem>()
     private val doItemClick = View.OnClickListener {
         val item = it.tag as OpenTableAdapterItem
-        onItemClick(item.table)
+        onItemClick(item.tableGroup)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemsHolder {
@@ -39,17 +40,13 @@ class OpenTablesAdapter(
         holder.itemView.setOnClickListener(doItemClick)
     }
 
-    fun setData(data: Map<Int, OpenTableData>) {
+    fun setData(data: Map<TableGroup, OpenTableData>) {
         val newList = mutableListOf<OpenTableAdapterItem>()
-        data.forEach { (table, data) ->
-            newList.add(OpenTableAdapterItem(table, data))
+        data.forEach { (tableGroup, data) ->
+            newList.add(OpenTableAdapterItem(tableGroup, data))
         }
-
         val diffCallback = ItemDiffCallback(items, newList)
-
-        val diffResult =
-            DiffUtil.calculateDiff(diffCallback)
-
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
         items.clear()
         items.addAll(newList)
         diffResult.dispatchUpdatesTo(this)
@@ -63,11 +60,15 @@ class OpenTablesAdapter(
         }
 
         fun bindTo(item: OpenTableAdapterItem) {
-            table.text = "${item.table} - count(${item.tableData.parts?.size})"
+            table.text =
+                "${item.tableGroup.tableId}/${item.tableGroup.tablePart} - count(${item.tableData.orders?.size})"
         }
     }
 
-    data class OpenTableAdapterItem(val table: Int, val tableData: OpenTableData)
+    data class OpenTableAdapterItem(
+        val tableGroup: TableGroup,
+        val tableData: OpenTableData
+    )
 
     private class ItemDiffCallback(
         private val oldList: List<OpenTableAdapterItem>,
@@ -86,7 +87,7 @@ class OpenTablesAdapter(
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
-            return oldItem.table == newItem.table && oldItem.tableData.updated == newItem.tableData.updated
+            return oldItem.tableGroup == newItem.tableGroup && oldItem.tableData.updated == newItem.tableData.updated
         }
     }
 

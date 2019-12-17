@@ -8,19 +8,19 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayoutMediator
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_pay_list.*
 import net.arwix.extension.gone
 import net.arwix.extension.visible
 import net.arwix.gastro.client.R
+import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.text.NumberFormat
 
 class PayListFragment : Fragment() {
 
     private val payViewModel: PayViewModel by sharedViewModel()
-    private lateinit var adapter: PayListAdapter
+    private lateinit var adapter: PayListItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,54 +36,56 @@ class PayListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter =
-            PayListAdapter { part: PayViewModel.StatePart, type: String, payOrderItem: PayViewModel.PayOrderItem, delta: Int ->
-                payViewModel.nonCancelableIntent(
-                    PayViewModel.Action.ChangePayCount(
-                        part, type, payOrderItem, delta
-                    )
+        adapter = PayListItemAdapter { type, payOrderItem, delta ->
+            payViewModel.nonCancelableIntent(
+                PayViewModel.Action.ChangePayCount(
+                    type,
+                    payOrderItem,
+                    delta
                 )
-            }
-        pay_list_pager.adapter = this.adapter
-        val mediator = TabLayoutMediator(pay_list_tab_layout, pay_list_pager) { tab, position ->
-            tab.text = "part №${position + 1}"
+            )
+            //  listener?.invoke(itemView, type, payOrderItem, delta)
         }
-        mediator.attach()
-        pay_list_pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+        val linearLayoutManager = LinearLayoutManager(requireContext())
+        with(pay_list_order_recycler_view) {
+            layoutManager = linearLayoutManager
+            itemAnimator = null
+            addItemDecoration(
+                androidx.recyclerview.widget.DividerItemDecoration(
+                    context,
+                    linearLayoutManager.orientation
+                )
+            )
+            adapter = this@PayListFragment.adapter
+        }
 
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                updateTextAndVisiblePayButton(position, payViewModel.liveState.value)
-            }
-
-        })
     }
 
     private fun render(state: PayViewModel.State) {
-        updateTextAndVisiblePayButton(pay_list_pager.currentItem, payViewModel.liveState.value)
-        state.tableId?.run(this::setTitle)
-        state.parts?.run {
-            adapter.setPartList(this)
-            if (this.size == 1) {
-                pay_list_tab_layout.gone()
-            } else {
-                pay_list_tab_layout.visible()
-            }
+        updateTextAndVisiblePayButton(payViewModel.liveState.value)
+        state.tableGroup?.run(this::setTitle)
+        state.summaryData?.run {
+            adapter.setItems(this)
+//            if (this.size == 1) {
+//                pay_list_tab_layout.gone()
+//            } else {
+//                pay_list_tab_layout.visible()
+//            }
         }
     }
 
-    private fun setTitle(tableId: Int) {
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Table $tableId"
+    private fun setTitle(tableGroup: TableGroup) {
+        (requireActivity() as AppCompatActivity).supportActionBar?.title =
+            "Table ${tableGroup.tableId}/${tableGroup.tablePart} "
     }
 
-    private fun getPayCountAndPrice(position: Int, state: PayViewModel.State?): Pair<Long, Int>? {
+    private fun getPayCountAndPrice(state: PayViewModel.State?): Pair<Long, Int>? {
         state ?: return null
-        val parts = state.parts ?: return null
-        val part = parts.getOrNull(position) ?: return null
+        val payOrderItems = state.summaryData ?: return null
         var count = 0
         var price = 0L
-        part.payOrderData.payOrderItems.values.forEach { payOrderItems ->
-            payOrderItems.forEach {
+        payOrderItems.values.forEach { payOrderItem ->
+            payOrderItem.forEach {
                 if (it.payCount > 0) {
                     count += it.payCount
                     price += it.orderItem.price * it.payCount
@@ -93,8 +95,8 @@ class PayListFragment : Fragment() {
         return price to count
     }
 
-    private fun updateTextAndVisiblePayButton(position: Int, state: PayViewModel.State?) {
-        getPayCountAndPrice(position, state)?.let { (price, count) ->
+    private fun updateTextAndVisiblePayButton(state: PayViewModel.State?) {
+        getPayCountAndPrice(state)?.let { (price, count) ->
             if (price > 0) {
                 pay_list_submit_button.visible()
             } else {
@@ -108,17 +110,17 @@ class PayListFragment : Fragment() {
         }
     }
 
-    private fun checkVisiblePayButton(position: Int, state: PayViewModel.State?): Boolean {
-        state ?: return false
-        val parts = state.parts ?: return false
-        val part = parts.getOrNull(position) ?: return false
-        part.payOrderData.payOrderItems.values.forEach {
-            it.forEach {
-                if (it.payCount > 0) return true
-            }
-        }
-        return false
-    }
+//    private fun checkVisiblePayButton(position: Int, state: PayViewModel.State?): Boolean {
+//        state ?: return false
+//        val parts = state.orders ?: return false
+//        val part = parts.getOrNull(position) ?: return false
+//        part.payOrderData.payOrderItems.values.forEach {
+//            it.forEach {
+//                if (it.payCount > 0) return true
+//            }
+//        }
+//        return false
+//    }
 
 
 }

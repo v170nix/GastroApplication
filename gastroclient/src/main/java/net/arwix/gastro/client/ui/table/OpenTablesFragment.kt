@@ -60,6 +60,6 @@ class OpenTablesFragment : Fragment() {
     }
 
     private fun setTitle() {
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Open table list"
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Open tables"
     }
 }

@@ -9,6 +9,9 @@ import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import kotlinx.android.synthetic.main.fragment_order_table.*
 import net.arwix.gastro.client.R
+import net.arwix.gastro.library.common.hideKeyboard
+import net.arwix.gastro.library.common.showSoftKeyboard
+import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
@@ -30,28 +33,25 @@ class OrderTableFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        showSoftKeyboard()
         order_table_custom_button.setOnClickListener {
-            val tableNumber = runCatching {
-                order_table_custom_edit_text.editableText.toString().toInt()
+            val tableId = runCatching {
+                order_table_custom_edit_text.editableText.toString().trim().toInt()
             }.getOrNull() ?: return@setOnClickListener
-            toOrderList(tableNumber)
-        }
-        order_table_1_button.setOnClickListener {
-            toOrderList(1)
-        }
-        order_table_2_button.setOnClickListener {
-            toOrderList(2)
-        }
-        order_table_3_button.setOnClickListener {
-            toOrderList(3)
+            val tablePart = kotlin.runCatching {
+                order_table_custom_part_input_layout.editText!!.editableText.toString().trim()
+                    .toInt()
+            }.getOrElse { 1 }
+            requireActivity().hideKeyboard()
+            toOrderList(TableGroup(tableId, tablePart))
         }
     }
 
     private fun render(state: OrderViewModel.State) {
     }
 
-    private fun toOrderList(tableNumber: Int) {
-        orderViewModel.selectTable(tableNumber)
+    private fun toOrderList(tableGroup: TableGroup) {
+        orderViewModel.selectTable(tableGroup)
         Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(
             R.id.orderListFragment
         )

@@ -1,6 +1,5 @@
 package net.arwix.gastro.client.ui.order
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -12,6 +11,7 @@ import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.OpenTableData
 import net.arwix.gastro.library.data.OrderData
 import net.arwix.gastro.library.data.OrderItem
+import net.arwix.gastro.library.data.TableGroup
 import net.arwix.mvi.SimpleIntentViewModel
 
 class OrderViewModel(private val firestore: FirebaseFirestore) :
@@ -25,37 +25,31 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
             val doc = firestore.collection("menu").orderBy("order").get().await()!!
             val menu = doc.documents.map { it.id }
             menuTypes = menu
-            Log.e("menu", menu.toString())
             notificationFromObserver(Result.AddMenu(menu))
         }
     }
 
     override fun dispatchAction(action: Action): LiveData<Result> = liveData {
         when (action) {
-            is Action.AddItem -> {
-                emit(Result.AddItem(action.partIndex, action.typeItem, action.item))
-            }
-            is Action.EditItem -> {
-                emit(Result.EditItem(action.partIndex, action.typeItem, action.item))
-            }
-            is Action.ChangeCountItem -> {
-                emit(
-                    Result.ChangeCountItem(
-                        action.partIndex,
-                        action.typeItem,
-                        action.item,
-                        action.delta
-                    )
+            is Action.AddItem -> emit(Result.AddItem(action.typeItem, action.item))
+            is Action.EditItem -> emit(Result.EditItem(action.typeItem, action.item))
+            is Action.ChangeCountItem -> emit(
+                Result.ChangeCountItem(
+                    action.typeItem,
+                    action.item,
+                    action.delta
                 )
-            }
+            )
+
             is Action.SubmitOrder -> {
                 withContext(Dispatchers.Main) {
                     val orders = firestore.collection("orders")
                     val orderData =
                         OrderData(
                             action.userId,
-                            internalViewState.orderParts[0].table!!,
-                            internalViewState.orderParts[0].orderItems.filter {
+                            internalViewState.tableGroup!!.tableId,
+                            internalViewState.tableGroup!!.tablePart,
+                            internalViewState.orderItems.filter {
                                 it.value.isNotEmpty()
                             }.let { filterMap ->
                                 mutableMapOf<String, List<OrderItem>>().apply {
@@ -71,13 +65,16 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
                     if (!orderData.orderItems.isNullOrEmpty()) {
                         //   orders.add(orderData).await()!!
                         val doc = orders.document()
-                        val table = orderData.table!!
+                        val tableId = orderData.table.toString().toIntOrNull() ?: return@withContext
+                        val tablePart =
+                            orderData.tablePart.toString().toIntOrNull() ?: return@withContext
+                        val docId = "$tableId-$tablePart"
                         firestore.runTransaction {
                             val openTableDoc =
-                                it.get(firestore.collection("open tables").document(table.toString()))
+                                it.get(firestore.collection("open tables").document(docId))
                             val openTableData = openTableDoc.toObject(OpenTableData::class.java)
                             val newOpenTableData = OpenTableData(
-                                parts = openTableData?.parts?.run { this + doc } ?: listOf(doc)
+                                orders = openTableData?.orders?.run { this + doc } ?: listOf(doc)
                             )
                             it.set(doc, orderData)
                             it.set(openTableDoc.reference, newOpenTableData)
@@ -93,80 +90,61 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
         notificationFromObserver(Result.Clear)
     }
 
-    fun selectTable(number: Int) {
-        notificationFromObserver(Result.InitOrder(number))
+    fun selectTable(tableGroup: TableGroup) {
+        notificationFromObserver(Result.InitOrder(tableGroup))
     }
 
     override fun reduce(result: Result): State {
         return when (result) {
             is Result.InitOrder -> {
                 internalViewState.copy(
-                    orderParts = mutableListOf(
-                        OrderPart(
-                            table = result.table,
-                            orderItems = mutableMapOf<String, List<OrderItem>>().apply {
-                                menuTypes?.forEach { menuType ->
-                                    this[menuType] = listOf()
-                                }
-                            }
-                        ))
-                )
-            }
-            Result.Clear -> internalViewState.copy(
-                orderParts = internalViewState.orderParts.apply {
-                    this.forEach { orderPart: OrderPart ->
-                        orderPart.orderItems.forEach { (key, _) ->
-                            orderPart.orderItems[key] = listOf()
+                    tableGroup = result.tableGroup,
+                    orderItems = mutableMapOf<String, List<OrderItem>>().apply {
+                        menuTypes?.forEach { menuType ->
+                            this[menuType] = listOf()
                         }
                     }
+                )
+            }
+
+            Result.Clear -> internalViewState.copy(
+                orderItems = internalViewState.orderItems.apply {
+                    forEach { (menuType, _) -> this[menuType] = listOf() }
                 },
                 isSubmit = false
             )
             is Result.AddMenu -> {
                 internalViewState.copy(
                     isLoadingMenu = false,
-                    orderParts = mutableListOf(
-                        OrderPart(
-                            table = kotlin.run {
-                                internalViewState.orderParts.firstOrNull()?.table
-                            },
-                            orderItems = mutableMapOf<String, List<OrderItem>>().apply {
-                                result.list.forEach { menuType ->
-                                    this[menuType] = listOf()
-                                }
-                            }
-                        ))
+                    orderItems = mutableMapOf<String, List<OrderItem>>().apply {
+                        result.list.forEach { menuType -> this[menuType] = listOf() }
+                    }
                 )
+
             }
             is Result.AddItem -> {
-                internalViewState.copy(orderParts = internalViewState.orderParts.apply {
-                    val part = internalViewState.orderParts[result.partIndex]
-                    val old = part.orderItems[result.typeItem]
-                    if (old == null) {
-                        part.orderItems[result.typeItem] = listOf(result.item)
-                    } else {
-                        part.orderItems[result.typeItem] = old + result.item
-                    }
+                internalViewState.copy(orderItems = internalViewState.orderItems.apply {
+                    val orderItems = this[result.typeItem]
+                    if (orderItems == null) this[result.typeItem] = listOf(result.item)
+                    else this[result.typeItem] = orderItems + result.item
                 })
             }
             is Result.EditItem -> {
-                internalViewState.copy(orderParts = internalViewState.orderParts.apply {
-                    val part = internalViewState.orderParts[result.partIndex]
-                    val old = part.orderItems[result.typeItem] ?: return@apply
-                    val current = old.map {
+                internalViewState.copy(orderItems = internalViewState.orderItems.apply {
+                    val orderItems = this[result.typeItem] ?: return@apply
+                    val current = orderItems.map {
                         if (it.name == result.item.name) result.item else it
                     }
-                    part.orderItems[result.typeItem] = current
+                    this[result.typeItem] = current
                 })
             }
             is Result.SubmitOrder -> {
                 internalViewState.copy(isSubmit = true)
             }
             is Result.ChangeCountItem -> {
-                internalViewState.copy(orderParts = internalViewState.orderParts.apply {
-                    val part = internalViewState.orderParts[result.partIndex]
-                    val orderList = part.orderItems[result.typeItem] ?: return@apply
-                    part.orderItems[result.typeItem] = orderList.map {
+                internalViewState.copy(orderItems = internalViewState.orderItems.apply {
+                    val orderItems = this[result.typeItem] ?: return@apply
+                    this[result.typeItem] = orderItems.map {
                         if (it.name == result.item.name) it.copy(count = it.count + result.delta) else it
                     }
                 })
@@ -175,12 +153,11 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
     }
 
     sealed class Action {
-        data class AddItem(val partIndex: Int, val typeItem: String, val item: OrderItem) : Action()
-        data class EditItem(val partIndex: Int, val typeItem: String, val item: OrderItem) :
+        data class AddItem(val typeItem: String, val item: OrderItem) : Action()
+        data class EditItem(val typeItem: String, val item: OrderItem) :
             Action()
 
         data class ChangeCountItem(
-            val partIndex: Int,
             val typeItem: String,
             val item: OrderItem,
             val delta: Int
@@ -191,14 +168,13 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
 
     sealed class Result {
         object Clear : Result()
-        data class InitOrder(val table: Int) : Result()
+        data class InitOrder(val tableGroup: TableGroup) : Result()
         data class AddMenu(val list: List<String>) : Result()
-        data class AddItem(val partIndex: Int, val typeItem: String, val item: OrderItem) : Result()
-        data class EditItem(val partIndex: Int, val typeItem: String, val item: OrderItem) :
+        data class AddItem(val typeItem: String, val item: OrderItem) : Result()
+        data class EditItem(val typeItem: String, val item: OrderItem) :
             Result()
 
         data class ChangeCountItem(
-            val partIndex: Int,
             val typeItem: String,
             val item: OrderItem,
             val delta: Int
@@ -210,18 +186,13 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
 
     data class State(
         val isLoadingMenu: Boolean = true,
-        val orderParts: MutableList<OrderPart> = mutableListOf(),
+        val tableGroup: TableGroup? = null,
+        val orderItems: MutableMap<String, List<OrderItem>> = mutableMapOf(),
         val isSubmit: Boolean = false
-    )
-
-    data class OrderPart(
-        val table: Int? = null,
-        val orderItems: MutableMap<String, List<OrderItem>> = mutableMapOf()
     )
 
     companion object {
         const val BUNDLE_ID_ITEM_TYPE = "gastro.order.type"
-        const val BUNGLE_ID_ORDER_PART_ID = "gastro.order.part.id"
     }
 
 }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.arwix.gastro.library.data.OpenTableData
 import net.arwix.gastro.library.data.OrderItem
+import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 
@@ -24,9 +25,9 @@ class OpenTablesViewModel(private val firestore: FirebaseFirestore) :
                 .orderBy("updated", Query.Direction.DESCENDING)
             query.toFlow()
                 .collect { snapshot ->
-                    val map = LinkedHashMap<Int, OpenTableData>()
+                    val map = LinkedHashMap<TableGroup, OpenTableData>()
                     snapshot.documents.forEach {
-                        map[it.id.toInt()] = it.toObject(OpenTableData::class.java)!!
+                        map[TableGroup.fromString(it.id)] = it.toObject(OpenTableData::class.java)!!
                     }
                     notificationFromObserver(Result.UpdateTablesList(map))
                 }
@@ -55,20 +56,20 @@ class OpenTablesViewModel(private val firestore: FirebaseFirestore) :
 
     sealed class Action
     sealed class Result {
-        data class UpdateTablesList(val tablesData: Map<Int, OpenTableData>?) : Result()
+        data class UpdateTablesList(val tablesData: Map<TableGroup, OpenTableData>?) : Result()
     }
 
     data class State(
-        val tablesData: Map<Int, OpenTableData>? = null
+        val tablesData: Map<TableGroup, OpenTableData>? = null
     )
 
     private companion object {
         private fun filterOrderMap(map: Map<String, List<OrderItem>>): Map<String, List<OrderItem>> {
             val outMap = mutableMapOf<String, List<OrderItem>>()
             map.forEach { (type, orderItems) ->
-                val items = orderItems.filter { it.count > it.checkout }
-                if (items.isNotEmpty()) {
-                    outMap[type] = items
+                //  val items = orderItems.filter { it.count > it.checkout }
+                if (orderItems.isNotEmpty()) {
+                    outMap[type] = orderItems
                 }
             }
             return outMap

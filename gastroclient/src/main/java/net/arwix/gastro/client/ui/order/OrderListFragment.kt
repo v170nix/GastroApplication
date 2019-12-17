@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.fragment_order_list.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.data.OrderItem
+import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.text.NumberFormat
 
@@ -45,17 +46,12 @@ class OrderListFragment : Fragment() {
             onTypeClick = {
                 findNavController(this).navigate(
                     R.id.orderListAddItemFragment,
-                    bundleOf(
-                        OrderViewModel.BUNDLE_ID_ITEM_TYPE to it,
-                        OrderViewModel.BUNGLE_ID_ORDER_PART_ID to 0
-                    )
+                    bundleOf(OrderViewModel.BUNDLE_ID_ITEM_TYPE to it)
                 )
             },
             onChangeCount = { type, orderItem, delta ->
                 orderViewModel.nonCancelableIntent(
-                    OrderViewModel.Action.ChangeCountItem(
-                        0, type, orderItem, delta
-                    )
+                    OrderViewModel.Action.ChangeCountItem(type, orderItem, delta)
                 )
             }
 
@@ -84,16 +80,15 @@ class OrderListFragment : Fragment() {
                 .build()
             findNavController(this).navigate(R.id.openTablesFragment, null, options)
         } else {
-            adapterOrder.setItems(state.orderParts[0].orderItems)
-            state.orderParts[0].table?.run {
-                setTitleTable(this)
-            }
-            renderTotalPrice(state.orderParts[0].orderItems)
+            adapterOrder.setItems(state.orderItems)
+            state.tableGroup?.run(::setTitle)
+            renderTotalPrice(state.orderItems)
         }
     }
 
-    private fun setTitleTable(table: Int) {
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = "pay table $table"
+    private fun setTitle(tableGroup: TableGroup) {
+        (requireActivity() as AppCompatActivity).supportActionBar?.title =
+            "add order - table ${tableGroup.tableId}/${tableGroup.tablePart}"
     }
 
     private fun renderTotalPrice(map: Map<String, List<OrderItem>>) {

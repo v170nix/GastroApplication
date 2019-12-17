@@ -1,9 +1,9 @@
 package net.arwix.gastro.client.ui.pay
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -13,6 +13,7 @@ import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.OpenTableData
 import net.arwix.gastro.library.data.OrderData
 import net.arwix.gastro.library.data.OrderItem
+import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 
@@ -23,31 +24,17 @@ class PayViewModel(
     private var tableUpdateJob: Job? = null
     override var internalViewState: State = State()
 
-    fun setTable(tableId: Int) {
+    fun setTable(tableGroup: TableGroup) {
         tableUpdateJob?.cancel()
-        notificationFromObserver(Result.InitTable(tableId))
+        notificationFromObserver(Result.InitTable(tableGroup))
         tableUpdateJob = viewModelScope.launch {
-            firestore.collection("open tables").document(tableId.toString()).toFlow()
+            firestore.collection("open tables").document(tableGroup.toDocId())
+                .toFlow()
                 .collect {
                     it.toObject(OpenTableData::class.java)?.run {
-                        val parts = (this.parts ?: return@run).mapNotNull { doc ->
-                            val orderData = doc.get().await()?.toObject(OrderData::class.java)
-                                ?: return@mapNotNull null
-                            val orderItems = orderData.orderItems ?: return@mapNotNull null
-                            val payOrderItems =
-                                orderItems.mapValues { (_, listOrderItems) ->
-                                    listOrderItems.map { orderItem ->
-                                        PayOrderItem(orderItem = orderItem)
-                                    }.toMutableList()
-                                }
-                            StatePart(
-                                doc,
-                                PayOrderData(
-                                    orderData, payOrderItems
-                                )
-                            )
-                        }
-                        notificationFromObserver(Result.TableData(tableId, parts))
+                        val summaryData = ordersToSum(this)
+                        Log.e("collect", summaryData.toString())
+                        notificationFromObserver(Result.TableData(tableGroup, this, summaryData))
                     }
                 }
         }
@@ -59,7 +46,6 @@ class PayViewModel(
                 is Action.ChangePayCount -> {
                     emit(
                         Result.ChangePayCount(
-                            action.statePart,
                             action.type,
                             action.payOrderItem,
                             action.delta
@@ -74,19 +60,22 @@ class PayViewModel(
         return when (result) {
             is Result.TableData -> {
                 internalViewState.copy(
-                    tableId = result.tableId,
-                    parts = result.data
+                    tableGroup = result.tableGroup,
+                    orders = result.orders,
+                    summaryData = result.summaryData
                 )
             }
             is Result.InitTable -> {
-                State(tableId = result.tableId)
+                State(tableGroup = result.tableGroup)
             }
             is Result.ChangePayCount -> {
-                val list = result.statePart.payOrderData.payOrderItems.getValue(result.type)
-                val index = list.indexOf(result.payOrderItem)
-                list[index] = result.payOrderItem.copy(
-                    payCount = result.payOrderItem.payCount + result.delta
-                )
+                internalViewState.summaryData?.run {
+                    val list = this.getValue(result.type)
+                    val index = list.indexOf(result.payOrderItem)
+                    list[index] = result.payOrderItem.copy(
+                        payCount = result.payOrderItem.payCount + result.delta
+                    )
+                }
                 internalViewState
             }
         }
@@ -97,9 +86,39 @@ class PayViewModel(
         viewModelScope.cancel()
     }
 
+    private suspend fun ordersToSum(openTableData: OpenTableData): MutableMap<String, MutableList<PayOrderItem>> {
+        val summaryOrder = mutableMapOf<String, MutableList<PayOrderItem>>()
+        openTableData.orders?.forEach { doc ->
+            val orderData = doc.get().await()!!.toObject(OrderData::class.java)!!
+            orderData.orderItems?.forEach { (type, orderItems) ->
+                val summaryOrderItemsOfCurrentType = summaryOrder[type]
+                if (summaryOrderItemsOfCurrentType == null) {
+                    summaryOrder[type] =
+                        orderItems.map { PayOrderItem(orderItem = it) }.toMutableList()
+                } else {
+                    orderItems.forEach { orderItem ->
+                        val summaryOrderItem = summaryOrderItemsOfCurrentType.find {
+                            it.orderItem.name == orderItem.name && it.orderItem.price == orderItem.price
+                        }
+                        if (summaryOrderItem != null) {
+                            val index = summaryOrderItemsOfCurrentType.indexOf(summaryOrderItem)
+                            summaryOrderItemsOfCurrentType[index] = summaryOrderItem.copy(
+                                orderItem = summaryOrderItem.orderItem.copy(
+                                    count = summaryOrderItem.orderItem.count + orderItem.count
+                                )
+                            )
+                        } else {
+                            summaryOrderItemsOfCurrentType.add(PayOrderItem(orderItem = orderItem))
+                        }
+                    }
+                }
+            }
+        }
+        return summaryOrder
+    }
+
     sealed class Action {
         data class ChangePayCount(
-            val statePart: StatePart,
             val type: String,
             val payOrderItem: PayOrderItem,
             val delta: Int
@@ -107,10 +126,14 @@ class PayViewModel(
     }
 
     sealed class Result {
-        data class InitTable(val tableId: Int) : Result()
-        data class TableData(val tableId: Int, val data: List<StatePart>) : Result()
+        data class InitTable(val tableGroup: TableGroup) : Result()
+        data class TableData(
+            val tableGroup: TableGroup,
+            val orders: OpenTableData? = null,
+            val summaryData: MutableMap<String, MutableList<PayOrderItem>>
+        ) : Result()
+
         data class ChangePayCount(
-            val statePart: StatePart,
             val type: String,
             val payOrderItem: PayOrderItem,
             val delta: Int
@@ -119,15 +142,36 @@ class PayViewModel(
 
     data class State(
         val isLoadingParts: Boolean = true,
-        val tableId: Int? = null,
-        val parts: List<StatePart>? = null
+        val tableGroup: TableGroup? = null,
+        val orders: OpenTableData? = null,
+        val summaryData: MutableMap<String, MutableList<PayOrderItem>>? = null
     )
 
-    data class StatePart(val reference: DocumentReference, val payOrderData: PayOrderData)
-    data class PayOrderData(
-        val orderData: OrderData,
-        val payOrderItems: Map<String, MutableList<PayOrderItem>>
-    )
+//    it.toObject(OpenTableData::class.java)?.run {
+//        val parts = (this.orders ?: return@run).mapNotNull { doc ->
+//            val orderData = doc.get().await()?.toObject(OrderData::class.java)
+//                ?: return@mapNotNull null
+//            val orderItems = orderData.orderItems ?: return@mapNotNull null
+//            val payOrderItems =
+//                orderItems.mapValues { (_, listOrderItems) ->
+//                    listOrderItems.map { orderItem ->
+//                        PayOrderItem(orderItem = orderItem)
+//                    }.toMutableList()
+//                }
+//            StatePart(
+//                doc,
+//                PayOrderData(
+//                    orderData, payOrderItems
+//                )
+//            )
+//        }
+//        notificationFromObserver(Result.TableData(tableGroup, parts))
+//    }
+
+//    data class PayOrderData(
+//        val orderData: OrderData,
+//        val payOrderItems: Map<String, MutableList<PayOrderItem>>
+//    )
 
     data class PayOrderItem(val payCount: Int = 0, val orderItem: OrderItem)
 

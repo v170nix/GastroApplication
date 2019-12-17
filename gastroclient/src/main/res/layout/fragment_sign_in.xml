@@ -6,11 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".ui.profile.SignInFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/TextInputLayoutAppearance"
         android:id="@+id/password_input_layout"
+        style="@style/TextInputLayoutAppearance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -23,14 +21,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:cursorVisible="true"
-            android:ems="4"
+            android:ems="3"
             android:enabled="true"
+            android:imeActionLabel="Done"
+            android:imeOptions="actionDone"
             android:inputType="numberPassword"
             android:singleLine="true"
             android:textSize="36sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/signin_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

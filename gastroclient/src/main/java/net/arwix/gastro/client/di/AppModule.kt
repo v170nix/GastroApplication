@@ -12,7 +12,11 @@ import org.koin.dsl.module
 
 val mainModule = module {
 
-    single { Firebase.firestore(Firebase.app) }
+    single {
+        Firebase.firestore(Firebase.app).apply {
+            clearPersistence()
+        }
+    }
 
     viewModel { OpenTablesViewModel(get()) }
     viewModel { OrderViewModel(get()) }

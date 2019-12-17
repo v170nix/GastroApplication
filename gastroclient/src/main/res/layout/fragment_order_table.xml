@@ -6,54 +6,72 @@
     android:layout_height="match_parent"
     tools:context=".ui.order.OrderTableFragment">
 
-    <Button
-        android:id="@+id/order_table_3_button"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/order_table_custom_input_layout"
+        style="@style/TextInputLayoutAppearance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="3"
-        app:layout_constraintStart_toEndOf="@+id/order_table_2_button"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/order_table_1_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="1"
+        android:layout_marginEnd="8dp"
+        android:hint="table №"
+        app:layout_constraintBottom_toBottomOf="@+id/order_table_custom_slash_text"
+        app:layout_constraintEnd_toStartOf="@+id/order_table_custom_slash_text"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/order_table_custom_slash_text">
 
-    <Button
-        android:id="@+id/order_table_2_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:text="2"
-        app:layout_constraintStart_toEndOf="@+id/order_table_1_button"
-        app:layout_constraintTop_toTopOf="parent" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/order_table_custom_edit_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:cursorVisible="true"
+            android:ems="4"
+            android:enabled="true"
+            android:imeOptions="actionNext"
+            android:inputType="number"
+            android:singleLine="true" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <EditText
-        android:id="@+id/order_table_custom_edit_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:inputType="number"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/order_table_2_button" />
 
     <Button
         android:id="@+id/order_table_custom_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@android:string/ok"
-        app:layout_constraintBottom_toBottomOf="@+id/order_table_custom_edit_text"
-        app:layout_constraintStart_toEndOf="@+id/order_table_custom_edit_text"
-        app:layout_constraintTop_toTopOf="@+id/order_table_custom_edit_text" />
+        android:layout_marginTop="16dp"
+        android:text="set table"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/order_table_custom_slash_text" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/order_table_custom_part_input_layout"
+        style="@style/TextInputLayoutAppearance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:hint="part"
+        app:layout_constraintBottom_toBottomOf="@+id/order_table_custom_slash_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/order_table_custom_slash_text"
+        app:layout_constraintTop_toTopOf="@+id/order_table_custom_slash_text">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="3"
+            android:imeOptions="actionDone"
+            android:inputType="number" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/order_table_custom_slash_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="/"
+        android:textSize="42dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
