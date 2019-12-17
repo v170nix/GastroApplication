@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
-import androidx.navigation.Navigation
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -79,8 +79,10 @@ class OrderListFragment : Fragment() {
     private fun render(state: OrderViewModel.State) {
         if (state.isSubmit) {
             orderViewModel.clear()
-            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
-                .popBackStack(R.id.openTablesFragment, true)
+            val options = NavOptions.Builder()
+                .setPopUpTo(R.id.openTablesFragment, true)
+                .build()
+            findNavController(this).navigate(R.id.openTablesFragment, null, options)
         } else {
             adapterOrder.setItems(state.orderParts[0].orderItems)
             state.orderParts[0].table?.run {
@@ -91,13 +93,13 @@ class OrderListFragment : Fragment() {
     }
 
     private fun setTitleTable(table: Int) {
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Table $table"
+        (requireActivity() as AppCompatActivity).supportActionBar?.title = "pay table $table"
     }
 
     private fun renderTotalPrice(map: Map<String, List<OrderItem>>) {
         val price =
             map.values.sumBy { it.sumBy { orderItem -> orderItem.price.toInt() * orderItem.count } }
-        val counts = map.values.sumBy { it.size }
+        val counts = map.values.sumBy { it.sumBy { orderItem -> orderItem.count } }
         val formatter = NumberFormat.getCurrencyInstance()
         order_list_total_price_text.text =
             "Total price: ${formatter.format(price / 100.0)}\n($counts items)"

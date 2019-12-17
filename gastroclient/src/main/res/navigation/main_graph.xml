@@ -9,11 +9,7 @@
         android:id="@+id/openTablesFragment"
         android:name="net.arwix.gastro.client.ui.table.OpenTablesFragment"
         android:label="Open tables list"
-        tools:layout="@layout/fragment_open_tables">
-        <action
-            android:id="@+id/action_mainClientFragment_to_chooseFragment"
-            app:destination="@id/orderTableFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_open_tables" />
     <fragment
         android:id="@+id/orderTableFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderTableFragment"
@@ -41,9 +37,10 @@
         android:id="@+id/signInFragment"
         android:name="net.arwix.gastro.client.ui.profile.SignInFragment"
         android:label="Sign in"
-        tools:layout="@layout/fragment_sign_in">
-        <action
-            android:id="@+id/action_signInFragment_to_openTablesFragment"
-            app:destination="@id/openTablesFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_sign_in" />
+    <fragment
+        android:id="@+id/payListFragment"
+        android:name="net.arwix.gastro.client.ui.pay.PayListFragment"
+        android:label="fragment_pay_list"
+        tools:layout="@layout/fragment_pay_list" />
 </navigation>

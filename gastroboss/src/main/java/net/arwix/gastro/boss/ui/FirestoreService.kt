@@ -184,9 +184,9 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
                     cont.resume(printAdapter)
                 }
             }
-            val items = orderData.orderItems!!.joinToString("") {
-                "<tr><td width=\"100%\" style=\"font-size: 10px\">${it.count}x ${it.name}</td><td style=\"font-size: 10px\">${it.price / 100.0}</td></tr>"
-            }
+//            val items = orderData.orderItems!!.joinToString("") {
+//                "<tr><td width=\"100%\" style=\"font-size: 10px\">${it.count}x ${it.name}</td><td style=\"font-size: 10px\">${it.price / 100.0}</td></tr>"
+//            }
 
 //            val cal = Calendar.getInstance().apply {
 //                this.timeInMillis = orderData.timestampCreated!!.seconds * 1000L
@@ -199,7 +199,7 @@ class FirestoreService : Service(), CoroutineScope by MainScope() {
                         "</style></head>" +
                         "<body><h3>table №${orderData.table}</br>${dateFormat.format(orderData.created!!.toDate())}</h3>" +
                         "<table width=\"100%\">" +
-                        "$items</table>" +
+//                        "$items</table>" +
                         "<p style=\"font-size:5px\" align=\"right\">" +
                         "order - $documentName</p>" +
                         "</body></html>"

@@ -1,9 +1,6 @@
 package net.arwix.gastro.library
 
-import android.util.Log
-import com.google.firebase.firestore.CollectionReference
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.*
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -20,12 +17,24 @@ fun CollectionReference.toFlow() = callbackFlow<QuerySnapshot> {
             offer(snapshot)
         }
     }
-//        invokeOnClose {
-//            registration.remove()
-//        }
     awaitClose {
         cancel()
-        Log.e("snapshotFlow", "cancel")
+        registration.remove()
+    }
+}
+
+fun DocumentReference.toFlow() = callbackFlow<DocumentSnapshot> {
+    val registration = this@toFlow.addSnapshotListener { snapshot, e ->
+        if (e != null) {
+            cancel(CancellationException("API Error", e))
+            return@addSnapshotListener
+        }
+        if (snapshot != null) {
+            offer(snapshot)
+        }
+    }
+    awaitClose {
+        cancel()
         registration.remove()
     }
 }
@@ -40,12 +49,8 @@ fun Query.toFlow() = callbackFlow<QuerySnapshot> {
             offer(snapshot)
         }
     }
-//        invokeOnClose {
-//            registration.remove()
-//        }
     awaitClose {
         cancel()
-        Log.e("snapshotFlow", "cancel")
         registration.remove()
     }
 }

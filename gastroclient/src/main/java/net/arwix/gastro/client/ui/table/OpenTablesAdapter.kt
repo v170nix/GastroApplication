@@ -10,9 +10,15 @@ import kotlinx.android.synthetic.main.item_open_tables.view.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.data.OpenTableData
 
-class OpenTablesAdapter() : RecyclerView.Adapter<OpenTablesAdapter.ItemsHolder>() {
+class OpenTablesAdapter(
+    onItemClick: (table: Int) -> Unit
+) : RecyclerView.Adapter<OpenTablesAdapter.ItemsHolder>() {
 
     private val items = mutableListOf<OpenTableAdapterItem>()
+    private val doItemClick = View.OnClickListener {
+        val item = it.tag as OpenTableAdapterItem
+        onItemClick(item.table)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemsHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -29,6 +35,8 @@ class OpenTablesAdapter() : RecyclerView.Adapter<OpenTablesAdapter.ItemsHolder>(
 
     override fun onBindViewHolder(holder: ItemsHolder, position: Int) {
         holder.bindTo(items[position])
+        holder.itemView.tag = items[position]
+        holder.itemView.setOnClickListener(doItemClick)
     }
 
     fun setData(data: Map<Int, OpenTableData>) {
@@ -49,6 +57,10 @@ class OpenTablesAdapter() : RecyclerView.Adapter<OpenTablesAdapter.ItemsHolder>(
 
     class ItemsHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val table: TextView = view.item_open_tables_table_id_text
+
+        init {
+            view.setBackgroundResource(R.drawable.selected_list_item)
+        }
 
         fun bindTo(item: OpenTableAdapterItem) {
             table.text = "${item.table} - count(${item.tableData.parts?.size})"

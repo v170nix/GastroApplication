@@ -4,6 +4,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.app
 import net.arwix.gastro.client.ui.order.OrderViewModel
+import net.arwix.gastro.client.ui.pay.PayViewModel
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.client.ui.table.OpenTablesViewModel
 import org.koin.android.viewmodel.dsl.viewModel
@@ -16,4 +17,5 @@ val mainModule = module {
     viewModel { OpenTablesViewModel(get()) }
     viewModel { OrderViewModel(get()) }
     viewModel { ProfileViewModel() }
+    viewModel { PayViewModel(get()) }
 }

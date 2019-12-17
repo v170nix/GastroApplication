@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import kotlinx.android.synthetic.main.fragment_sign_in.*
 import net.arwix.gastro.client.R
@@ -38,7 +39,10 @@ class SignInFragment : Fragment() {
 
     private fun renderProfile(state: ProfileViewModel.State) {
         if (state.isLogin) {
-            findNavController(this).navigate(R.id.openTablesFragment)
+            val navOptions = NavOptions.Builder().setPopUpTo(R.id.openTablesFragment, true).build()
+            findNavController(this).navigate(R.id.openTablesFragment, null, navOptions)
+
+            //    findNavController(this).navigate(R.id.openTablesFragment)
         }
         if (state.error != null) {
             password_input_layout.error = null
