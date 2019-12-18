@@ -1,8 +1,12 @@
 package net.arwix.gastro.client
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation.findNavController
@@ -24,6 +28,7 @@ class MainClientActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration.Builder(navController.graph).build()
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         profileViewModel.liveState.observe(this, Observer(this::renderProfile))
+        requestRuntimePermission()
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -33,6 +38,30 @@ class MainClientActivity : AppCompatActivity() {
             navController,
             appBarConfiguration
         ) || super.onSupportNavigateUp()
+    }
+
+    private fun requestRuntimePermission() {
+        val permissionStorage =
+            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        val permissionLocation =
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+
+        val requestPermissions: MutableList<String> = ArrayList()
+
+        if (permissionStorage == PackageManager.PERMISSION_DENIED) {
+            requestPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+        if (permissionLocation == PackageManager.PERMISSION_DENIED) {
+            requestPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+
+        if (requestPermissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                requestPermissions.toTypedArray(),
+                100
+            )
+        }
     }
 
     private fun renderProfile(state: ProfileViewModel.State) {
@@ -53,11 +82,6 @@ class MainClientActivity : AppCompatActivity() {
                     .navigate(R.id.signInFragment, null, navOptions)
             }
         }
-//        if (state.error != null) {
-//            password_input_layout.error = null
-//            password_input_layout.isErrorEnabled = true
-//            password_input_layout.error = "wrong password"
-//        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

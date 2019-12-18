@@ -1,9 +1,11 @@
 package net.arwix.gastro.client.ui.check
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import net.arwix.gastro.client.domain.PrinterUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.CheckData
 import net.arwix.mvi.SimpleIntentViewModel
@@ -31,6 +33,12 @@ class CheckDetailViewModel(
                 State(checkData = result.checkData)
             }
         }
+    }
+
+    suspend fun print(context: Context): Int {
+        return internalViewState.checkData?.run {
+            PrinterUseCase(context).printCheck(this)
+        } ?: -100
     }
 
     sealed class Action {
