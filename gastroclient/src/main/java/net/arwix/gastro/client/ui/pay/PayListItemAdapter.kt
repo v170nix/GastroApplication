@@ -22,7 +22,8 @@ class PayListItemAdapter(
 
     private val doPlusCountClick = View.OnClickListener { view ->
         val item = view.tag as PayAdapterOrderItem.Item
-        if (item.order.payCount >= item.order.orderItem.count) return@OnClickListener
+        val currentMaxCount = item.order.orderItem.count - item.order.checkCount
+        if (item.order.payCount >= currentMaxCount) return@OnClickListener
         onChangeCount(item.type, item.order, 1)
     }
     private val doMinusCountClick = View.OnClickListener { view ->
@@ -98,10 +99,14 @@ class PayListItemAdapter(
 
         fun bindTo(item: PayAdapterOrderItem.Item) {
             val formatter = NumberFormat.getCurrencyInstance()
-            name.text = "${item.order.orderItem.count}x ${item.order.orderItem.name}"
+            val currentMaxCount = item.order.orderItem.count - item.order.checkCount
+            val count = if (item.order.checkCount > 0) {
+                "(${item.order.orderItem.count}) "
+            } else ""
+            name.text = "$count${currentMaxCount}x ${item.order.orderItem.name}"
             price.text =
                 formatter.format(item.order.orderItem.price / 100.0).toString() // + "\u20ac"
-            plusItemButton.isEnabled = item.order.payCount < item.order.orderItem.count
+            plusItemButton.isEnabled = item.order.payCount < currentMaxCount
             minusItemButton.isEnabled = item.order.payCount > 0
             payText.text = "${item.order.payCount} items(s)"
             if (item.order.payCount > 0) {

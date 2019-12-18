@@ -9,6 +9,6 @@ data class TableGroup(val tableId: Int, val tablePart: Int = 1) {
     }
 
     fun toDocId() = "$tableId-$tablePart"
-
+    fun toPrintString() = "$tableId/$tablePart"
 
 }

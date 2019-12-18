@@ -3,6 +3,7 @@ package net.arwix.gastro.client.ui.order
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -64,7 +65,7 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
                         )
                     if (!orderData.orderItems.isNullOrEmpty()) {
                         //   orders.add(orderData).await()!!
-                        val doc = orders.document()
+                        val orderDoc = orders.document()
                         val tableId = orderData.table.toString().toIntOrNull() ?: return@withContext
                         val tablePart =
                             orderData.tablePart.toString().toIntOrNull() ?: return@withContext
@@ -72,12 +73,26 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
                         firestore.runTransaction {
                             val openTableDoc =
                                 it.get(firestore.collection("open tables").document(docId))
-                            val openTableData = openTableDoc.toObject(OpenTableData::class.java)
-                            val newOpenTableData = OpenTableData(
-                                orders = openTableData?.orders?.run { this + doc } ?: listOf(doc)
-                            )
-                            it.set(doc, orderData)
-                            it.set(openTableDoc.reference, newOpenTableData)
+                            it.set(orderDoc, orderData)
+                            if (openTableDoc.exists()) {
+                                it.update(
+                                    openTableDoc.reference,
+                                    "orders",
+                                    FieldValue.arrayUnion(orderDoc)
+                                )
+                                it.update(
+                                    openTableDoc.reference,
+                                    "updated",
+                                    FieldValue.serverTimestamp()
+                                )
+                            } else {
+                                val openTableData = openTableDoc.toObject(OpenTableData::class.java)
+                                val newOpenTableData = OpenTableData(
+                                    orders = openTableData?.orders?.run { this + orderDoc }
+                                        ?: listOf(orderDoc)
+                                )
+                                it.set(openTableDoc.reference, newOpenTableData)
+                            }
                         }.await()
                     }
                 }

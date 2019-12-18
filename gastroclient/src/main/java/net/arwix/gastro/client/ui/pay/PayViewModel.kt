@@ -4,16 +4,12 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import net.arwix.gastro.library.await
-import net.arwix.gastro.library.data.OpenTableData
-import net.arwix.gastro.library.data.OrderData
-import net.arwix.gastro.library.data.OrderItem
-import net.arwix.gastro.library.data.TableGroup
+import net.arwix.gastro.library.data.*
 import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 
@@ -33,7 +29,6 @@ class PayViewModel(
                 .collect {
                     it.toObject(OpenTableData::class.java)?.run {
                         val summaryData = ordersToSum(this)
-                        Log.e("collect", summaryData.toString())
                         notificationFromObserver(Result.TableData(tableGroup, this, summaryData))
                     }
                 }
@@ -51,6 +46,17 @@ class PayViewModel(
                             action.delta
                         )
                     )
+                }
+                is Action.CheckOut -> {
+                    withContext(Dispatchers.Main) {
+                        val isCloseTable = checkOut(
+                            action.waiterId,
+                            internalViewState.orders!!,
+                            internalViewState.tableGroup!!,
+                            internalViewState.summaryData!!
+                        )
+                        if (isCloseTable) emit(Result.CloseTableGroup)
+                    }
                 }
             }
         }
@@ -78,12 +84,86 @@ class PayViewModel(
                 }
                 internalViewState
             }
+            is Result.CheckOut -> internalViewState
+            Result.CloseTableGroup -> internalViewState.copy(isCloseTableGroup = true)
         }
     }
 
     override fun onCleared() {
         super.onCleared()
         viewModelScope.cancel()
+    }
+
+    private fun checkOut(
+        waiterId: Int,
+        currentOpenTableData: OpenTableData,
+        tableGroup: TableGroup,
+        summaryData: MutableMap<String, MutableList<PayOrderItem>>
+    ): Boolean {
+        val checkItems = mutableMapOf<String, List<OrderItem>>()
+        var isEmpty = true
+        var residualCount = 0
+        var summaryPrice = 0L
+        summaryData.forEach { (type, payOrderItems) ->
+            val payItems = mutableListOf<PayOrderItem>()
+            payOrderItems.forEach {
+                summaryPrice += it.orderItem.price * it.orderItem.count
+                residualCount += it.orderItem.count - it.payCount - it.checkCount
+                if (it.payCount > 0) payItems.add(it)
+            }
+            if (payItems.isNotEmpty()) {
+                checkItems[type] = payItems.map { it.orderItem.copy(count = it.payCount) }
+                isEmpty = false
+            }
+        }
+        if (isEmpty) return false
+
+        val checkData = CheckData(
+            waiterId = waiterId,
+            table = tableGroup.tableId,
+            tablePart = tableGroup.tablePart,
+            checkItems = checkItems
+        )
+        val openTablesRef = firestore.collection("open tables")
+        val closeTablesRef = firestore.collection("close tables")
+        val checks = firestore.collection("checks")
+        val checkDoc = checks.document()
+        firestore.runTransaction {
+            val serverOrderData =
+                it.get(openTablesRef.document(tableGroup.toDocId())).toObject(OpenTableData::class.java)!!
+            if (serverOrderData.updated != currentOpenTableData.updated) return@runTransaction
+            it.set(checkDoc, checkData)
+            if (residualCount == 0) {
+                // closeTable
+                Log.e("close Table", "1")
+                val closeTableData = CloseTableData(
+                    table = tableGroup.tableId,
+                    tablePart = tableGroup.tablePart,
+                    orders = currentOpenTableData.orders,
+                    checks = currentOpenTableData.checks?.run {
+                        this + checkDoc
+                    } ?: run {
+                        listOf(checkDoc)
+                    },
+                    summaryPrice = summaryPrice
+                )
+                Log.e("table", closeTableData.toString())
+                it.set(closeTablesRef.document(), closeTableData)
+                it.delete(openTablesRef.document(tableGroup.toDocId()))
+            } else {
+                it.update(
+                    openTablesRef.document(tableGroup.toDocId()),
+                    "checks",
+                    FieldValue.arrayUnion(checkDoc)
+                )
+                it.update(
+                    openTablesRef.document(tableGroup.toDocId()),
+                    "updated",
+                    FieldValue.serverTimestamp()
+                )
+            }
+        }
+        return residualCount == 0
     }
 
     private suspend fun ordersToSum(openTableData: OpenTableData): MutableMap<String, MutableList<PayOrderItem>> {
@@ -114,6 +194,32 @@ class PayViewModel(
                 }
             }
         }
+        openTableData.checks?.forEach { doc ->
+            val checkData = doc.get().await()!!.toObject(CheckData::class.java)!!
+            checkData.checkItems?.forEach { (type, checkItems) ->
+                val summaryOrderItemsOfCurrentType = summaryOrder[type]
+                if (summaryOrderItemsOfCurrentType == null) {
+                    //ERROR
+                    throw IllegalStateException("pay order error sync")
+                    //      summaryOrder[type] = orderItems.map { PayOrderItem(orderItem = it) }.toMutableList()
+                } else {
+                    checkItems.forEach { checkItem ->
+                        val summaryOrderItem = summaryOrderItemsOfCurrentType.find {
+                            it.orderItem.name == checkItem.name && it.orderItem.price == checkItem.price
+                        }
+                        if (summaryOrderItem != null) {
+                            val index = summaryOrderItemsOfCurrentType.indexOf(summaryOrderItem)
+                            summaryOrderItemsOfCurrentType[index] = summaryOrderItem.copy(
+                                checkCount = summaryOrderItem.checkCount + checkItem.count
+                            )
+                        } else {
+                            throw IllegalStateException("pay order error sync item")
+                        }
+                    }
+                }
+            }
+        }
+
         return summaryOrder
     }
 
@@ -123,6 +229,8 @@ class PayViewModel(
             val payOrderItem: PayOrderItem,
             val delta: Int
         ) : Action()
+
+        data class CheckOut(val waiterId: Int) : Action()
     }
 
     sealed class Result {
@@ -138,41 +246,23 @@ class PayViewModel(
             val payOrderItem: PayOrderItem,
             val delta: Int
         ) : Result()
+
+        data class CheckOut(val waiterId: Int) : Result()
+        object CloseTableGroup : Result()
     }
 
     data class State(
+        val isCloseTableGroup: Boolean = false,
         val isLoadingParts: Boolean = true,
         val tableGroup: TableGroup? = null,
         val orders: OpenTableData? = null,
         val summaryData: MutableMap<String, MutableList<PayOrderItem>>? = null
     )
 
-//    it.toObject(OpenTableData::class.java)?.run {
-//        val parts = (this.orders ?: return@run).mapNotNull { doc ->
-//            val orderData = doc.get().await()?.toObject(OrderData::class.java)
-//                ?: return@mapNotNull null
-//            val orderItems = orderData.orderItems ?: return@mapNotNull null
-//            val payOrderItems =
-//                orderItems.mapValues { (_, listOrderItems) ->
-//                    listOrderItems.map { orderItem ->
-//                        PayOrderItem(orderItem = orderItem)
-//                    }.toMutableList()
-//                }
-//            StatePart(
-//                doc,
-//                PayOrderData(
-//                    orderData, payOrderItems
-//                )
-//            )
-//        }
-//        notificationFromObserver(Result.TableData(tableGroup, parts))
-//    }
-
-//    data class PayOrderData(
-//        val orderData: OrderData,
-//        val payOrderItems: Map<String, MutableList<PayOrderItem>>
-//    )
-
-    data class PayOrderItem(val payCount: Int = 0, val orderItem: OrderItem)
+    data class PayOrderItem(
+        val payCount: Int = 0,
+        val orderItem: OrderItem,
+        val checkCount: Int = 0
+    )
 
 }

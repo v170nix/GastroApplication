@@ -2,17 +2,22 @@ package net.arwix.gastro.client.ui.pay
 
 
 import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_pay_list.*
 import net.arwix.extension.gone
 import net.arwix.extension.visible
 import net.arwix.gastro.client.R
+import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.text.NumberFormat
@@ -20,6 +25,7 @@ import java.text.NumberFormat
 class PayListFragment : Fragment() {
 
     private val payViewModel: PayViewModel by sharedViewModel()
+    private val profileViewModel: ProfileViewModel by sharedViewModel()
     private lateinit var adapter: PayListItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,6 +65,11 @@ class PayListFragment : Fragment() {
             adapter = this@PayListFragment.adapter
         }
 
+        pay_list_submit_button.setOnClickListener {
+            val userId = profileViewModel.liveState.value?.userId ?: return@setOnClickListener
+            payViewModel.nonCancelableIntent(PayViewModel.Action.CheckOut(userId))
+        }
+
     }
 
     private fun render(state: PayViewModel.State) {
@@ -66,11 +77,19 @@ class PayListFragment : Fragment() {
         state.tableGroup?.run(this::setTitle)
         state.summaryData?.run {
             adapter.setItems(this)
-//            if (this.size == 1) {
-//                pay_list_tab_layout.gone()
-//            } else {
-//                pay_list_tab_layout.visible()
-//            }
+        }
+        if (state.isCloseTableGroup) {
+            Log.e("isClose", "3")
+            Toast.makeText(
+                requireContext(),
+                "close table ${state.tableGroup?.toPrintString()}",
+                Toast.LENGTH_LONG
+            )
+                .apply {
+                    this.setGravity(Gravity.CENTER, 0, 0)
+                }
+                .show()
+            findNavController(this).navigateUp()
         }
     }
 
