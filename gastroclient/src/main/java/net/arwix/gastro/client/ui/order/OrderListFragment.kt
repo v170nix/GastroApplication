@@ -2,9 +2,7 @@ package net.arwix.gastro.client.ui.order
 
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -26,6 +24,11 @@ class OrderListFragment : Fragment() {
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private val profileViewModel: ProfileViewModel by sharedViewModel()
     private lateinit var adapterOrder: OrderListAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -100,9 +103,14 @@ class OrderListFragment : Fragment() {
             "Total price: ${formatter.format(price / 100.0)}\n($counts items)"
     }
 
-    private sealed class AdapterOrderItems {
-        data class Type(val name: String) : AdapterOrderItems()
-        data class Default(val type: Type, val order: OrderItem) : AdapterOrderItems()
+//    private sealed class AdapterOrderItems {
+//        data class Type(val name: String) : AdapterOrderItems()
+//        data class Default(val type: Type, val order: OrderItem) : AdapterOrderItems()
+//    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.standart_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
 }

@@ -1,11 +1,9 @@
 package net.arwix.gastro.client.ui.order
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.observe
 import androidx.navigation.Navigation
 import kotlinx.android.synthetic.main.fragment_order_table.*
 import net.arwix.gastro.client.R
@@ -21,7 +19,7 @@ class OrderTableFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        orderViewModel.liveState.observe(this, ::render)
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -35,19 +33,26 @@ class OrderTableFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         showSoftKeyboard()
         order_table_custom_button.setOnClickListener {
-            val tableId = runCatching {
-                order_table_custom_edit_text.editableText.toString().trim().toInt()
-            }.getOrNull() ?: return@setOnClickListener
-            val tablePart = kotlin.runCatching {
-                order_table_custom_part_input_layout.editText!!.editableText.toString().trim()
-                    .toInt()
-            }.getOrElse { 1 }
-            requireActivity().hideKeyboard()
-            toOrderList(TableGroup(tableId, tablePart))
+            submitTable()
+        }
+        order_table_custom_part_input_layout.editText!!.setOnEditorActionListener { _, actionId, event ->
+            if ((event != null && event.keyCode == KeyEvent.KEYCODE_ENTER) ||
+                actionId == EditorInfo.IME_ACTION_DONE
+            ) submitTable()
+            false
         }
     }
 
-    private fun render(state: OrderViewModel.State) {
+    private fun submitTable() {
+        val tableId = runCatching {
+            order_table_custom_edit_text.editableText.toString().trim().toInt()
+        }.getOrNull() ?: return
+        val tablePart = kotlin.runCatching {
+            order_table_custom_part_input_layout.editText!!.editableText.toString().trim()
+                .toInt()
+        }.getOrElse { 1 }
+        requireActivity().hideKeyboard()
+        toOrderList(TableGroup(tableId, tablePart))
     }
 
     private fun toOrderList(tableGroup: TableGroup) {
@@ -55,6 +60,11 @@ class OrderTableFragment : Fragment() {
         Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(
             R.id.orderListFragment
         )
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.standart_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
 }

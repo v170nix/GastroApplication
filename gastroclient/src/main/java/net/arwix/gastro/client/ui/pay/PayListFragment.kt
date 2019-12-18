@@ -3,10 +3,7 @@ package net.arwix.gastro.client.ui.pay
 
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -31,6 +28,7 @@ class PayListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         payViewModel.liveState.observe(this, Observer(this::render))
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -129,17 +127,20 @@ class PayListFragment : Fragment() {
         }
     }
 
-//    private fun checkVisiblePayButton(position: Int, state: PayViewModel.State?): Boolean {
-//        state ?: return false
-//        val parts = state.orders ?: return false
-//        val part = parts.getOrNull(position) ?: return false
-//        part.payOrderData.payOrderItems.values.forEach {
-//            it.forEach {
-//                if (it.payCount > 0) return true
-//            }
-//        }
-//        return false
-//    }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.open_tables_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.open_tables_menu_add_all_to_pay -> {
+                payViewModel.nonCancelableIntent(PayViewModel.Action.AddAllItemsToPay)
+                return true
+            }
+        }
+        return false
+    }
 
 
 }

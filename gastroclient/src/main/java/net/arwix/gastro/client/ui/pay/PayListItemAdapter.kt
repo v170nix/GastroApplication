@@ -108,7 +108,7 @@ class PayListItemAdapter(
                 formatter.format(item.order.orderItem.price / 100.0).toString() // + "\u20ac"
             plusItemButton.isEnabled = item.order.payCount < currentMaxCount
             minusItemButton.isEnabled = item.order.payCount > 0
-            payText.text = "${item.order.payCount} items(s)"
+            payText.text = "${item.order.payCount} item(s)"
             if (item.order.payCount > 0) {
                 payText.visible()
             } else {

@@ -1,7 +1,6 @@
 package net.arwix.gastro.client.ui.pay
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FieldValue
@@ -35,30 +34,29 @@ class PayViewModel(
         }
     }
 
-    override fun dispatchAction(action: Action): LiveData<Result> {
-        return liveData<Result> {
-            when (action) {
-                is Action.ChangePayCount -> {
-                    emit(
-                        Result.ChangePayCount(
-                            action.type,
-                            action.payOrderItem,
-                            action.delta
-                        )
+    override fun dispatchAction(action: Action) = liveData {
+        when (action) {
+            is Action.ChangePayCount -> {
+                emit(
+                    Result.ChangePayCount(
+                        action.type,
+                        action.payOrderItem,
+                        action.delta
                     )
-                }
-                is Action.CheckOut -> {
-                    withContext(Dispatchers.Main) {
-                        val isCloseTable = checkOut(
-                            action.waiterId,
-                            internalViewState.orders!!,
-                            internalViewState.tableGroup!!,
-                            internalViewState.summaryData!!
-                        )
-                        if (isCloseTable) emit(Result.CloseTableGroup)
-                    }
+                )
+            }
+            is Action.CheckOut -> {
+                withContext(Dispatchers.Main) {
+                    val isCloseTable = checkOut(
+                        action.waiterId,
+                        internalViewState.orders!!,
+                        internalViewState.tableGroup!!,
+                        internalViewState.summaryData!!
+                    )
+                    if (isCloseTable) emit(Result.CloseTableGroup)
                 }
             }
+            Action.AddAllItemsToPay -> emit(Result.AddAllItemsToPay)
         }
     }
 
@@ -86,6 +84,17 @@ class PayViewModel(
             }
             is Result.CheckOut -> internalViewState
             Result.CloseTableGroup -> internalViewState.copy(isCloseTableGroup = true)
+            Result.AddAllItemsToPay -> {
+                internalViewState.summaryData?.run {
+                    this.forEach {
+                        it.value.forEachIndexed { index, payOrderItem ->
+                            it.value[index] =
+                                payOrderItem.copy(payCount = payOrderItem.orderItem.count - payOrderItem.checkCount)
+                        }
+                    }
+                }
+                internalViewState
+            }
         }
     }
 
@@ -230,6 +239,7 @@ class PayViewModel(
             val delta: Int
         ) : Action()
 
+        object AddAllItemsToPay : Action()
         data class CheckOut(val waiterId: Int) : Action()
     }
 
@@ -248,6 +258,7 @@ class PayViewModel(
         ) : Result()
 
         data class CheckOut(val waiterId: Int) : Result()
+        object AddAllItemsToPay : Result()
         object CloseTableGroup : Result()
     }
 
