@@ -66,6 +66,14 @@ class MainClientActivity : AppCompatActivity() {
                 profileViewModel.nonCancelableIntent(ProfileViewModel.Action.Logout)
                 return true
             }
+            R.id.check_menu -> {
+                if (profileViewModel.isLogin()) {
+                    findNavController(
+                        this,
+                        R.id.nav_host_fragment
+                    ).navigate(R.id.checkDetailFragment)
+                }
+            }
         }
         return false
     }

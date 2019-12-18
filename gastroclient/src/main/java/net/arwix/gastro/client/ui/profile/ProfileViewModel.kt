@@ -29,6 +29,8 @@ class ProfileViewModel :
         return password in 1000..9999
     }
 
+    fun isLogin(): Boolean = internalViewState.isLogin
+
     override fun reduce(result: Result): State {
         return when (result) {
             is Result.LoginAssert -> internalViewState.copy(

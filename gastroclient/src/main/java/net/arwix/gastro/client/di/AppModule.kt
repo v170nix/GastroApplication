@@ -3,6 +3,7 @@ package net.arwix.gastro.client.di
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.app
+import net.arwix.gastro.client.ui.check.CheckDetailViewModel
 import net.arwix.gastro.client.ui.order.OrderViewModel
 import net.arwix.gastro.client.ui.pay.PayViewModel
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
@@ -22,4 +23,5 @@ val mainModule = module {
     viewModel { OrderViewModel(get()) }
     viewModel { ProfileViewModel() }
     viewModel { PayViewModel(get()) }
+    viewModel { CheckDetailViewModel(get()) }
 }

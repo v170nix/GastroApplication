@@ -43,4 +43,9 @@
         android:name="net.arwix.gastro.client.ui.pay.PayListFragment"
         android:label="fragment_pay_list"
         tools:layout="@layout/fragment_pay_list" />
+    <fragment
+        android:id="@+id/checkDetailFragment"
+        android:name="net.arwix.gastro.client.ui.check.CheckDetailFragment"
+        android:label="fragment_check_detail"
+        tools:layout="@layout/fragment_check_detail" />
 </navigation>
