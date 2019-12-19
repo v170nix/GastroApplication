@@ -23,6 +23,13 @@
             app:showAsAction="never" />
     </group>
 
+    <group android:id="@+id/menu_group_admin">
+        <item
+            android:id="@+id/menu_admin_menu_edit"
+            android:title="@string/menu_report_daily"
+            app:showAsAction="never" />
+    </group>
+
     <item
         android:id="@+id/menu_logout"
         android:title="@string/menu_logout"

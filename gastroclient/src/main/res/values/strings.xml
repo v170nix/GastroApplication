@@ -1,24 +1,24 @@
 <resources>
     <string name="app_name">gastroClient</string>
 
-    <string name="menu_pay_add_items">add all items to pay</string>
-    <string name="menu_history_orders">view last order</string>
-    <string name="menu_history_checks">view last check</string>
-    <string name="menu_report_daily">daily report</string>
-    <string name="menu_logout">logout</string>
+    <string name="menu_pay_add_items">Add all items to pay</string>
+    <string name="menu_history_orders">View last order</string>
+    <string name="menu_history_checks">View last check</string>
+    <string name="menu_report_daily">Daily report</string>
+    <string name="menu_admin_menu_edit">Edit menu</string>
+    <string name="menu_logout">Logout</string>
 
     <string name="title_sign_in">Sign in</string>
     <string name="button_sign_in">Sign in</string>
     <string name="error_sign_in">wrong password</string>
 
     <string name="title_open_tables">Open tables</string>
-    <string name="button_add_order">add order</string>
+    <string name="button_add_order">Add order</string>
 
     <string name="title_order_add">Add order</string>
     <string name="subtitle_order_add_table">Set table</string>
-    <string name="hint_order_add_table_id">table №</string>
-    <string name="hint_order_add_table_part">part</string>
-    <string name="button_order_add_set_table">set table</string>
-
+    <string name="hint_order_add_table_id">Table №</string>
+    <string name="hint_order_add_table_part">Part</string>
+    <string name="button_order_add_set_table">Set table</string>
 
 </resources>

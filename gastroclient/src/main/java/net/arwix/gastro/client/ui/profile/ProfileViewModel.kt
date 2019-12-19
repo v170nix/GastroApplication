@@ -61,6 +61,7 @@ class ProfileViewModel :
     data class State(
         val isLogin: Boolean = false,
         val userId: Int? = null,
+        val isAdmin: Boolean = true,
         val error: Boolean? = null
     )
 }
