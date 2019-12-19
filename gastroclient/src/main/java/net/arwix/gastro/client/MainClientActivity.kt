@@ -98,6 +98,14 @@ class MainClientActivity : AppCompatActivity() {
                     ).navigate(R.id.checkDetailFragment)
                 }
             }
+            R.id.order_menu -> {
+                if (profileViewModel.isLogin()) {
+                    findNavController(
+                        this,
+                        R.id.nav_host_fragment
+                    ).navigate(R.id.historyOrderDetailFragment)
+                }
+            }
         }
         return false
     }

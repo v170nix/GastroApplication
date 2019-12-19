@@ -48,4 +48,8 @@
         android:name="net.arwix.gastro.client.ui.check.CheckDetailFragment"
         android:label="fragment_check_detail"
         tools:layout="@layout/fragment_check_detail" />
+    <fragment
+        android:id="@+id/historyOrderDetailFragment"
+        android:name="net.arwix.gastro.client.ui.history.order.HistoryOrderDetailFragment"
+        android:label="HistoryOrderDetailFragment" />
 </navigation>

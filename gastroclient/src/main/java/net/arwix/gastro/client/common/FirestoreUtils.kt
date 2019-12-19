@@ -7,3 +7,12 @@ package net.arwix.gastro.client.common
 //                FirebaseFirestore.getInstance().apply { lock() }
 //    }
 //}
+
+fun createCharString(count: Int, char: String) = run {
+    buildString {
+        repeat(count) {
+            append(char)
+        }
+        append("\n")
+    }
+}
