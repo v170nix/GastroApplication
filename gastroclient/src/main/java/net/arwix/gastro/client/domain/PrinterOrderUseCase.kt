@@ -12,7 +12,6 @@ import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
 import java.text.NumberFormat
 import kotlin.coroutines.resume
 
@@ -52,7 +51,7 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
                 Instant.ofEpochSecond(orderData.created!!.seconds), ZoneId.systemDefault()
             )
             val timeFormatter =
-                DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT, FormatStyle.SHORT)
+                DateTimeFormatter.ofPattern("dd.MM. HH:mm:ss")
 
             orderData.orderItems?.forEach { (type: String, items: List<OrderItem>) ->
                 //==============================================
