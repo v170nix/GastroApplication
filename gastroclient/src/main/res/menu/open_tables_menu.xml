@@ -6,14 +6,23 @@
         android:icon="@drawable/ic_playlist_add"
         android:title="add all items to pay"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/order_menu"
-        android:title="view last order"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/check_menu"
-        android:title="view last check"
-        app:showAsAction="never" />
+    <group android:id="@+id/menu_group_view">
+        <item
+            android:id="@+id/order_menu"
+            android:title="view last order"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/check_menu"
+            android:title="view last check"
+            app:showAsAction="never" />
+    </group>
+    <group android:id="@+id/menu_group_report">
+        <item
+            android:id="@+id/menu_day_report"
+            android:title="daily report"
+            app:showAsAction="never" />
+    </group>
+
     <item
         android:id="@+id/logout_menu"
         android:title="logout"

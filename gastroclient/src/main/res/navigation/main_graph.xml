@@ -52,4 +52,9 @@
         android:id="@+id/historyOrderDetailFragment"
         android:name="net.arwix.gastro.client.ui.history.order.HistoryOrderDetailFragment"
         android:label="HistoryOrderDetailFragment" />
+    <fragment
+        android:id="@+id/reportDayFragment"
+        android:name="net.arwix.gastro.client.ui.report.day.ReportDayFragment"
+        android:label="Daily report"
+        tools:layout="@layout/fragment_report_day" />
 </navigation>

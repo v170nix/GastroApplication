@@ -9,6 +9,7 @@ import net.arwix.gastro.client.ui.history.order.HistoryOrderDetailViewModel
 import net.arwix.gastro.client.ui.order.OrderViewModel
 import net.arwix.gastro.client.ui.pay.PayViewModel
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
+import net.arwix.gastro.client.ui.report.day.ReportDayUseCase
 import net.arwix.gastro.client.ui.table.OpenTablesViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -23,6 +24,10 @@ val mainModule = module {
         Firebase.firestore(Firebase.app).apply {
             clearPersistence()
         }
+    }
+
+    single {
+        ReportDayUseCase(get(), androidContext())
     }
 
     viewModel { OpenTablesViewModel(get()) }

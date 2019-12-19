@@ -6,6 +6,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.navigation.NavOptions
@@ -117,6 +118,7 @@ class OrderListFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.standart_menu, menu)
+        MenuCompat.setGroupDividerEnabled(menu, true)
         super.onCreateOptionsMenu(menu, inflater)
     }
 

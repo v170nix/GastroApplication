@@ -4,6 +4,7 @@ package net.arwix.gastro.client.ui.table
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment.findNavController
@@ -68,6 +69,7 @@ class OpenTablesFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.standart_menu, menu)
+        MenuCompat.setGroupDividerEnabled(menu, true)
         super.onCreateOptionsMenu(menu, inflater)
     }
 }

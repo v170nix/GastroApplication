@@ -3,6 +3,7 @@ package net.arwix.gastro.client.ui.order
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.EditorInfo
+import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import kotlinx.android.synthetic.main.fragment_order_table.*
@@ -64,6 +65,7 @@ class OrderTableFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.standart_menu, menu)
+        MenuCompat.setGroupDividerEnabled(menu, true)
         super.onCreateOptionsMenu(menu, inflater)
     }
 

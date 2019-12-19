@@ -3,6 +3,7 @@ package net.arwix.gastro.client.ui.check
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import net.arwix.gastro.client.R
 
@@ -22,6 +23,7 @@ class CheckListFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.open_tables_menu, menu)
+        MenuCompat.setGroupDividerEnabled(menu, true)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
