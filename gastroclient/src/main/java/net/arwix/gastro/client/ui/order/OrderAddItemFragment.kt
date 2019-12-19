@@ -50,6 +50,10 @@ class OrderAddItemFragment : Fragment() {
             hideKeyboard()
             findNavController(this).navigateUp()
         }
+        order_list_add_item_back_button.setOnClickListener {
+            requireActivity().hideKeyboard()
+            findNavController(this).popBackStack()
+        }
 
 
     }
