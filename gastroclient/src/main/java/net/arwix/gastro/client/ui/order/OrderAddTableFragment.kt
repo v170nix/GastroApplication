@@ -1,12 +1,14 @@
 package net.arwix.gastro.client.ui.order
 
 import android.os.Bundle
-import android.view.*
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
-import kotlinx.android.synthetic.main.fragment_order_table.*
+import kotlinx.android.synthetic.main.fragment_order_add_table.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.common.hideKeyboard
 import net.arwix.gastro.library.common.showSoftKeyboard
@@ -14,20 +16,15 @@ import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
-class OrderTableFragment : Fragment() {
+class OrderAddTableFragment : Fragment() {
 
     private val orderViewModel: OrderViewModel by sharedViewModel()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_order_table, container, false)
+        return inflater.inflate(R.layout.fragment_order_add_table, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -61,12 +58,6 @@ class OrderTableFragment : Fragment() {
         Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(
             R.id.orderListFragment
         )
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.standart_menu, menu)
-        MenuCompat.setGroupDividerEnabled(menu, true)
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
 }

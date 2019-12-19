@@ -8,14 +8,14 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment.findNavController
-import kotlinx.android.synthetic.main.fragment_order_list_add_item.*
+import kotlinx.android.synthetic.main.fragment_order_add_item.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.common.hideKeyboard
 import net.arwix.gastro.library.common.showSoftKeyboard
 import net.arwix.gastro.library.data.OrderItem
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class OrderListAddItemFragment : Fragment() {
+class OrderAddItemFragment : Fragment() {
 
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private lateinit var itemType: String
@@ -24,8 +24,7 @@ class OrderListAddItemFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_order_list_add_item, container, false)
+        return inflater.inflate(R.layout.fragment_order_add_item, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

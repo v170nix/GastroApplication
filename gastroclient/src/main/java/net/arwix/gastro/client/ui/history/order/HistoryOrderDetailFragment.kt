@@ -16,7 +16,7 @@ import com.epson.epos2.Epos2Exception
 import kotlinx.android.synthetic.main.fragment_history_order_detail.*
 import kotlinx.coroutines.*
 import net.arwix.gastro.client.R
-import net.arwix.gastro.client.ui.check.CheckDetailAdapter
+import net.arwix.gastro.client.ui.history.check.HistoryCheckDetailAdapter
 import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -24,19 +24,18 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 class HistoryOrderDetailFragment : Fragment(), CoroutineScope by MainScope() {
 
     private val orderDetailViewModel: HistoryOrderDetailViewModel by sharedViewModel()
-    private lateinit var adapter: CheckDetailAdapter
+    private lateinit var adapterHistory: HistoryCheckDetailAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_history_order_detail, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = CheckDetailAdapter()
+        adapterHistory = HistoryCheckDetailAdapter()
         val linearLayoutManager = LinearLayoutManager(requireContext())
 
 //        val priceTotal = 340 * 2
@@ -57,7 +56,7 @@ class HistoryOrderDetailFragment : Fragment(), CoroutineScope by MainScope() {
                     linearLayoutManager.orientation
                 )
             )
-            adapter = this@HistoryOrderDetailFragment.adapter
+            adapter = this@HistoryOrderDetailFragment.adapterHistory
         }
         orderDetailViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
         orderDetailViewModel.nonCancelableIntent(HistoryOrderDetailViewModel.Action.GetLastOrder)
@@ -94,7 +93,7 @@ class HistoryOrderDetailFragment : Fragment(), CoroutineScope by MainScope() {
 
     private fun render(state: HistoryOrderDetailViewModel.State) {
         state.orderData?.run {
-            orderItems?.run(adapter::setItems)
+            orderItems?.run(adapterHistory::setItems)
             val t = table ?: return@run
             val tp = tablePart ?: return@run
             setTitle(TableGroup(t, tp))

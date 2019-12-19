@@ -2,29 +2,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/open_tables_menu_add_all_to_pay"
+        android:id="@+id/menu_pay_add_items"
         android:icon="@drawable/ic_playlist_add"
-        android:title="add all items to pay"
+        android:title="@string/menu_pay_add_items"
         app:showAsAction="ifRoom" />
     <group android:id="@+id/menu_group_view">
         <item
-            android:id="@+id/order_menu"
-            android:title="view last order"
+            android:id="@+id/menu_history_orders"
+            android:title="@string/menu_history_orders"
             app:showAsAction="never" />
         <item
-            android:id="@+id/check_menu"
-            android:title="view last check"
+            android:id="@+id/menu_history_checks"
+            android:title="@string/menu_history_checks"
             app:showAsAction="never" />
     </group>
     <group android:id="@+id/menu_group_report">
         <item
-            android:id="@+id/menu_day_report"
-            android:title="daily report"
+            android:id="@+id/menu_report_day"
+            android:title="@string/menu_report_daily"
             app:showAsAction="never" />
     </group>
 
     <item
-        android:id="@+id/logout_menu"
-        android:title="logout"
+        android:id="@+id/menu_logout"
+        android:title="@string/menu_logout"
         app:showAsAction="never" />
 </menu>

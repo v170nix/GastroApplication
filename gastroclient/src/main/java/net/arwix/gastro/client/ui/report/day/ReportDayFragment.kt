@@ -2,15 +2,16 @@ package net.arwix.gastro.client.ui.report.day
 
 
 import android.os.Bundle
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import com.crashlytics.android.Crashlytics
 import com.epson.epos2.Epos2Exception
 import kotlinx.android.synthetic.main.fragment_report_day.*
 import kotlinx.coroutines.*
-
 import net.arwix.gastro.client.R
 import org.koin.android.ext.android.inject
 import org.threeten.bp.LocalDate
@@ -23,11 +24,6 @@ class ReportDayFragment : Fragment(), CoroutineScope by MainScope() {
 
     private val reportDayUseCase: ReportDayUseCase by inject()
     private var reportDayData: ReportDayData? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -87,12 +83,6 @@ class ReportDayFragment : Fragment(), CoroutineScope by MainScope() {
         ).apply {
             this.setGravity(Gravity.CENTER, 0, 0)
         }.show()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.standart_menu, menu)
-        MenuCompat.setGroupDividerEnabled(menu, true)
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun updateReport(dayData: ReportDayData) {

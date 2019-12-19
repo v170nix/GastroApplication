@@ -3,28 +3,37 @@ package net.arwix.gastro.client
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuCompat
+import androidx.core.view.forEach
 import androidx.lifecycle.Observer
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
+import net.arwix.gastro.client.common.MenuHelper
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.hideKeyboard
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class MainClientActivity : AppCompatActivity() {
+class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChangedListener {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private val profileViewModel by viewModel<ProfileViewModel>()
+    private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var navController: NavController
+    private var destination: NavDestination? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_client)
-        val navController = findNavController(this, R.id.nav_host_fragment)
+        navController = findNavController(this, R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration.Builder(navController.graph).build()
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         profileViewModel.liveState.observe(this, Observer(this::renderProfile))
@@ -32,7 +41,6 @@ class MainClientActivity : AppCompatActivity() {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(this, R.id.nav_host_fragment)
         hideKeyboard()
         return NavigationUI.navigateUp(
             navController,
@@ -64,58 +72,82 @@ class MainClientActivity : AppCompatActivity() {
         }
     }
 
-    private fun renderProfile(state: ProfileViewModel.State) {
-        if (state.isLogin) {
-            val navOptions = NavOptions.Builder().setPopUpTo(R.id.openTablesFragment, true).build()
-            hideKeyboard()
-            findNavController(this, R.id.nav_host_fragment)
-                .navigate(R.id.openTablesFragment, null, navOptions)
-        } else {
-            if (findNavController(
-                    this,
-                    R.id.nav_host_fragment
-                ).currentDestination?.id != R.id.signInFragment
-            ) {
-                val navOptions = NavOptions.Builder().setPopUpTo(R.id.signInFragment, true).build()
-                hideKeyboard()
-                findNavController(this, R.id.nav_host_fragment)
-                    .navigate(R.id.signInFragment, null, navOptions)
-            }
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.logout_menu -> {
+            R.id.menu_logout -> {
                 profileViewModel.nonCancelableIntent(ProfileViewModel.Action.Logout)
                 return true
             }
-            R.id.check_menu -> {
+            R.id.menu_history_checks ->
                 if (profileViewModel.isLogin()) {
-                    findNavController(
-                        this,
-                        R.id.nav_host_fragment
-                    ).navigate(R.id.checkDetailFragment)
+                    navigateTo(R.id.historyCheckDetailFragment, true)
+                    return true
                 }
-            }
-            R.id.menu_day_report -> {
+            R.id.menu_report_day ->
                 if (profileViewModel.isLogin()) {
-                    findNavController(
-                        this,
-                        R.id.nav_host_fragment
-                    ).navigate(R.id.reportDayFragment)
+                    navigateTo(R.id.reportDayFragment, true)
+                    return true
                 }
-            }
-            R.id.order_menu -> {
+            R.id.menu_history_orders ->
                 if (profileViewModel.isLogin()) {
-                    findNavController(
-                        this,
-                        R.id.nav_host_fragment
-                    ).navigate(R.id.historyOrderDetailFragment)
+                    navigateTo(R.id.historyOrderDetailFragment, true)
+                    return true
                 }
-            }
         }
-        return false
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun navigateTo(@IdRes resId: Int, inclusive: Boolean = false) {
+        hideKeyboard()
+        val navOptions =
+            if (inclusive) NavOptions.Builder().setPopUpTo(resId, true).build() else null
+        findNavController(this, R.id.nav_host_fragment).navigate(resId, null, navOptions)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.app_menu, menu)
+        menu?.forEach { it.isVisible = false }
+        MenuCompat.setGroupDividerEnabled(menu, true)
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        navController.currentDestination?.id?.run {
+            MenuHelper.updateVisibleMenu(this, menu)
+            supportActionBar?.let {
+                MenuHelper.updateActionBar(this@MainClientActivity, this, it)
+            }
+            return true
+        }
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        navController.addOnDestinationChangedListener(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        navController.removeOnDestinationChangedListener(this)
+    }
+
+    override fun onDestinationChanged(
+        controller: NavController,
+        destination: NavDestination,
+        arguments: Bundle?
+    ) {
+        this.destination = destination
+        invalidateOptionsMenu()
+    }
+
+    private fun renderProfile(state: ProfileViewModel.State) {
+        if (state.isLogin) {
+            navigateTo(R.id.openTablesFragment, true)
+            return
+        }
+        if (navController.currentDestination?.id != R.id.signInFragment
+        ) navigateTo(R.id.signInFragment, true)
     }
 
 }

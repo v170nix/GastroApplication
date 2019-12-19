@@ -1,6 +1,5 @@
 package net.arwix.gastro.client.ui.pay
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,7 +69,6 @@ class PayListItemAdapter(
     }
 
     fun setItems(payOrderData: MutableMap<String, MutableList<PayViewModel.PayOrderItem>>) {
-        Log.e("setItems", payOrderData.toString())
         val newList = mutableListOf<PayAdapterOrderItem>()
         payOrderData.forEach { (type, list) ->
             val typeItem = PayAdapterOrderItem.Type(type)

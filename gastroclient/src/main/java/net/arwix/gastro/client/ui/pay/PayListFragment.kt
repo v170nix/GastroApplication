@@ -2,11 +2,9 @@ package net.arwix.gastro.client.ui.pay
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment.findNavController
@@ -78,7 +76,6 @@ class PayListFragment : Fragment() {
             adapter.setItems(this)
         }
         if (state.isCloseTableGroup) {
-            Log.e("isClose", "3")
             Toast.makeText(
                 requireContext(),
                 "close table ${state.tableGroup?.toPrintString()}",
@@ -128,15 +125,9 @@ class PayListFragment : Fragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.open_tables_menu, menu)
-        MenuCompat.setGroupDividerEnabled(menu, true)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.open_tables_menu_add_all_to_pay -> {
+            R.id.menu_pay_add_items -> {
                 payViewModel.nonCancelableIntent(PayViewModel.Action.AddAllItemsToPay)
                 return true
             }

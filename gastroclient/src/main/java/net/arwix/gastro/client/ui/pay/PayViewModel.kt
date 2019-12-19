@@ -1,19 +1,18 @@
 package net.arwix.gastro.client.ui.pay
 
-import android.util.Log
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
+import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.*
 import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 
 class PayViewModel(
-    private val firestore: FirebaseFirestore
+    private val firestoreDbApp: FirestoreDbApp
 ) : SimpleIntentViewModel<PayViewModel.Action, PayViewModel.Result, PayViewModel.State>() {
 
     private var tableUpdateJob: Job? = null
@@ -23,7 +22,7 @@ class PayViewModel(
         tableUpdateJob?.cancel()
         notificationFromObserver(Result.InitTable(tableGroup))
         tableUpdateJob = viewModelScope.launch {
-            firestore.collection("open tables").document(tableGroup.toDocId())
+            firestoreDbApp.refs.openTables.document(tableGroup.toDocId())
                 .toFlow()
                 .collect {
                     it.toObject(OpenTableData::class.java)?.run {
@@ -133,18 +132,17 @@ class PayViewModel(
             tablePart = tableGroup.tablePart,
             checkItems = checkItems
         )
-        val openTablesRef = firestore.collection("open tables")
-        val closeTablesRef = firestore.collection("close tables")
-        val checks = firestore.collection("checks")
+        val openTablesRef = firestoreDbApp.refs.openTables
+        val closeTablesRef = firestoreDbApp.refs.closeTables
+        val checks = firestoreDbApp.refs.checks
         val checkDoc = checks.document()
-        firestore.runTransaction {
+        firestoreDbApp.firestore.runTransaction {
             val serverOrderData =
                 it.get(openTablesRef.document(tableGroup.toDocId())).toObject(OpenTableData::class.java)!!
             if (serverOrderData.updated != currentOpenTableData.updated) return@runTransaction
             it.set(checkDoc, checkData)
             if (residualCount == 0) {
                 // closeTable
-                Log.e("close Table", "1")
                 val closeTableData = CloseTableData(
                     table = tableGroup.tableId,
                     tablePart = tableGroup.tablePart,
@@ -156,7 +154,6 @@ class PayViewModel(
                     },
                     summaryPrice = summaryPrice
                 )
-                Log.e("table", closeTableData.toString())
                 it.set(closeTablesRef.document(), closeTableData)
                 it.delete(openTablesRef.document(tableGroup.toDocId()))
             } else {

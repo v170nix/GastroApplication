@@ -2,9 +2,9 @@ package net.arwix.gastro.client.ui.table
 
 
 import android.os.Bundle
-import android.view.*
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.MenuCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment.findNavController
@@ -23,11 +23,6 @@ class OpenTablesFragment : Fragment() {
     private val payViewModel: PayViewModel by sharedViewModel()
     private lateinit var adapter: OpenTablesAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,11 +32,10 @@ class OpenTablesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setTitle()
         openTablesViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
         open_tables_add_order_button.setOnClickListener {
             orderViewModel.clear()
-            findNavController(this).navigate(R.id.orderTableFragment)
+            findNavController(this).navigate(R.id.orderAddTableFragment)
         }
 
         adapter = OpenTablesAdapter(
@@ -63,13 +57,4 @@ class OpenTablesFragment : Fragment() {
         state.tablesData?.run(adapter::setData)
     }
 
-    private fun setTitle() {
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = "Open tables"
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.standart_menu, menu)
-        MenuCompat.setGroupDividerEnabled(menu, true)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
 }

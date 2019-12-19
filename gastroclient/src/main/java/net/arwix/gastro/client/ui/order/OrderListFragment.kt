@@ -2,11 +2,13 @@ package net.arwix.gastro.client.ui.order
 
 
 import android.os.Bundle
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import androidx.core.view.MenuCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.navigation.NavOptions
@@ -26,11 +28,6 @@ class OrderListFragment : Fragment() {
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private val profileViewModel: ProfileViewModel by sharedViewModel()
     private lateinit var adapterOrder: OrderListAdapter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -98,8 +95,10 @@ class OrderListFragment : Fragment() {
     }
 
     private fun setTitle(tableGroup: TableGroup) {
-        (requireActivity() as AppCompatActivity).supportActionBar?.title =
-            "add order - table ${tableGroup.tableId}/${tableGroup.tablePart}"
+        (requireActivity() as AppCompatActivity).supportActionBar?.run {
+            title = getString(R.string.title_order_add)
+            subtitle = "Table ${tableGroup.tableId}/${tableGroup.tablePart}"
+        }
     }
 
     private fun renderTotalPrice(map: Map<String, List<OrderItem>>) {
@@ -109,17 +108,6 @@ class OrderListFragment : Fragment() {
         val formatter = NumberFormat.getCurrencyInstance()
         order_list_total_price_text.text =
             "Total price: ${formatter.format(price / 100.0)}\n($counts items)"
-    }
-
-//    private sealed class AdapterOrderItems {
-//        data class Type(val name: String) : AdapterOrderItems()
-//        data class Default(val type: Type, val order: OrderItem) : AdapterOrderItems()
-//    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.standart_menu, menu)
-        MenuCompat.setGroupDividerEnabled(menu, true)
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
 }

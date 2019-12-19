@@ -2,35 +2,38 @@ package net.arwix.gastro.client.ui.table
 
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.library.data.OpenTableData
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 
-class OpenTablesViewModel(private val firestore: FirebaseFirestore) :
+class OpenTablesViewModel(
+    private val firestoreDbApp: FirestoreDbApp
+) :
     SimpleIntentViewModel<OpenTablesViewModel.Action, OpenTablesViewModel.Result, OpenTablesViewModel.State>() {
 
     override var internalViewState = State()
 
     init {
         viewModelScope.launch {
-            val query = firestore
-                .collection("open tables")
+            val query = firestoreDbApp.refs.openTables
+            query
                 .orderBy("updated", Query.Direction.DESCENDING)
-            query.toFlow()
+                .toFlow()
                 .collect { snapshot ->
                     val map = LinkedHashMap<TableGroup, OpenTableData>()
-                    snapshot.documents.forEach {
+                    snapshot.documents.map {
                         map[TableGroup.fromString(it.id)] = it.toObject(OpenTableData::class.java)!!
                     }
                     notificationFromObserver(Result.UpdateTablesList(map))
                 }
+
         }
     }
 

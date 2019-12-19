@@ -13,7 +13,7 @@ fun CollectionReference.toFlow() = callbackFlow<QuerySnapshot> {
             cancel(CancellationException("API Error", e))
             return@addSnapshotListener
         }
-        if (snapshot != null && !snapshot.isEmpty) {
+        if (snapshot != null) {
             offer(snapshot)
         }
     }
@@ -45,7 +45,7 @@ fun Query.toFlow() = callbackFlow<QuerySnapshot> {
             cancel(CancellationException("API Error", e))
             return@addSnapshotListener
         }
-        if (snapshot != null && !snapshot.isEmpty) {
+        if (snapshot != null) {
             offer(snapshot)
         }
     }

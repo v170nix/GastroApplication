@@ -5,9 +5,9 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.launch
+import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.MenuData
@@ -15,7 +15,7 @@ import net.arwix.gastro.library.data.OrderData
 import net.arwix.mvi.SimpleIntentViewModel
 
 class HistoryOrderDetailViewModel(
-    private val firestore: FirebaseFirestore,
+    private val firestoreDbApp: FirestoreDbApp,
     private val sharedPreferences: SharedPreferences
 ) : SimpleIntentViewModel<HistoryOrderDetailViewModel.Action, HistoryOrderDetailViewModel.Result, HistoryOrderDetailViewModel.State>() {
 
@@ -23,7 +23,7 @@ class HistoryOrderDetailViewModel(
 
     init {
         viewModelScope.launch {
-            val doc = firestore.collection("menu").orderBy("order").get().await()!!
+            val doc = firestoreDbApp.refs.menu.orderBy("order").get().await()!!
             val menu = doc.documents.map { MenuData(it.id, it.getString("printer")!!) }
             menuTypes = menu
         }
@@ -32,11 +32,14 @@ class HistoryOrderDetailViewModel(
 
     override fun dispatchAction(action: Action): LiveData<Result> {
         return liveData<Result> {
-            val lastCheck =
-                firestore.collection("orders").orderBy("created", Query.Direction.DESCENDING)
+            val lastOrder =
+                firestoreDbApp.refs.orders.orderBy("created", Query.Direction.DESCENDING)
                     .limit(1).get().await()
-            val data = lastCheck!!.documents[0].toObject(OrderData::class.java) ?: return@liveData
-            emit(Result.LastOrder(data))
+            lastOrder?.run {
+                val data =
+                    documents.firstOrNull()?.toObject(OrderData::class.java) ?: return@liveData
+                emit(Result.LastOrder(data))
+            }
         }
     }
 

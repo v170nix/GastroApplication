@@ -1,29 +1,32 @@
-package net.arwix.gastro.client.ui.check
+package net.arwix.gastro.client.ui.history.check
 
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.client.domain.PrinterUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.CheckData
 import net.arwix.mvi.SimpleIntentViewModel
 
-class CheckDetailViewModel(
-    private val firestore: FirebaseFirestore
+class HistoryCheckDetailViewModel(
+    private val firestoreDbApp: FirestoreDbApp
 ) :
-    SimpleIntentViewModel<CheckDetailViewModel.Action, CheckDetailViewModel.Result, CheckDetailViewModel.State>() {
+    SimpleIntentViewModel<HistoryCheckDetailViewModel.Action, HistoryCheckDetailViewModel.Result, HistoryCheckDetailViewModel.State>() {
 
     override var internalViewState: State = State()
 
     override fun dispatchAction(action: Action): LiveData<Result> {
         return liveData<Result> {
             val lastCheck =
-                firestore.collection("checks").orderBy("created", Query.Direction.DESCENDING)
+                firestoreDbApp.refs.checks.orderBy("created", Query.Direction.DESCENDING)
                     .limit(1).get().await()
-            val data = lastCheck!!.documents[0].toObject(CheckData::class.java) ?: return@liveData
-            emit(Result.LastCheck(data))
+            lastCheck?.run {
+                val data =
+                    documents.firstOrNull()?.toObject(CheckData::class.java) ?: return@liveData
+                emit(Result.LastCheck(data))
+            }
         }
     }
 

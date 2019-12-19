@@ -6,48 +6,51 @@
     app:startDestination="@id/signInFragment">
 
     <fragment
+        android:id="@+id/signInFragment"
+        android:name="net.arwix.gastro.client.ui.profile.SignInFragment"
+        android:label="@string/title_sign_in"
+        tools:layout="@layout/fragment_sign_in" />
+    <fragment
         android:id="@+id/openTablesFragment"
         android:name="net.arwix.gastro.client.ui.table.OpenTablesFragment"
-        android:label="Open tables list"
+        android:label="@string/title_open_tables"
         tools:layout="@layout/fragment_open_tables" />
+
     <fragment
-        android:id="@+id/orderTableFragment"
-        android:name="net.arwix.gastro.client.ui.order.OrderTableFragment"
-        android:label="add table"
-        tools:layout="@layout/fragment_order_table" >
+        android:id="@+id/orderAddTableFragment"
+        android:name="net.arwix.gastro.client.ui.order.OrderAddTableFragment"
+        android:label="@string/title_order_add"
+        tools:layout="@layout/fragment_order_add_table">
         <action
-            android:id="@+id/action_orderTableFragment_to_orderListFragment"
+            android:id="@+id/action_orderAddTableFragment_to_orderListFragment"
             app:destination="@id/orderListFragment" />
     </fragment>
     <fragment
         android:id="@+id/orderListFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderListFragment"
-        android:label="order list"
+        android:label="@string/title_order_add"
         tools:layout="@layout/fragment_order_list">
         <action
             android:id="@+id/action_orderListFragment_to_orderListAddItemFragment"
             app:destination="@id/orderListAddItemFragment" />
+
     </fragment>
     <fragment
         android:id="@+id/orderListAddItemFragment"
-        android:name="net.arwix.gastro.client.ui.order.OrderListAddItemFragment"
-        android:label="fragment_order_list_add"
-        tools:layout="@layout/fragment_order_list_add_item" />
-    <fragment
-        android:id="@+id/signInFragment"
-        android:name="net.arwix.gastro.client.ui.profile.SignInFragment"
-        android:label="Sign in"
-        tools:layout="@layout/fragment_sign_in" />
+        android:name="net.arwix.gastro.client.ui.order.OrderAddItemFragment"
+        android:label=""
+        tools:layout="@layout/fragment_order_add_item" />
+
     <fragment
         android:id="@+id/payListFragment"
         android:name="net.arwix.gastro.client.ui.pay.PayListFragment"
-        android:label="fragment_pay_list"
+        android:label=""
         tools:layout="@layout/fragment_pay_list" />
     <fragment
-        android:id="@+id/checkDetailFragment"
-        android:name="net.arwix.gastro.client.ui.check.CheckDetailFragment"
+        android:id="@+id/historyCheckDetailFragment"
+        android:name="net.arwix.gastro.client.ui.history.check.HistoryCheckDetailFragment"
         android:label="fragment_check_detail"
-        tools:layout="@layout/fragment_check_detail" />
+        tools:layout="@layout/fragment_history_check_detail" />
     <fragment
         android:id="@+id/historyOrderDetailFragment"
         android:name="net.arwix.gastro.client.ui.history.order.HistoryOrderDetailFragment"

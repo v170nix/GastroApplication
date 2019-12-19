@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.order.OrderListAddItemFragment">
+    tools:context=".ui.order.OrderAddItemFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         style="@style/TextInputLayoutAppearance"

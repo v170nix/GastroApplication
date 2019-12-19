@@ -7,17 +7,17 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.epson.epos2.Epos2Exception
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.*
 import net.arwix.mvi.SimpleIntentViewModel
 
 class OrderViewModel(
-    private val firestore: FirebaseFirestore,
+    private val firestoreDbApp: FirestoreDbApp,
     private val sharedPreferences: SharedPreferences,
     private val context: Context
 ) :
@@ -30,7 +30,7 @@ class OrderViewModel(
 
     init {
         viewModelScope.launch {
-            val doc = firestore.collection("menu").orderBy("order").get().await()!!
+            val doc = firestoreDbApp.refs.menu.orderBy("order").get().await()!!
             val menu = doc.documents.map { it.id }
             val menuA = doc.documents.map { MenuData(it.id, it.getString("printer")!!) }
             menuData = menuA
@@ -53,7 +53,7 @@ class OrderViewModel(
 
             is Action.SubmitOrder -> {
                 withContext(Dispatchers.Main) {
-                    val orders = firestore.collection("orders")
+                    val orders = firestoreDbApp.refs.orders
                     val orderData =
                         OrderData(
                             action.userId,
@@ -79,9 +79,9 @@ class OrderViewModel(
                         val tablePart =
                             orderData.tablePart.toString().toIntOrNull() ?: return@withContext
                         val docId = "$tableId-$tablePart"
-                        firestore.runTransaction {
+                        firestoreDbApp.firestore.runTransaction {
                             val openTableDoc =
-                                it.get(firestore.collection("open tables").document(docId))
+                                it.get(firestoreDbApp.refs.openTables.document(docId))
                             it.set(orderDoc, orderData)
                             if (openTableDoc.exists()) {
                                 it.update(

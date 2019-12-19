@@ -2,8 +2,8 @@ package net.arwix.gastro.client.ui.report.day
 
 import android.content.Context
 import com.epson.epos2.printer.Printer
-import com.google.firebase.firestore.FirebaseFirestore
 import net.arwix.gastro.client.common.createCharString
+import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.client.domain.PrinterUtils
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.CheckData
@@ -16,7 +16,7 @@ import org.threeten.bp.format.FormatStyle
 import java.text.NumberFormat
 
 class ReportDayUseCase(
-    private val firestore: FirebaseFirestore,
+    private val firestoreDbApp: FirestoreDbApp,
     private val applicationContext: Context
 ) {
 
@@ -27,7 +27,7 @@ class ReportDayUseCase(
         val zdtEnd = localDate.atStartOfDay(ZoneId.systemDefault()).plusDays(1)
         val endDate = DateTimeUtils.toDate(zdtEnd.toInstant())
         val query =
-            firestore.collection("checks")
+            firestoreDbApp.refs.checks
                 .whereGreaterThan("created", beginDate)
                 .whereLessThan("created", endDate)
                 .get().await()
@@ -57,7 +57,7 @@ class ReportDayUseCase(
         val zdtEnd = localDate.atStartOfDay(ZoneId.systemDefault()).plusDays(1)
         val endDate = DateTimeUtils.toDate(zdtEnd.toInstant())
         val query =
-            firestore.collection("orders")
+            firestoreDbApp.refs.orders
                 .whereGreaterThan("created", beginDate)
                 .whereLessThan("created", endDate)
                 .get().await()

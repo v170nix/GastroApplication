@@ -1,4 +1,4 @@
-package net.arwix.gastro.client.ui.check
+package net.arwix.gastro.client.ui.history.check
 
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +10,7 @@ import net.arwix.gastro.client.R
 import net.arwix.gastro.library.data.OrderItem
 import java.text.NumberFormat
 
-class CheckDetailAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class HistoryCheckDetailAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val items = mutableListOf<OrderItem>()
 

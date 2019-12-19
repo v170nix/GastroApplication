@@ -17,9 +17,7 @@ class SignInFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_sign_in, container, false)
-    }
+    ): View = inflater.inflate(R.layout.fragment_sign_in, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -54,7 +52,7 @@ class SignInFragment : Fragment() {
             password_input_layout.error = null
             if (password_text_edit.editableText.toString() != "") {
                 password_input_layout.isErrorEnabled = true
-                password_input_layout.error = "wrong password"
+                password_input_layout.error = getString(R.string.error_sign_in)
             }
         }
     }
