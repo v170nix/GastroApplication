@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEach
 import net.arwix.gastro.client.R
 
-object MenuHelper {
+object AppMenuHelper {
 
     fun updateVisibleMenu(fragmentId: Int, menu: Menu) {
         when (fragmentId) {

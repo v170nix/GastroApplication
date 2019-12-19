@@ -18,7 +18,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
-import net.arwix.gastro.client.common.MenuHelper
+import net.arwix.gastro.client.common.AppMenuHelper
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.hideKeyboard
 import org.koin.android.viewmodel.ext.android.viewModel
@@ -113,9 +113,9 @@ class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChang
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         navController.currentDestination?.id?.run {
-            MenuHelper.updateVisibleMenu(this, menu)
+            AppMenuHelper.updateVisibleMenu(this, menu)
             supportActionBar?.let {
-                MenuHelper.updateActionBar(this@MainClientActivity, this, it)
+                AppMenuHelper.updateActionBar(this@MainClientActivity, this, it)
             }
             return true
         }
