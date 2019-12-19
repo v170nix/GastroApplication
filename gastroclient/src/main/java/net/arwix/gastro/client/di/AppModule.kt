@@ -11,6 +11,7 @@ import net.arwix.gastro.client.ui.pay.PayViewModel
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.client.ui.table.OpenTablesViewModel
 import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -25,7 +26,7 @@ val mainModule = module {
     }
 
     viewModel { OpenTablesViewModel(get()) }
-    viewModel { OrderViewModel(get()) }
+    viewModel { OrderViewModel(get(), get(), androidContext()) }
     viewModel { ProfileViewModel() }
     viewModel { PayViewModel(get()) }
     viewModel { CheckDetailViewModel(get()) }

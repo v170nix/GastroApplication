@@ -6,7 +6,6 @@ import com.epson.epos2.printer.Printer
 import com.epson.epos2.printer.PrinterStatusInfo
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.arwix.gastro.client.common.createCharString
-import net.arwix.gastro.library.data.MenuData
 import net.arwix.gastro.library.data.OrderData
 import net.arwix.gastro.library.data.OrderItem
 import org.threeten.bp.Instant
@@ -22,7 +21,7 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
     //Bon Nr: 120555
 
     // return first bonNumber last code
-    suspend fun printOrder(orderData: OrderData, menuData: List<MenuData>, bonNumber: Long) =
+    suspend fun printOrder(addressPrinter: String, orderData: OrderData, bonNumber: Long) =
         suspendCancellableCoroutine<Pair<Long, Int>> { cont ->
 
             var innerBonNumber = bonNumber
@@ -82,9 +81,7 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
                     val priceTotal = item.price * item.count
                     var itemString = createCharString(lineSize, " ")
                     val nameString = "   ${item.count}x ${item.name}"
-                    val priceString = formatter.format(priceTotal / 100.0).apply {
-                        this.dropLast(2)
-                    }
+                    val priceString = formatter.format(priceTotal / 100.0).dropLast(2)
                     if (nameString.length > lineSize - priceString.length - 4) {
                         printer.addText("$nameString\n")
                         itemString = itemString.replaceRange(
@@ -108,7 +105,7 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
                 innerBonNumber++
             }
 
-            printer.connect("TCP:192.168.0.103", Printer.PARAM_DEFAULT)
+            printer.connect(addressPrinter, Printer.PARAM_DEFAULT)
             printer.beginTransaction()
             val status = printer.status
             printer.sendData(Printer.PARAM_DEFAULT)

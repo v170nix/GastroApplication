@@ -3,6 +3,7 @@ package net.arwix.gastro.client.ui.order
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -77,6 +78,12 @@ class OrderListFragment : Fragment() {
 
     private fun render(state: OrderViewModel.State) {
         if (state.isSubmit) {
+            if (state.resultPrint != null) {
+                Toast.makeText(requireContext(), "code: ${state.resultPrint}", Toast.LENGTH_LONG)
+                    .apply {
+                        this.setGravity(Gravity.CENTER, 0, 0)
+                    }.show()
+            }
             orderViewModel.clear()
             val options = NavOptions.Builder()
                 .setPopUpTo(R.id.openTablesFragment, true)

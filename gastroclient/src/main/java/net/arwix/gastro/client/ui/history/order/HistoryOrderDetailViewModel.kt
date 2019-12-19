@@ -48,13 +48,61 @@ class HistoryOrderDetailViewModel(
         }
     }
 
-    suspend fun print(context: Context): Int {
-        val orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
-        val result = internalViewState.orderData?.run {
-            PrinterOrderUseCase(context).printOrder(this, menuTypes, orderBonNumber)
-        } ?: orderBonNumber to -100
-        sharedPreferences.edit().putLong("orderBonNumber", result.first).apply()
-        return result.second
+    suspend fun print(context: Context): List<Int> {
+        var orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
+        val printers = transformMenuToPrinters(menuTypes)
+        val partsOrders = transformOrders(printers, internalViewState.orderData!!)
+        val resultCodes = mutableListOf<Int>()
+
+        partsOrders.forEach { (printerAddress, orderData) ->
+            val result = internalViewState.orderData?.run {
+                PrinterOrderUseCase(context).printOrder(printerAddress, orderData, orderBonNumber)
+            } ?: orderBonNumber to -100
+            orderBonNumber = result.first
+            resultCodes.add(result.second)
+        }
+        sharedPreferences.edit().putLong("orderBonNumber", orderBonNumber).apply()
+        return resultCodes
+    }
+
+    private fun transformMenuToPrinters(menu: List<MenuData>): MutableMap<String, MutableList<String>> {
+        // address list menu
+        val printersAddress = mutableMapOf<String, MutableList<String>>()
+        menu.forEach {
+            val items = printersAddress.getOrPut(it.printer) {
+                mutableListOf()
+            }
+            items.add(it.name)
+        }
+        return printersAddress
+    }
+
+    private fun transformOrders(
+        printerMap: Map<String, List<String>>,
+        summaryOrderData: OrderData
+    ): Map<String, OrderData> {
+        val result = mutableMapOf<String, OrderData>()
+        summaryOrderData.orderItems!!.forEach { (menu, listOrders) ->
+            var printerAddress: String? = null
+            printerMap.forEach printerMap@{ (printer, partMenusInPrinter) ->
+                if (partMenusInPrinter.indexOf(menu) > -1) {
+                    printerAddress = printer
+                    return@printerMap
+                }
+            }
+            if (printerAddress == null) throw IllegalStateException("menu error")
+            val orderData = result.getOrPut(printerAddress!!) {
+                summaryOrderData.copy(
+                    orderItems = mutableMapOf()
+                )
+            }
+            val orderItemsMap = orderData.orderItems as MutableMap
+            val orderItemsList = orderItemsMap.getOrPut(menu) {
+                mutableListOf()
+            } as MutableList
+            orderItemsList.addAll(listOrders)
+        }
+        return result
     }
 
 

@@ -1,22 +1,29 @@
 package net.arwix.gastro.client.ui.order
 
+import android.content.Context
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.epson.epos2.Epos2Exception
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
-import net.arwix.gastro.library.data.OpenTableData
-import net.arwix.gastro.library.data.OrderData
-import net.arwix.gastro.library.data.OrderItem
-import net.arwix.gastro.library.data.TableGroup
+import net.arwix.gastro.library.data.*
 import net.arwix.mvi.SimpleIntentViewModel
 
-class OrderViewModel(private val firestore: FirebaseFirestore) :
+class OrderViewModel(
+    private val firestore: FirebaseFirestore,
+    private val sharedPreferences: SharedPreferences,
+    private val context: Context
+) :
     SimpleIntentViewModel<OrderViewModel.Action, OrderViewModel.Result, OrderViewModel.State>() {
+
+    private lateinit var menuData: List<MenuData>
 
     override var internalViewState: State = State()
     private var menuTypes: List<String>? = null
@@ -25,6 +32,8 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
         viewModelScope.launch {
             val doc = firestore.collection("menu").orderBy("order").get().await()!!
             val menu = doc.documents.map { it.id }
+            val menuA = doc.documents.map { MenuData(it.id, it.getString("printer")!!) }
+            menuData = menuA
             menuTypes = menu
             notificationFromObserver(Result.AddMenu(menu))
         }
@@ -94,11 +103,42 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
                                 it.set(openTableDoc.reference, newOpenTableData)
                             }
                         }.await()
+
+                        withContext(Dispatchers.IO) {
+                            orderDoc.get().await()
+                            val openTableDoc =
+                                orderDoc.get().await()!!.toObject(OrderData::class.java)!!
+                            val result = print(context, openTableDoc)
+                            emit(Result.SubmitOrder(result))
+                        }
+                        return@withContext
                     }
                 }
-                emit(Result.SubmitOrder)
+                emit(Result.SubmitOrder())
             }
         }
+    }
+
+    suspend fun print(context: Context, orderData: OrderData): List<Int> {
+        var orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
+        val printers = transformMenuToPrinters(menuData)
+        val partsOrders = transformOrders(printers, orderData)
+        val resultCodes = mutableListOf<Int>()
+
+        partsOrders.forEach { (printerAddress, orderData) ->
+            orderData.runCatching {
+                PrinterOrderUseCase(context).printOrder(printerAddress, orderData, orderBonNumber)
+            }.onSuccess {
+                orderBonNumber = it.first
+                resultCodes.add(it.second)
+            }.onFailure {
+                if (it is Epos2Exception) {
+                    resultCodes.add(it.errorStatus)
+                }
+            }
+        }
+        sharedPreferences.edit().putLong("orderBonNumber", orderBonNumber).apply()
+        return resultCodes
     }
 
     fun clear() {
@@ -107,6 +147,46 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
 
     fun selectTable(tableGroup: TableGroup) {
         notificationFromObserver(Result.InitOrder(tableGroup))
+    }
+
+    private fun transformMenuToPrinters(menu: List<MenuData>): MutableMap<String, MutableList<String>> {
+        // address list menu
+        val printersAddress = mutableMapOf<String, MutableList<String>>()
+        menu.forEach {
+            val items = printersAddress.getOrPut(it.printer) {
+                mutableListOf()
+            }
+            items.add(it.name)
+        }
+        return printersAddress
+    }
+
+    private fun transformOrders(
+        printerMap: Map<String, List<String>>,
+        summaryOrderData: OrderData
+    ): Map<String, OrderData> {
+        val result = mutableMapOf<String, OrderData>()
+        summaryOrderData.orderItems!!.forEach { (menu, listOrders) ->
+            var printerAddress: String? = null
+            printerMap.forEach printerMap@{ (printer, partMenusInPrinter) ->
+                if (partMenusInPrinter.indexOf(menu) > -1) {
+                    printerAddress = printer
+                    return@printerMap
+                }
+            }
+            if (printerAddress == null) throw IllegalStateException("menu error")
+            val orderData = result.getOrPut(printerAddress!!) {
+                summaryOrderData.copy(
+                    orderItems = mutableMapOf()
+                )
+            }
+            val orderItemsMap = orderData.orderItems as MutableMap
+            val orderItemsList = orderItemsMap.getOrPut(menu) {
+                mutableListOf()
+            } as MutableList
+            orderItemsList.addAll(listOrders)
+        }
+        return result
     }
 
     override fun reduce(result: Result): State {
@@ -154,7 +234,7 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
                 })
             }
             is Result.SubmitOrder -> {
-                internalViewState.copy(isSubmit = true)
+                internalViewState.copy(isSubmit = true, resultPrint = result.resultPrint)
             }
             is Result.ChangeCountItem -> {
                 internalViewState.copy(orderItems = internalViewState.orderItems.apply {
@@ -195,7 +275,7 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
             val delta: Int
         ) : Result()
 
-        object SubmitOrder : Result()
+        data class SubmitOrder(val resultPrint: List<Int>? = null) : Result()
     }
 
 
@@ -203,6 +283,7 @@ class OrderViewModel(private val firestore: FirebaseFirestore) :
         val isLoadingMenu: Boolean = true,
         val tableGroup: TableGroup? = null,
         val orderItems: MutableMap<String, List<OrderItem>> = mutableMapOf(),
+        val resultPrint: List<Int>? = null,
         val isSubmit: Boolean = false
     )
 
