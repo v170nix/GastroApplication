@@ -21,4 +21,9 @@
     <string name="hint_order_add_table_part">Part</string>
     <string name="button_order_add_set_table">Set table</string>
 
+    <string name="title_admin_edit_menu">Edit menu</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

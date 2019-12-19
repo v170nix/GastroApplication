@@ -1,14 +1,16 @@
 package net.arwix.gastro.client.common
 
+import android.graphics.drawable.ColorDrawable
 import android.view.Menu
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.forEach
 import net.arwix.gastro.client.R
 
 object AppMenuHelper {
 
-    fun updateVisibleMenu(fragmentId: Int, menu: Menu) {
+    fun updateVisibleMenu(fragmentId: Int, menu: Menu, isAdminUser: Boolean = true) {
         when (fragmentId) {
             R.id.payListFragment -> {
                 menu.forEach { it.isVisible = true }
@@ -18,6 +20,7 @@ object AppMenuHelper {
             R.id.orderListAddItemFragment -> hideMenu(menu)
             else -> menu.forEach {
                 it.isVisible = it.itemId != R.id.menu_pay_add_items
+                menu.findItem(R.id.menu_admin_menu_edit).isVisible = isAdminUser
             }
         }
     }
@@ -26,6 +29,10 @@ object AppMenuHelper {
         when (fragmentId) {
             R.id.openTablesFragment -> {
                 actionBar.title = activity.getString(R.string.title_open_tables)
+                actionBar.setDisplayHomeAsUpEnabled(false)
+            }
+            else -> {
+                actionBar.setDisplayHomeAsUpEnabled(true)
             }
         }
 
@@ -37,6 +44,28 @@ object AppMenuHelper {
             }
             else -> {
                 actionBar.subtitle = null
+            }
+        }
+        when (fragmentId) {
+            R.id.adminMenuEditFragment -> {
+                actionBar.setBackgroundDrawable(
+                    ColorDrawable(
+                        ContextCompat.getColor(
+                            activity,
+                            R.color.colorAdminBar
+                        )
+                    )
+                )
+            }
+            else -> {
+                actionBar.setBackgroundDrawable(
+                    ColorDrawable(
+                        ContextCompat.getColor(
+                            activity,
+                            R.color.colorPrimary
+                        )
+                    )
+                )
             }
         }
     }

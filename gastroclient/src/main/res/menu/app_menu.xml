@@ -26,7 +26,7 @@
     <group android:id="@+id/menu_group_admin">
         <item
             android:id="@+id/menu_admin_menu_edit"
-            android:title="@string/menu_report_daily"
+            android:title="@string/menu_admin_menu_edit"
             app:showAsAction="never" />
     </group>
 
