@@ -20,11 +20,13 @@ class HistoryCheckDetailViewModel(
     override fun dispatchAction(action: Action): LiveData<Result> {
         return liveData<Result> {
             val lastCheck =
-                firestoreDbApp.refs.checks.orderBy("created", Query.Direction.DESCENDING)
+                firestoreDbApp.refs.checks
+                    .orderBy("created", Query.Direction.DESCENDING)
                     .limit(1).get().await()
             lastCheck?.run {
                 val data =
                     documents.firstOrNull()?.toObject(CheckData::class.java) ?: return@liveData
+                if (data.isReturnOrder) return@liveData
                 emit(Result.LastCheck(data))
             }
         }

@@ -10,6 +10,7 @@ import net.arwix.gastro.library.data.FirestoreDbApp
 import net.arwix.gastro.library.data.OrderData
 import org.threeten.bp.DateTimeUtils
 import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
@@ -21,10 +22,12 @@ class ReportDayUseCase(
 ) {
 
 
-    suspend fun getReport(localDate: LocalDate): ReportDayData? {
-        val zdtBegin = localDate.atStartOfDay(ZoneId.systemDefault()).plusHours(7)
+    suspend fun getReport(localDateTime: LocalDateTime): ReportDayData? {
+        val localDate = if (localDateTime.hour < 8)
+            localDateTime.toLocalDate().minusDays(1) else localDateTime.toLocalDate()
+        val zdtBegin = localDate.atStartOfDay(ZoneId.systemDefault()).plusHours(8)
         val beginDate = DateTimeUtils.toDate(zdtBegin.toInstant())
-        val zdtEnd = localDate.atStartOfDay(ZoneId.systemDefault()).plusDays(1)
+        val zdtEnd = localDate.atStartOfDay(ZoneId.systemDefault()).plusDays(1).plusHours(8)
         val endDate = DateTimeUtils.toDate(zdtEnd.toInstant())
         val query =
             firestoreDbApp.refs.checks
@@ -38,6 +41,7 @@ class ReportDayUseCase(
         var totalPrice = 0L
 
         query.toObjects(CheckData::class.java).forEach {
+            if (it.isReturnOrder) return@forEach
             totalChecks++
             it.checkItems?.forEach { (_, checkItems) ->
                 checkItems.forEach { check ->

@@ -99,7 +99,7 @@ class PayListItemAdapter(
             val formatter = NumberFormat.getCurrencyInstance()
             val currentMaxCount = item.order.orderItem.count - item.order.checkCount
             val count = if (item.order.checkCount > 0) {
-                "(${item.order.orderItem.count}) "
+                "(${item.order.orderItem.count - item.order.returnCount}) "
             } else ""
             name.text = "$count${currentMaxCount}x ${item.order.orderItem.name}"
             price.text =

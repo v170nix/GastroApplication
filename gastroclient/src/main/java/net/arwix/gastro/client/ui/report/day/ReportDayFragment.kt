@@ -14,7 +14,7 @@ import kotlinx.android.synthetic.main.fragment_report_day.*
 import kotlinx.coroutines.*
 import net.arwix.gastro.client.R
 import org.koin.android.ext.android.inject
-import org.threeten.bp.LocalDate
+import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.text.NumberFormat
@@ -36,7 +36,7 @@ class ReportDayFragment : Fragment(), CoroutineScope by MainScope() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         launch {
-            reportDayData = reportDayUseCase.getReport(LocalDate.now())
+            reportDayData = reportDayUseCase.getReport(LocalDateTime.now())
             reportDayData?.run {
                 updateReport(this)
             }

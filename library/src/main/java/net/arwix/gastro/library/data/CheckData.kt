@@ -8,7 +8,8 @@ data class CheckData constructor(
     var table: Int? = null,
     var tablePart: Int? = null,
     var checkItems: Map<String, List<OrderItem>>? = null,
+    var isReturnOrder: Boolean = false,
     @ServerTimestamp var created: Timestamp? = null
 ) {
-    constructor() : this(null, null, null, null, null)
+    constructor() : this(null, null, null, null, false, null)
 }

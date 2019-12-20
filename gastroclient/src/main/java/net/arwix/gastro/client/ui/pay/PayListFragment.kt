@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_pay_list.*
 import net.arwix.extension.gone
 import net.arwix.extension.visible
@@ -64,12 +66,27 @@ class PayListFragment : Fragment() {
 
         pay_list_submit_button.setOnClickListener {
             val userId = profileViewModel.liveState.value?.userId ?: return@setOnClickListener
+            setIsEnableButtons(false)
             payViewModel.nonCancelableIntent(PayViewModel.Action.CheckOut(userId))
+        }
+
+        pay_list_delete_button.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Delete selected items?")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Confirm") { _, _ ->
+                    setIsEnableButtons(false)
+                    val userId =
+                        profileViewModel.liveState.value?.userId ?: return@setPositiveButton
+                    payViewModel.nonCancelableIntent(PayViewModel.Action.DeleteCheckOut(userId))
+                }
+                .show()
         }
 
     }
 
     private fun render(state: PayViewModel.State) {
+        setIsEnableButtons(true)
         updateTextAndVisiblePayButton(payViewModel.liveState.value)
         state.tableGroup?.run(this::setTitle)
         state.summaryData?.run {
@@ -88,6 +105,19 @@ class PayListFragment : Fragment() {
             findNavController(this).navigateUp()
         }
     }
+
+    private fun setIsEnableButtons(isEnabled: Boolean) {
+
+        pay_list_delete_button.isEnabled = isEnabled
+        pay_list_submit_button.isEnabled = isEnabled
+
+        pay_list_delete_button.backgroundTintList = if (isEnabled)
+            ContextCompat.getColorStateList(requireContext(), R.color.design_default_color_error)
+        else
+            ContextCompat.getColorStateList(requireContext(), R.color.mtrl_btn_bg_color_selector)
+
+    }
+
 
     private fun setTitle(tableGroup: TableGroup) {
         (requireActivity() as AppCompatActivity).supportActionBar?.title =
@@ -114,14 +144,17 @@ class PayListFragment : Fragment() {
         getPayCountAndPrice(state)?.let { (price, count) ->
             if (price > 0) {
                 pay_list_submit_button.visible()
+                pay_list_delete_button.visible()
             } else {
                 pay_list_submit_button.gone()
+                pay_list_delete_button.gone()
                 return
             }
             val formatter = NumberFormat.getCurrencyInstance()
             pay_list_submit_button.text = "To pay: ${formatter.format(price / 100.0)}"
         } ?: run {
             pay_list_submit_button.gone()
+            pay_list_delete_button.gone()
         }
     }
 

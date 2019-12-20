@@ -1,5 +1,6 @@
 package net.arwix.gastro.client.ui.pay
 
+import android.util.Log
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FieldValue
@@ -42,6 +43,18 @@ class PayViewModel(
                         action.delta
                     )
                 )
+            }
+            is Action.DeleteCheckOut -> {
+                withContext(Dispatchers.Main) {
+                    val isCloseTable = checkOut(
+                        action.waiterId,
+                        internalViewState.orders!!,
+                        internalViewState.tableGroup!!,
+                        internalViewState.summaryData!!,
+                        true
+                    )
+                    if (isCloseTable) emit(Result.CloseTableGroup)
+                }
             }
             is Action.CheckOut -> {
                 withContext(Dispatchers.Main) {
@@ -105,7 +118,8 @@ class PayViewModel(
         waiterId: Int,
         currentOpenTableData: OpenTableData,
         tableGroup: TableGroup,
-        summaryData: MutableMap<String, MutableList<PayOrderItem>>
+        summaryData: MutableMap<String, MutableList<PayOrderItem>>,
+        isReturnOrder: Boolean = false
     ): Boolean {
         val checkItems = mutableMapOf<String, List<OrderItem>>()
         var isEmpty = true
@@ -114,7 +128,10 @@ class PayViewModel(
         summaryData.forEach { (type, payOrderItems) ->
             val payItems = mutableListOf<PayOrderItem>()
             payOrderItems.forEach {
-                summaryPrice += it.orderItem.price * it.orderItem.count
+                summaryPrice += it.orderItem.price * it.orderItem.count - it.orderItem.price * it.returnCount + if (isReturnOrder) {
+                    -it.orderItem.price * it.payCount
+                } else 0
+                Log.e("price", it.toString())
                 residualCount += it.orderItem.count - it.payCount - it.checkCount
                 if (it.payCount > 0) payItems.add(it)
             }
@@ -129,7 +146,8 @@ class PayViewModel(
             waiterId = waiterId,
             table = tableGroup.tableId,
             tablePart = tableGroup.tablePart,
-            checkItems = checkItems
+            checkItems = checkItems,
+            isReturnOrder = isReturnOrder
         )
         val openTablesRef = firestoreDbApp.refs.openTables
         val closeTablesRef = firestoreDbApp.refs.closeTables
@@ -202,6 +220,10 @@ class PayViewModel(
         openTableData.checks?.forEach { doc ->
             val checkData = doc.get().await()!!.toObject(CheckData::class.java)!!
             checkData.checkItems?.forEach { (type, checkItems) ->
+                //                if (checkData.isReturnOrder) {
+//                      //TODO
+//                }
+
                 val summaryOrderItemsOfCurrentType = summaryOrder[type]
                 if (summaryOrderItemsOfCurrentType == null) {
                     //ERROR
@@ -215,7 +237,10 @@ class PayViewModel(
                         if (summaryOrderItem != null) {
                             val index = summaryOrderItemsOfCurrentType.indexOf(summaryOrderItem)
                             summaryOrderItemsOfCurrentType[index] = summaryOrderItem.copy(
-                                checkCount = summaryOrderItem.checkCount + checkItem.count
+                                checkCount = summaryOrderItem.checkCount + checkItem.count,
+                                returnCount = if (checkData.isReturnOrder) {
+                                    summaryOrderItem.returnCount + checkItem.count
+                                } else summaryOrderItem.returnCount
                             )
                         } else {
                             throw IllegalStateException("pay order error sync item")
@@ -237,6 +262,7 @@ class PayViewModel(
 
         object AddAllItemsToPay : Action()
         data class CheckOut(val waiterId: Int) : Action()
+        data class DeleteCheckOut(val waiterId: Int) : Action()
     }
 
     sealed class Result {
@@ -269,7 +295,8 @@ class PayViewModel(
     data class PayOrderItem(
         val payCount: Int = 0,
         val orderItem: OrderItem,
-        val checkCount: Int = 0
+        val checkCount: Int = 0,
+        val returnCount: Int = 0
     )
 
 }
