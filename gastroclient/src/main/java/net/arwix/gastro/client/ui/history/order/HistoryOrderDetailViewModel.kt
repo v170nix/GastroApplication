@@ -10,9 +10,9 @@ import kotlinx.coroutines.launch
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.FirestoreDbApp
-import net.arwix.gastro.library.data.MenuData
-import net.arwix.gastro.library.data.MenuDoc
 import net.arwix.gastro.library.data.OrderData
+import net.arwix.gastro.library.menu.data.MenuDoc
+import net.arwix.gastro.library.menu.data.MenuGroupData
 import net.arwix.mvi.SimpleIntentViewModel
 
 class HistoryOrderDetailViewModel(
@@ -20,13 +20,13 @@ class HistoryOrderDetailViewModel(
     private val sharedPreferences: SharedPreferences
 ) : SimpleIntentViewModel<HistoryOrderDetailViewModel.Action, HistoryOrderDetailViewModel.Result, HistoryOrderDetailViewModel.State>() {
 
-    private lateinit var menuTypes: List<MenuData>
+    private lateinit var menuGroupTypes: List<MenuGroupData>
 
     init {
         viewModelScope.launch {
             val doc = firestoreDbApp.refs.menu.orderBy("order").get().await()!!
             val menu = doc.documents.map { it.toObject(MenuDoc::class.java)!!.toMenuData(it.id) }
-            menuTypes = menu
+            menuGroupTypes = menu
         }
     }
 
@@ -54,7 +54,7 @@ class HistoryOrderDetailViewModel(
 
     suspend fun print(context: Context): List<Int> {
         var orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
-        val printers = transformMenuToPrinters(menuTypes)
+        val printers = transformMenuToPrinters(menuGroupTypes)
         val partsOrders = transformOrders(printers, internalViewState.orderData!!)
         val resultCodes = mutableListOf<Int>()
 
@@ -69,10 +69,10 @@ class HistoryOrderDetailViewModel(
         return resultCodes
     }
 
-    private fun transformMenuToPrinters(menu: List<MenuData>): MutableMap<String, MutableList<String>> {
+    private fun transformMenuToPrinters(menuGroups: List<MenuGroupData>): MutableMap<String, MutableList<String>> {
         // address list menu
         val printersAddress = mutableMapOf<String, MutableList<String>>()
-        menu.forEach {
+        menuGroups.forEach {
             val printer = it.printer ?: return@forEach
             val items = printersAddress.getOrPut(printer) {
                 mutableListOf()

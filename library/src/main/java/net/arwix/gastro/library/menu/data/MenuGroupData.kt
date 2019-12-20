@@ -1,9 +1,9 @@
-package net.arwix.gastro.library.data
+package net.arwix.gastro.library.menu.data
 
 import androidx.annotation.ColorInt
 import org.threeten.bp.Instant
 
-data class MenuData(
+data class MenuGroupData(
     val name: String,
     val printer: String?,
     val items: List<PreMenuItems>? = null,
