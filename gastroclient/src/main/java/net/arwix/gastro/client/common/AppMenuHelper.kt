@@ -1,10 +1,8 @@
 package net.arwix.gastro.client.common
 
-import android.graphics.drawable.ColorDrawable
 import android.view.Menu
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.forEach
 import net.arwix.gastro.client.R
 
@@ -20,7 +18,6 @@ object AppMenuHelper {
             R.id.orderListAddItemFragment -> hideMenu(menu)
             else -> menu.forEach {
                 it.isVisible = it.itemId != R.id.menu_pay_add_items
-                menu.findItem(R.id.menu_admin_menu_edit).isVisible = isAdminUser
             }
         }
     }
@@ -46,28 +43,18 @@ object AppMenuHelper {
                 actionBar.subtitle = null
             }
         }
-        when (fragmentId) {
-            R.id.adminMenuEditFragment -> {
-                actionBar.setBackgroundDrawable(
-                    ColorDrawable(
-                        ContextCompat.getColor(
-                            activity,
-                            R.color.colorAdminBar
-                        )
-                    )
-                )
-            }
-            else -> {
-                actionBar.setBackgroundDrawable(
-                    ColorDrawable(
-                        ContextCompat.getColor(
-                            activity,
-                            R.color.colorPrimary
-                        )
-                    )
-                )
-            }
-        }
+//        when (fragmentId) {
+//            else -> {
+//                actionBar.setBackgroundDrawable(
+//                    ColorDrawable(
+//                        ContextCompat.getColor(
+//                            activity,
+//                            R.color.colorPrimary
+//                        )
+//                    )
+//                )
+//            }
+//        }
     }
 
     private fun hideMenu(menu: Menu) {

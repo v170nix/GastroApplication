@@ -5,7 +5,6 @@
     <string name="menu_history_orders">View last order</string>
     <string name="menu_history_checks">View last check</string>
     <string name="menu_report_daily">Daily report</string>
-    <string name="menu_admin_menu_edit">Edit menu</string>
     <string name="menu_logout">Logout</string>
 
     <string name="title_sign_in">Sign in</string>

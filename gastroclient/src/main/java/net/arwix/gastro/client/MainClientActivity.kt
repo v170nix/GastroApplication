@@ -93,11 +93,6 @@ class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChang
                     navigateTo(R.id.historyOrderDetailFragment, true)
                     return true
                 }
-            R.id.menu_admin_menu_edit ->
-                if (profileViewModel.isLogin()) {
-                    navigateTo(R.id.adminMenuEditFragment, true)
-                    return true
-                }
         }
         return super.onOptionsItemSelected(item)
     }

@@ -1,2 +1,2 @@
-include ':gastroclient', ':gastroboss', ':library'
+include ':gastroclient', ':gastroboss', ':library', ':gastroadmin'
 rootProject.name='GastroApplication'

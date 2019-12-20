@@ -60,9 +60,4 @@
         android:name="net.arwix.gastro.client.ui.report.day.ReportDayFragment"
         android:label="Daily report"
         tools:layout="@layout/fragment_report_day" />
-    <fragment
-        android:id="@+id/adminMenuEditFragment"
-        android:name="net.arwix.gastro.client.feature.admin.menu.ui.AdminMenuEditFragment"
-        android:label="@string/title_admin_edit_menu"
-        tools:layout="@layout/fragment_admin_menu_edit" />
 </navigation>
