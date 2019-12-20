@@ -4,7 +4,6 @@ import android.content.Context.MODE_PRIVATE
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.app
-import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.client.ui.history.check.HistoryCheckDetailViewModel
 import net.arwix.gastro.client.ui.history.order.HistoryOrderDetailViewModel
 import net.arwix.gastro.client.ui.order.OrderViewModel
@@ -12,6 +11,7 @@ import net.arwix.gastro.client.ui.pay.PayViewModel
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.client.ui.report.day.ReportDayUseCase
 import net.arwix.gastro.client.ui.table.OpenTablesViewModel
+import net.arwix.gastro.library.data.FirestoreDbApp
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel

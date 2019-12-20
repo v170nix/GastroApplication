@@ -28,7 +28,6 @@ class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChang
     private val profileViewModel by viewModel<ProfileViewModel>()
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navController: NavController
-    private var destination: NavDestination? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,7 +136,6 @@ class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChang
         destination: NavDestination,
         arguments: Bundle?
     ) {
-        this.destination = destination
         invalidateOptionsMenu()
     }
 

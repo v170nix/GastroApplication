@@ -3,10 +3,10 @@ package net.arwix.gastro.client.ui.report.day
 import android.content.Context
 import com.epson.epos2.printer.Printer
 import net.arwix.gastro.client.common.createCharString
-import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.client.domain.PrinterUtils
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.CheckData
+import net.arwix.gastro.library.data.FirestoreDbApp
 import net.arwix.gastro.library.data.OrderData
 import org.threeten.bp.DateTimeUtils
 import org.threeten.bp.LocalDate

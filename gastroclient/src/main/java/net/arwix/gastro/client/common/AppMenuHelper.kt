@@ -8,7 +8,7 @@ import net.arwix.gastro.client.R
 
 object AppMenuHelper {
 
-    fun updateVisibleMenu(fragmentId: Int, menu: Menu, isAdminUser: Boolean = true) {
+    fun updateVisibleMenu(fragmentId: Int, menu: Menu) {
         when (fragmentId) {
             R.id.payListFragment -> {
                 menu.forEach { it.isVisible = true }

@@ -10,7 +10,6 @@ import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.*
@@ -32,7 +31,7 @@ class OrderViewModel(
         viewModelScope.launch {
             val doc = firestoreDbApp.refs.menu.orderBy("order").get().await()!!
             val menu = doc.documents.map { it.id }
-            val menuA = doc.documents.map { MenuData(it.id, it.getString("printer")!!) }
+            val menuA = doc.documents.map { it.toObject(MenuDoc::class.java)!!.toMenuData(it.id) }
             menuData = menuA
             menuTypes = menu
             notificationFromObserver(Result.AddMenu(menu))
@@ -153,7 +152,8 @@ class OrderViewModel(
         // address list menu
         val printersAddress = mutableMapOf<String, MutableList<String>>()
         menu.forEach {
-            val items = printersAddress.getOrPut(it.printer) {
+            val printer = it.printer ?: return@forEach
+            val items = printersAddress.getOrPut(printer) {
                 mutableListOf()
             }
             items.add(it.name)

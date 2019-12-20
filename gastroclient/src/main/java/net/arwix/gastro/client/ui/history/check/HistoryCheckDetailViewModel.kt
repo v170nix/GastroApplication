@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.google.firebase.firestore.Query
-import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.client.domain.PrinterUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.CheckData
+import net.arwix.gastro.library.data.FirestoreDbApp
 import net.arwix.mvi.SimpleIntentViewModel
 
 class HistoryCheckDetailViewModel(

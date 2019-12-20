@@ -1,4 +1,4 @@
-package net.arwix.gastro.client.data
+package net.arwix.gastro.library.data
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore

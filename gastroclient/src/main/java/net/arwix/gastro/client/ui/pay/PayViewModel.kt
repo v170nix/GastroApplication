@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.*
 import net.arwix.gastro.library.toFlow

@@ -7,10 +7,11 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.launch
-import net.arwix.gastro.client.data.FirestoreDbApp
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
+import net.arwix.gastro.library.data.FirestoreDbApp
 import net.arwix.gastro.library.data.MenuData
+import net.arwix.gastro.library.data.MenuDoc
 import net.arwix.gastro.library.data.OrderData
 import net.arwix.mvi.SimpleIntentViewModel
 
@@ -24,7 +25,7 @@ class HistoryOrderDetailViewModel(
     init {
         viewModelScope.launch {
             val doc = firestoreDbApp.refs.menu.orderBy("order").get().await()!!
-            val menu = doc.documents.map { MenuData(it.id, it.getString("printer")!!) }
+            val menu = doc.documents.map { it.toObject(MenuDoc::class.java)!!.toMenuData(it.id) }
             menuTypes = menu
         }
     }
@@ -72,7 +73,8 @@ class HistoryOrderDetailViewModel(
         // address list menu
         val printersAddress = mutableMapOf<String, MutableList<String>>()
         menu.forEach {
-            val items = printersAddress.getOrPut(it.printer) {
+            val printer = it.printer ?: return@forEach
+            val items = printersAddress.getOrPut(printer) {
                 mutableListOf()
             }
             items.add(it.name)
