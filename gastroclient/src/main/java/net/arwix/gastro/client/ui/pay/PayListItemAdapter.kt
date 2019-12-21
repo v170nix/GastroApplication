@@ -18,14 +18,17 @@ class PayListItemAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items = mutableListOf<PayAdapterOrderItem>()
+    var isClickable = true
 
     private val doPlusCountClick = View.OnClickListener { view ->
+        if (!isClickable) return@OnClickListener
         val item = view.tag as PayAdapterOrderItem.Item
         val currentMaxCount = item.order.orderItem.count - item.order.checkCount
         if (item.order.payCount >= currentMaxCount) return@OnClickListener
         onChangeCount(item.type, item.order, 1)
     }
     private val doMinusCountClick = View.OnClickListener { view ->
+        if (!isClickable) return@OnClickListener
         val item = view.tag as PayAdapterOrderItem.Item
         if (item.order.payCount <= 0) return@OnClickListener
         onChangeCount(item.type, item.order, -1)

@@ -110,6 +110,7 @@ class PayListFragment : Fragment() {
 
         pay_list_delete_button.isEnabled = isEnabled
         pay_list_submit_button.isEnabled = isEnabled
+        adapter.isClickable = isEnabled
 
         pay_list_delete_button.backgroundTintList = if (isEnabled)
             ContextCompat.getColorStateList(requireContext(), R.color.design_default_color_error)

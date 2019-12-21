@@ -17,16 +17,21 @@ class OrderListAdapter(
     val onChangeCount: (type: String, orderItem: OrderItem, delta: Int) -> Unit
 ) : RecyclerView.Adapter<OrderListAdapter.AdapterItemHolder>() {
 
+    var isClickable = true
+
     private val items = mutableListOf<AdapterOrderItems>()
     private val doTypeClick = View.OnClickListener { view ->
+        if (!isClickable) return@OnClickListener
         val type = view.tag as AdapterOrderItems.Type
         onTypeClick(type.name)
     }
     private val doPlusCountClick = View.OnClickListener { view ->
+        if (!isClickable) return@OnClickListener
         val orderItem = view.tag as AdapterOrderItems.Default
         onChangeCount(orderItem.type.name, orderItem.order, 1)
     }
     private val doMinusCountClick = View.OnClickListener { view ->
+        if (!isClickable) return@OnClickListener
         val orderItem = view.tag as AdapterOrderItems.Default
         if (orderItem.order.count == 0) return@OnClickListener
         onChangeCount(orderItem.type.name, orderItem.order, -1)

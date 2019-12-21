@@ -66,6 +66,7 @@ class OrderListFragment : Fragment() {
             adapter = this@OrderListFragment.adapterOrder
         }
         order_list_submit_button.setOnClickListener {
+            setIsEnableButtons(false)
             putToDb()
         }
     }
@@ -75,6 +76,7 @@ class OrderListFragment : Fragment() {
     }
 
     private fun render(state: OrderViewModel.State) {
+        setIsEnableButtons(true)
         if (state.isSubmit) {
             if (state.resultPrint != null) {
                 Toast.makeText(requireContext(), "code: ${state.resultPrint}", Toast.LENGTH_LONG)
@@ -92,6 +94,11 @@ class OrderListFragment : Fragment() {
             state.tableGroup?.run(::setTitle)
             renderTotalPrice(state.orderItems)
         }
+    }
+
+    private fun setIsEnableButtons(isEnabled: Boolean) {
+        order_list_submit_button.isEnabled = isEnabled
+        adapterOrder.isClickable = isEnabled
     }
 
     private fun setTitle(tableGroup: TableGroup) {
