@@ -42,6 +42,10 @@ class OpenTablesFragment : Fragment() {
             onItemClick = {
                 payViewModel.setTable(it)
                 findNavController(this).navigate(R.id.payListFragment)
+            },
+            onAddOrderClick = {
+                orderViewModel.selectTable(it)
+                findNavController(this).navigate(R.id.orderListFragment)
             }
         )
         with(open_tables_recycler_view) {

@@ -3,6 +3,7 @@ package net.arwix.gastro.client.ui.table
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -12,13 +13,18 @@ import net.arwix.gastro.library.data.OpenTableData
 import net.arwix.gastro.library.data.TableGroup
 
 class OpenTablesAdapter(
-    onItemClick: (tableGroup: TableGroup) -> Unit
+    onItemClick: (tableGroup: TableGroup) -> Unit,
+    onAddOrderClick: (tableGroup: TableGroup) -> Unit
 ) : RecyclerView.Adapter<OpenTablesAdapter.ItemsHolder>() {
 
     private val items = mutableListOf<OpenTableAdapterItem>()
     private val doItemClick = View.OnClickListener {
         val item = it.tag as OpenTableAdapterItem
         onItemClick(item.tableGroup)
+    }
+    private val doAddOrderClick = View.OnClickListener {
+        val item = it.tag as OpenTableAdapterItem
+        onAddOrderClick(item.tableGroup)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemsHolder {
@@ -38,6 +44,8 @@ class OpenTablesAdapter(
         holder.bindTo(items[position])
         holder.itemView.tag = items[position]
         holder.itemView.setOnClickListener(doItemClick)
+        holder.addOrderButton.tag = items[position]
+        holder.addOrderButton.setOnClickListener(doAddOrderClick)
     }
 
     fun setData(data: Map<TableGroup, OpenTableData>) {
@@ -54,6 +62,7 @@ class OpenTablesAdapter(
 
     class ItemsHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val table: TextView = view.item_open_tables_table_id_text
+        val addOrderButton: Button = view.item_open_tables_add_order_button
 
         init {
             view.setBackgroundResource(R.drawable.selected_list_item)
