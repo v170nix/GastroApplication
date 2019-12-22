@@ -4,6 +4,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.app
 import net.arwix.gastro.admin.feature.menu.ui.AdminMenuGroupViewModel
+import net.arwix.gastro.admin.feature.menu.ui.AdminMenuItemViewModel
 import net.arwix.gastro.admin.feature.profile.ui.AdminProfileViewModel
 import net.arwix.gastro.library.data.FirestoreDbApp
 import net.arwix.gastro.library.menu.data.MenuRepository
@@ -25,4 +26,5 @@ val AppAdminModule = module {
 
     viewModel { AdminProfileViewModel() }
     viewModel { AdminMenuGroupViewModel(get()) }
+    viewModel { AdminMenuItemViewModel(get()) }
 }

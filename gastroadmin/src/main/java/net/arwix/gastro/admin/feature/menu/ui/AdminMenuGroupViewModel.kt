@@ -19,7 +19,7 @@ class AdminMenuGroupViewModel(private val menuUseCase: MenuUseCase) :
 
     init {
         viewModelScope.launch {
-            menuUseCase.getFlow().collect {
+            menuUseCase.getMenusFlow().collect {
                 notificationFromObserver(Result.UpdateMenus(it))
             }
         }
@@ -30,8 +30,7 @@ class AdminMenuGroupViewModel(private val menuUseCase: MenuUseCase) :
     }
 
     suspend fun edit(oldMenuGroupData: MenuGroupData, newMenuGroupData: MenuGroupData) {
-        val mergeGroup = newMenuGroupData.copy(items = oldMenuGroupData.items)
-        menuUseCase.editMenuGroup(oldMenuGroupData.name, mergeGroup)
+        menuUseCase.editMenuGroup(oldMenuGroupData, newMenuGroupData)
     }
 
     override fun dispatchAction(action: Action): LiveData<Result> {

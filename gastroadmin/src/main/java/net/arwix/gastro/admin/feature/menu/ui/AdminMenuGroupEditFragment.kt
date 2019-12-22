@@ -29,7 +29,7 @@ class AdminMenuGroupEditFragment : Fragment(), CoroutineScope by MainScope() {
 
     private val groupViewModel: AdminMenuGroupViewModel by sharedViewModel()
     private val args: AdminMenuGroupEditFragmentArgs by navArgs()
-    private lateinit var innerMenuGroup: MenuGroupData
+    private lateinit var inputMenuGroup: MenuGroupData
     private var isProgress: Boolean = false
 
     override fun onCreateView(
@@ -70,17 +70,17 @@ class AdminMenuGroupEditFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         if (args.EditMenuGroupMode == AddEditMode.Edit) {
-            innerMenuGroup = args.EditMenuGroup!!
-            setData(innerMenuGroup)
+            inputMenuGroup = args.EditMenuGroup!!
+            setData(inputMenuGroup)
             (requireActivity() as AppCompatActivity).supportActionBar?.setTitle(R.string.admin_title_menu_group_edit)
         }
         if (args.EditMenuGroupMode == AddEditMode.Add) {
-            innerMenuGroup = MenuGroupData(
+            inputMenuGroup = MenuGroupData(
                 "", null, null, MenuGroupData.Metadata(
                     10
                 )
             )
-            setData(innerMenuGroup)
+            setData(inputMenuGroup)
             (requireActivity() as AppCompatActivity).supportActionBar?.setTitle(R.string.admin_title_menu_group_add)
         }
 

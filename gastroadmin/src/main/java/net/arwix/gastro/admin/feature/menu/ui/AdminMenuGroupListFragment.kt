@@ -31,6 +31,7 @@ class AdminMenuGroupListFragment : Fragment(), CoroutineScope by MainScope() {
     private val args: AdminMenuGroupListFragmentArgs by navArgs()
     private lateinit var adapter: MenuAdapter
     private val menuGroupViewModel: AdminMenuGroupViewModel by sharedViewModel()
+    private val menuItemViewModel: AdminMenuItemViewModel by sharedViewModel()
     private var isFirstScrollPositionCompleted = false
 
     override fun onCreateView(
@@ -67,7 +68,10 @@ class AdminMenuGroupListFragment : Fragment(), CoroutineScope by MainScope() {
                     .show()
             },
             onViewItems = {
-
+                menuItemViewModel.setMenu(it)
+                findNavController().navigate(
+                    AdminMenuGroupListFragmentDirections.actionToMenuItemListFragment(it)
+                )
             }
         )
 
@@ -105,9 +109,9 @@ class AdminMenuGroupListFragment : Fragment(), CoroutineScope by MainScope() {
     }
 
     private class MenuAdapter(
-        private val onDeleteGroup: (menuGroupGroupData: MenuGroupData) -> Unit,
-        private val onEditGroup: (menuGroupGroupData: MenuGroupData) -> Unit,
-        private val onViewItems: (menuGroupGroupData: MenuGroupData) -> Unit
+        private val onDeleteGroup: (menuGroupData: MenuGroupData) -> Unit,
+        private val onEditGroup: (menuGroupData: MenuGroupData) -> Unit,
+        private val onViewItems: (menuGroupData: MenuGroupData) -> Unit
     ) : SimpleRecyclerAdapter<MenuGroupData>(
         onCreate = { inflater, parent, _ ->
             MenuHolder(inflater.createView(R.layout.item_admin_menu_group_list, parent))

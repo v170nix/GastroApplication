@@ -18,6 +18,9 @@
             android:defaultValue="@null"
             app:argType="net.arwix.gastro.library.menu.data.MenuGroupData"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_to_MenuItemListFragment"
+            app:destination="@id/adminMenuItemListFragment" />
     </fragment>
     <fragment
         android:id="@+id/adminMenuGroupEditFragment"
@@ -37,5 +40,14 @@
             app:launchSingleTop="true"
             app:popUpTo="@+id/adminMenuGroupListFragment"
             app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/adminMenuItemListFragment"
+        android:name="net.arwix.gastro.admin.feature.menu.ui.AdminMenuItemListFragment"
+        android:label=""
+        tools:layout="@layout/fragment_admin_menu_item_list">
+        <argument
+            android:name="MenuGroup"
+            app:argType="net.arwix.gastro.library.menu.data.MenuGroupData" />
     </fragment>
 </navigation>

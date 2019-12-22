@@ -11,12 +11,20 @@ import org.threeten.bp.Instant
 data class MenuGroupData(
     val name: String,
     val printer: String?,
-    val items: List<PreMenuItems>? = null,
+    val items: List<PreMenuItem>? = null,
     val metadata: Metadata
 ) : Parcelable {
 
     fun toMenuDoc(): MenuDoc =
-        MenuDoc(printer, metadata.order, metadata.color, items)
+        MenuDoc(
+            printer,
+            metadata.order,
+            metadata.color,
+//            items.groupBy {  }
+            items?.associateBy(
+                keySelector = { it.name as MenuItemName },
+                valueTransform = { it.toPreMenuItemValueDoc() }
+            ))
 
     @Parcelize
     data class Metadata(
@@ -26,11 +34,17 @@ data class MenuGroupData(
     ) : Parcelable
 
     @Parcelize
-    data class PreMenuItems(
+    data class PreMenuItem(
         val name: String? = null,
-        val price: Int? = null,
-        val color: Int? = null
-    ) : Parcelable
+        val price: Int = 0,
+        val printer: String? = null,
+        val color: Int? = null,
+        val position: Int = 100
+    ) : Parcelable {
+        fun toPreMenuItemValueDoc() = MenuDoc.PreMenuItemValueDoc(
+            price, printer, color, position
+        )
+    }
 
 
 }
