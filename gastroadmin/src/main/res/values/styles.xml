@@ -9,16 +9,29 @@
         <item name="colorOnSecondary">#FFFFFF</item>
     </style>
 
-    <style name="TextInputLayoutAppearance" parent="Widget.Design.TextInputLayout">
-        <!-- reference our hint & error styles -->
-        <!--        <item name="hintTextAppearance">@style/HintText</item>-->
-        <!--        <item name="errorTextAppearance">@style/ErrorText</item>-->
-        <!--        <item name="android:textColor">@color/user_input_color</item>-->
-        <!--        <item name="android:textColorHint">@color/unfocused_color</item>-->
-        <item name="colorControlNormal">#FFFFFFFF</item>
-        <!--        <item name="colorControlActivated">@color/blue</item>-->
-        <!--        <item name="colorControlHighlight">@color/green</item>-->
+    <style name="Body_ThemeOverlay.MaterialComponents.MaterialAlertDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogBodyTextStyle">
+            @style/BodyMaterialAlertDialog.MaterialComponents.Body.Text
+        </item>
     </style>
+
+    <style name="BodyMaterialAlertDialog.MaterialComponents.Body.Text" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Headline5
+        </item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!--    <style name="TextInputLayoutAppearance" parent="Widget.Design.TextInputLayout">-->
+    <!--        &lt;!&ndash; reference our hint & error styles &ndash;&gt;-->
+    <!--        &lt;!&ndash;        <item name="hintTextAppearance">@style/HintText</item>&ndash;&gt;-->
+    <!--        &lt;!&ndash;        <item name="errorTextAppearance">@style/ErrorText</item>&ndash;&gt;-->
+    <!--        &lt;!&ndash;        <item name="android:textColor">@color/user_input_color</item>&ndash;&gt;-->
+    <!--        &lt;!&ndash;        <item name="android:textColorHint">@color/unfocused_color</item>&ndash;&gt;-->
+    <!--        <item name="colorControlNormal">#FFFFFFFF</item>-->
+    <!--        &lt;!&ndash;        <item name="colorControlActivated">@color/blue</item>&ndash;&gt;-->
+    <!--        &lt;!&ndash;        <item name="colorControlHighlight">@color/green</item>&ndash;&gt;-->
+    <!--    </style>-->
 
     <style name="Widget.AppTheme.Button.IconButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="android:minWidth">0dp</item>

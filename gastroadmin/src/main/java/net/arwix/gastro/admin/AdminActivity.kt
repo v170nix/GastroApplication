@@ -8,6 +8,8 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupWithNavController
+import kotlinx.android.synthetic.main.activity_admin.*
 import net.arwix.gastro.library.common.hideKeyboard
 
 class AdminActivity : AppCompatActivity() {
@@ -19,8 +21,10 @@ class AdminActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-        appBarConfiguration = AppBarConfiguration.Builder(navController.graph).build()
+        appBarConfiguration =
+            AppBarConfiguration.Builder(navController.graph).setDrawerLayout(drawer_layout).build()
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
+        nav_view.setupWithNavController(navController)
         supportActionBar?.setBackgroundDrawable(
             ColorDrawable(
                 ContextCompat.getColor(

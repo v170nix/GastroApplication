@@ -3,7 +3,6 @@ package net.arwix.gastro.admin.feature.menu.ui
 
 import android.os.Bundle
 import android.text.Editable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,17 +15,22 @@ import androidx.navigation.fragment.navArgs
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import kotlinx.android.synthetic.main.fragment_admin_menu_group_edit.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import net.arwix.gastro.admin.R
 import net.arwix.gastro.admin.data.AddEditMode
 import net.arwix.gastro.library.common.hideKeyboard
 import net.arwix.gastro.library.menu.data.MenuGroupData
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class AdminMenuGroupEditFragment : Fragment() {
+class AdminMenuGroupEditFragment : Fragment(), CoroutineScope by MainScope() {
 
     private val groupViewModel: AdminMenuGroupViewModel by sharedViewModel()
     private val args: AdminMenuGroupEditFragmentArgs by navArgs()
     private lateinit var innerMenuGroup: MenuGroupData
+    private var isProgress: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,22 +85,34 @@ class AdminMenuGroupEditFragment : Fragment() {
         }
 
         admin_menu_group_edit_submit_button.setOnClickListener {
+            if (isProgress) return@setOnClickListener
             val menuGroupData = getFilterData() ?: return@setOnClickListener
             if (args.EditMenuGroupMode == AddEditMode.Add) {
-                groupViewModel.nonCancelableIntent(
-                    AdminMenuGroupViewModel.Action.AddMenu(
-                        menuGroupData
+                launch {
+                    isProgress = true
+                    groupViewModel.add(menuGroupData)
+                    isProgress = false
+                    hideKeyboard()
+                    findNavController().navigate(
+                        AdminMenuGroupEditFragmentDirections.actionToAdminMenuGroupListFragment(
+                            menuGroupData
+                        )
                     )
-                )
+                }
             }
             if (args.EditMenuGroupMode == AddEditMode.Edit) {
-                groupViewModel.nonCancelableIntent(
-                    AdminMenuGroupViewModel.Action.EditMenu(
-                        args.EditMenuGroup!!, menuGroupData
+                launch {
+                    isProgress = true
+                    groupViewModel.edit(args.EditMenuGroup!!, menuGroupData)
+                    isProgress = false
+                    hideKeyboard()
+                    findNavController().navigate(
+                        AdminMenuGroupEditFragmentDirections.actionToAdminMenuGroupListFragment(
+                            menuGroupData
+                        )
                     )
-                )
+                }
             }
-            findNavController().navigateUp()
         }
     }
 
@@ -110,9 +126,18 @@ class AdminMenuGroupEditFragment : Fragment() {
             isErrors = true
         }
 
+        if (args.EditMenuGroupMode == AddEditMode.Add) {
+            val menus = groupViewModel.liveState.value?.menuGroups
+            menus?.find { it.name == name }?.run {
+                admin_menu_group_edit_name.isErrorEnabled = false
+                admin_menu_group_edit_name.isErrorEnabled = true
+                admin_menu_group_edit_name.error = "Name already exist"
+                isErrors = true
+            }
+        }
+
         val printer =
             admin_menu_group_edit_printer_address.editText?.text?.toString().orEmpty().trim()
-        Log.e("printer", printer)
         admin_menu_group_edit_printer_address.isErrorEnabled = false
         if (printer.isEmpty()) {
             admin_menu_group_edit_printer_address.isErrorEnabled = true
@@ -145,5 +170,10 @@ class AdminMenuGroupEditFragment : Fragment() {
         } ?: run {
             admin_menu_group_edit_color_view.background = null
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cancel()
     }
 }

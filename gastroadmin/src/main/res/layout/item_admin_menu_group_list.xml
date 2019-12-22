@@ -2,6 +2,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_admin_menu_group_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp">
@@ -34,15 +35,15 @@
             app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_group_name_text"
             tools:text="-" />
 
-        <com.google.android.material.button.MaterialButton
+        <ImageButton
             android:id="@+id/item_admin_menu_group_delete_button"
             style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
+            android:layout_width="48dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/button_delete"
-            android:textColor="@color/design_default_color_error"
-            app:layout_constraintStart_toEndOf="@+id/item_admin_menu_group_edit_button"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_delete"
+            android:tint="@color/design_default_color_error"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/item_admin_menu_group_edit_button" />
 
         <com.google.android.material.button.MaterialButton
@@ -86,17 +87,6 @@
             app:layout_constraintEnd_toEndOf="@+id/item_admin_menu_group_items_count_text"
             app:layout_constraintStart_toStartOf="@+id/item_admin_menu_group_items_count_text"
             app:layout_constraintTop_toTopOf="@+id/item_admin_menu_group_name_text" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/item_admin_menu_group_edit_items_button"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="@string/admin_menu_group_item_view_items"
-            android:textColor="@color/colorIconTint"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/item_admin_menu_group_delete_button" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

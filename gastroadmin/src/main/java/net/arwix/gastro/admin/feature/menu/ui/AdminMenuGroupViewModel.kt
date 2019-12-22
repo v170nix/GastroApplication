@@ -25,22 +25,20 @@ class AdminMenuGroupViewModel(private val menuUseCase: MenuUseCase) :
         }
     }
 
+    suspend fun add(menuGroupData: MenuGroupData) {
+        menuUseCase.addMenuGroup(menuGroupData)
+    }
+
+    suspend fun edit(oldMenuGroupData: MenuGroupData, newMenuGroupData: MenuGroupData) {
+        val mergeGroup = newMenuGroupData.copy(items = oldMenuGroupData.items)
+        menuUseCase.editMenuGroup(oldMenuGroupData.name, mergeGroup)
+    }
+
     override fun dispatchAction(action: Action): LiveData<Result> {
 
         return liveData<Result> {
             when (action) {
                 is Action.DeleteMenu -> menuUseCase.deleteMenuGroup(action.menuGroupData)
-                is Action.AddMenu -> menuUseCase.addMenuGroup(action.menuGroupData)
-                is Action.EditMenu -> {
-                    val mergeGroup = action.newMenuGroupData.copy(
-                        items = action.oldMenuGroupData.items
-                    )
-                    menuUseCase.editMenuGroup(
-                        action.oldMenuGroupData.name,
-                        mergeGroup
-                    )
-                }
-
             }
         }
 
@@ -56,11 +54,6 @@ class AdminMenuGroupViewModel(private val menuUseCase: MenuUseCase) :
 
     sealed class Action {
         data class DeleteMenu(val menuGroupData: MenuGroupData) : Action()
-        data class AddMenu(val menuGroupData: MenuGroupData) : Action()
-        data class EditMenu(
-            val oldMenuGroupData: MenuGroupData,
-            val newMenuGroupData: MenuGroupData
-        ) : Action()
     }
 
 

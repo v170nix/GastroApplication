@@ -13,6 +13,11 @@
         <action
             android:id="@+id/action_to_menuGroupEditFragment"
             app:destination="@+id/adminMenuGroupEditFragment" />
+        <argument
+            android:name="submitMenuGroup"
+            android:defaultValue="@null"
+            app:argType="net.arwix.gastro.library.menu.data.MenuGroupData"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/adminMenuGroupEditFragment"
@@ -26,5 +31,11 @@
         <argument
             android:name="EditMenuGroupMode"
             app:argType="net.arwix.gastro.admin.data.AddEditMode" />
+        <action
+            android:id="@+id/action_to_adminMenuGroupListFragment"
+            app:destination="@id/adminMenuGroupListFragment"
+            app:launchSingleTop="true"
+            app:popUpTo="@+id/adminMenuGroupListFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>
