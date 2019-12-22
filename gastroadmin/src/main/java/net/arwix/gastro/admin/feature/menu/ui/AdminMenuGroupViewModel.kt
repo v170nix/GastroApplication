@@ -1,6 +1,5 @@
 package net.arwix.gastro.admin.feature.menu.ui
 
-import androidx.annotation.ColorInt
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -10,8 +9,11 @@ import net.arwix.gastro.library.menu.data.MenuGroupData
 import net.arwix.gastro.library.menu.domain.MenuUseCase
 import net.arwix.mvi.SimpleIntentViewModel
 
-class AdminMenuViewModel(private val menuUseCase: MenuUseCase) :
-    SimpleIntentViewModel<AdminMenuViewModel.Action, AdminMenuViewModel.Result, AdminMenuViewModel.State>() {
+class AdminMenuGroupViewModel(private val menuUseCase: MenuUseCase) :
+    SimpleIntentViewModel<
+            AdminMenuGroupViewModel.Action,
+            AdminMenuGroupViewModel.Result,
+            AdminMenuGroupViewModel.State>() {
 
     override var internalViewState: State = State()
 
@@ -26,7 +28,20 @@ class AdminMenuViewModel(private val menuUseCase: MenuUseCase) :
     override fun dispatchAction(action: Action): LiveData<Result> {
 
         return liveData<Result> {
+            when (action) {
+                is Action.DeleteMenu -> menuUseCase.deleteMenuGroup(action.menuGroupData)
+                is Action.AddMenu -> menuUseCase.addMenuGroup(action.menuGroupData)
+                is Action.EditMenu -> {
+                    val mergeGroup = action.newMenuGroupData.copy(
+                        items = action.oldMenuGroupData.items
+                    )
+                    menuUseCase.editMenuGroup(
+                        action.oldMenuGroupData.name,
+                        mergeGroup
+                    )
+                }
 
+            }
         }
 
     }
@@ -40,18 +55,12 @@ class AdminMenuViewModel(private val menuUseCase: MenuUseCase) :
     }
 
     sealed class Action {
-        data class DeleteMenu(val menuGroupData: MenuGroupData)
-        data class AddMenu(
-            val name: String,
-            val printer: String?,
-            @ColorInt val color: Int? = null
-        )
-
-        data class UpdateMenu(
-            val name: String,
-            val printer: String?,
-            @ColorInt val color: Int? = null
-        )
+        data class DeleteMenu(val menuGroupData: MenuGroupData) : Action()
+        data class AddMenu(val menuGroupData: MenuGroupData) : Action()
+        data class EditMenu(
+            val oldMenuGroupData: MenuGroupData,
+            val newMenuGroupData: MenuGroupData
+        ) : Action()
     }
 
 

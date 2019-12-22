@@ -9,6 +9,8 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_admin_menu_group_list.*
@@ -16,6 +18,7 @@ import kotlinx.android.synthetic.main.item_admin_menu_group_list.view.*
 import net.arwix.extension.gone
 import net.arwix.extension.visible
 import net.arwix.gastro.admin.R
+import net.arwix.gastro.admin.data.AddEditMode
 import net.arwix.gastro.library.common.SimpleRecyclerAdapter
 import net.arwix.gastro.library.common.createView
 import net.arwix.gastro.library.menu.data.MenuGroupData
@@ -24,7 +27,7 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 class AdminMenuGroupListFragment : Fragment() {
 
     private lateinit var adapter: MenuAdapter
-    private val menuViewModel: AdminMenuViewModel by sharedViewModel()
+    private val menuGroupViewModel: AdminMenuGroupViewModel by sharedViewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,21 +36,49 @@ class AdminMenuGroupListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        menuViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
+        menuGroupViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
         adapter = MenuAdapter(
-            onDeleteItem = { menu ->
+            onEditGroup = {
+                findNavController().navigate(
+                    AdminMenuGroupListFragmentDirections.actionToMenuGroupEditFragment(
+                        it,
+                        AddEditMode.Edit
+                    )
+                )
+            },
+            onDeleteGroup = { menu ->
                 MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("")
+                    .setTitle("Delete menu?")
+                    .setNegativeButton("Cancel", null)
+                    .setPositiveButton("Delete") { _, _ ->
+                        menuGroupViewModel.nonCancelableIntent(
+                            AdminMenuGroupViewModel.Action.DeleteMenu(
+                                menu
+                            )
+                        )
+                    }
+                    .show()
+            },
+            onViewItems = {
+
             }
         )
-        admin_menu_recycler_view.apply {
+        admin_menu_group_recycler_view.apply {
             adapter = this@AdminMenuGroupListFragment.adapter
             layoutManager = LinearLayoutManager(requireContext())
+        }
+        admin_menu_group_add_button.setOnClickListener {
+            findNavController().navigate(
+                AdminMenuGroupListFragmentDirections.actionToMenuGroupEditFragment(
+                    null,
+                    AddEditMode.Add
+                )
+            )
         }
 
     }
 
-    private fun render(state: AdminMenuViewModel.State) {
+    private fun render(state: AdminMenuGroupViewModel.State) {
         state.menuGroups?.run {
             adapter.setItems(this)
         }
@@ -55,25 +86,48 @@ class AdminMenuGroupListFragment : Fragment() {
 
 
     private class MenuAdapter(
-        private val onDeleteItem: (menuGroupGroupData: MenuGroupData) -> Unit
+        private val onDeleteGroup: (menuGroupGroupData: MenuGroupData) -> Unit,
+        private val onEditGroup: (menuGroupGroupData: MenuGroupData) -> Unit,
+        private val onViewItems: (menuGroupGroupData: MenuGroupData) -> Unit
     ) : SimpleRecyclerAdapter<MenuGroupData>(
         onCreate = { inflater, parent, _ ->
             MenuHolder(inflater.createView(R.layout.item_admin_menu_group_list, parent))
+        },
+        diffUtilFactory = { oldList, newList ->
+            ItemDiffCallback(oldList, newList)
         }
     ) {
 
         private val doDeleteClick = View.OnClickListener {
-            val item = it.tag as MenuHolder
+            val item = it.tag as MenuGroupData
+            onDeleteGroup(item)
+        }
 
+        private val doEditClick = View.OnClickListener {
+            val item = it.tag as MenuGroupData
+            onEditGroup(item)
+        }
+
+        private val doViewItemsClick = View.OnClickListener {
+            val item = it.tag as MenuGroupData
+            onViewItems(item)
+        }
+
+        override fun setItems(list: List<MenuGroupData>) {
+            if (this.items == list) return
+            super.setItems(list)
         }
 
         override fun onBindViewHolder(holder: Holder<MenuGroupData>, position: Int) {
             super.onBindViewHolder(holder, position)
+            val item = items[position]
             holder as MenuHolder
-            holder.deleteGroupButton.tag = items[position]
-            holder.deleteGroupButton.setOnClickListener {
-
-            }
+            holder.deleteGroupButton.tag = item
+            holder.editGroupButton.tag = item
+            holder.viewItemsButton.tag = item
+            holder.deleteGroupButton.setOnClickListener(doDeleteClick)
+            holder.editGroupButton.setOnClickListener(doEditClick)
+            holder.viewItemsButton.setOnClickListener(doViewItemsClick)
         }
 
         private class MenuHolder(view: View) : SimpleRecyclerAdapter.Holder<MenuGroupData>(view) {
@@ -84,6 +138,7 @@ class AdminMenuGroupListFragment : Fragment() {
             val editGroupButton: Button = view.item_admin_menu_group_edit_button
             val deleteGroupButton: Button = view.item_admin_menu_group_delete_button
             val viewItemsButton: Button = view.item_admin_menu_group_edit_items_button
+            val colorView: View = view.item_admin_menu_group_color
 
             override fun bindTo(item: MenuGroupData) {
                 name.text = item.name
@@ -91,8 +146,44 @@ class AdminMenuGroupListFragment : Fragment() {
                     printer.visible()
                     printer.text = this
                 } ?: printer.gone()
-                order.text = (item.metadata.order?.toString() ?: "").let { "order: $it" }
-                items.text = (item.items?.size ?: 0).let { "items: $it" }
+
+                order.text = item.metadata.order?.run {
+                    itemView.resources.getString(
+                        R.string.admin_menu_group_item_order, this
+                    )
+                } ?: ""
+                items.text =
+                    itemView.resources.getString(
+                        R.string.admin_menu_group_item_items, item.items?.size ?: 0
+                    )
+                item.metadata.color?.run {
+                    colorView.setBackgroundColor(this)
+                } ?: run {
+                    colorView.background = null
+                }
+
+            }
+        }
+
+        private class ItemDiffCallback(
+            private val oldList: List<MenuGroupData>,
+            private val newList: List<MenuGroupData>
+        ) : DiffUtil.Callback() {
+            override fun getOldListSize(): Int = oldList.size
+
+            override fun getNewListSize(): Int = newList.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                val oldItem = oldList[oldItemPosition]
+                val newItem = newList[newItemPosition]
+                return (oldItem == newItem)
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                val oldItem = oldList[oldItemPosition]
+                val newItem = newList[newItemPosition]
+                return oldItem.items?.size == newItem.items?.size &&
+                        oldItem.metadata.updatedTime?.toEpochMilli() == newItem.metadata.updatedTime?.toEpochMilli()
             }
         }
     }

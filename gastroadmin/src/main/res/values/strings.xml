@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">GastroAdmin</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="button_delete">Delete</string>
+    <string name="button_edit">Edit</string>
+    <string name="admin_menu_group_item_order">position: %d</string>
+    <string name="admin_menu_group_item_items">items: %d</string>
+    <string name="admin_menu_group_item_view_items">View Items</string>
+    <string name="admin_title_menu_group_list">Menu groups</string>
+    <string name="admin_title_menu_group_add">Menu groups / Add</string>
+    <string name="admin_title_menu_group_edit">Menu groups / Edit</string>
 </resources>

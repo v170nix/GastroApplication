@@ -9,5 +9,22 @@
         android:id="@+id/adminMenuGroupListFragment"
         android:name="net.arwix.gastro.admin.feature.menu.ui.AdminMenuGroupListFragment"
         android:label="Menu groups"
-        tools:layout="@layout/fragment_admin_menu_group_list" />
+        tools:layout="@layout/fragment_admin_menu_group_list">
+        <action
+            android:id="@+id/action_to_menuGroupEditFragment"
+            app:destination="@+id/adminMenuGroupEditFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/adminMenuGroupEditFragment"
+        android:name="net.arwix.gastro.admin.feature.menu.ui.AdminMenuGroupEditFragment"
+        android:label=""
+        tools:layout="@layout/fragment_admin_menu_group_edit">
+        <argument
+            android:name="EditMenuGroup"
+            app:argType="net.arwix.gastro.library.menu.data.MenuGroupData"
+            app:nullable="true" />
+        <argument
+            android:name="EditMenuGroupMode"
+            app:argType="net.arwix.gastro.admin.data.AddEditMode" />
+    </fragment>
 </navigation>

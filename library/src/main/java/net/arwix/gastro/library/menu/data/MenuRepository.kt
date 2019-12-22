@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.toFlow
 
-class MenuRepository(private val menuRef: CollectionReference) {
+class MenuRepository(val menuRef: CollectionReference) {
 
     private val menuGroupAsFlow: Flow<List<MenuGroupData>> =
         menuRef.orderBy("order").toFlow().map { snapshot: QuerySnapshot ->

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--    <color name="colorPrimary">#a36644</color>-->
-    <color name="colorPrimary">#8F230F</color>
+    <color name="colorPrimary">#01579B</color>
     <color name="colorPrimaryDark">#321808</color>
     <!--        <color name="colorPrimaryDark">#cfa991</color>-->
     <color name="colorBg">#f8f7fc</color>
     <color name="colorSecondary">#148889</color>
     <color name="colorIconTint">#000000</color>
+    <color name="colorAppBar">#8F230F</color>
 </resources>

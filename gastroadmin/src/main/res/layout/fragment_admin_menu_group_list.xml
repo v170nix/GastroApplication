@@ -7,7 +7,7 @@
     tools:context=".feature.menu.ui.AdminMenuGroupListFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/admin_menu_recycler_view"
+        android:id="@+id/admin_menu_group_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/admin_menu_add_button"
+        android:id="@+id/admin_menu_group_add_button"
         style="@style/Widget.MaterialComponents.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

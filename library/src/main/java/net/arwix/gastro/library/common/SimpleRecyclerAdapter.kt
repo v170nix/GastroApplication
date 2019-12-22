@@ -4,10 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 
 open class SimpleRecyclerAdapter<T>(
-    private val onCreate: (inflater: LayoutInflater, parent: ViewGroup, viewType: Int) -> Holder<T>
+    private val onCreate: (inflater: LayoutInflater, parent: ViewGroup, viewType: Int) -> Holder<T>,
+    private val diffUtilFactory: ((oldList: List<T>, newList: List<T>) -> DiffUtil.Callback)? = null
 
 ) : RecyclerView.Adapter<SimpleRecyclerAdapter.Holder<T>>() {
 
@@ -24,10 +26,18 @@ open class SimpleRecyclerAdapter<T>(
         holder.bindTo(items[position])
     }
 
-    fun setItems(list: List<T>) {
-        items.clear()
-        items.addAll(list)
-        notifyDataSetChanged()
+    open fun setItems(list: List<T>) {
+        if (diffUtilFactory != null) {
+            val diffCallback = diffUtilFactory.invoke(items, list)
+            val diffResult = DiffUtil.calculateDiff(diffCallback)
+            items.clear()
+            items.addAll(list)
+            diffResult.dispatchUpdatesTo(this)
+        } else {
+            items.clear()
+            items.addAll(list)
+            notifyDataSetChanged()
+        }
     }
 
     abstract class Holder<M>(view: View) : RecyclerView.ViewHolder(view) {
@@ -38,5 +48,5 @@ open class SimpleRecyclerAdapter<T>(
 
 }
 
-fun LayoutInflater.createView(@LayoutRes layoutRes: Int, parent: ViewGroup) =
+fun LayoutInflater.createView(@LayoutRes layoutRes: Int, parent: ViewGroup): View =
     this.inflate(layoutRes, parent, false)

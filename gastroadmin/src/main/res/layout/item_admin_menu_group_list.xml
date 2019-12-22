@@ -18,7 +18,6 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            android:text="Hauptspeise"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
             app:layout_constraintEnd_toStartOf="@+id/item_admin_menu_group_color"
             app:layout_constraintStart_toStartOf="parent"
@@ -30,10 +29,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="TextView"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_group_name_text" />
+            app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_group_name_text"
+            tools:text="-" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/item_admin_menu_group_delete_button"
@@ -41,8 +40,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="delete"
-            app:iconTint="@color/design_default_color_error"
+            android:text="@string/button_delete"
+            android:textColor="@color/design_default_color_error"
             app:layout_constraintStart_toEndOf="@+id/item_admin_menu_group_edit_button"
             app:layout_constraintTop_toTopOf="@+id/item_admin_menu_group_edit_button" />
 
@@ -52,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:text="edit"
+            android:text="@string/button_edit"
             android:textColor="@color/colorIconTint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_group_order_text" />
@@ -62,17 +61,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="order: 20"
+            android:text="@string/admin_menu_group_item_order"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_group_printer_text" />
+            app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_group_printer_text"
+            tools:text="order: 20" />
 
         <TextView
             android:id="@+id/item_admin_menu_group_items_count_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="items: 0"
+            android:text="@string/admin_menu_group_item_items"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_group_name_text" />
@@ -93,7 +93,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:text="View Items"
+            android:text="@string/admin_menu_group_item_view_items"
             android:textColor="@color/colorIconTint"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/item_admin_menu_group_delete_button" />
