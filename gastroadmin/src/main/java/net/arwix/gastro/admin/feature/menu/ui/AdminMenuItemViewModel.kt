@@ -61,13 +61,22 @@ class AdminMenuItemViewModel(private val menuUseCase: MenuUseCase) :
         menuUseCase.addMenuItem(menuGroup, preMenuItem)
     }
 
-    sealed class Action {
-        //        data class SetMenu(val menuGroupData: MenuGroupData) : Action()
-        data class EditMenuItem(val preMenuItem: MenuGroupData.PreMenuItem) : Action()
-
-        data class DeleteMenuItem(val preMenuItem: MenuGroupData.PreMenuItem) : Action()
+    suspend fun edit(
+        oldPreMenuItem: MenuGroupData.PreMenuItem,
+        preMenuItem: MenuGroupData.PreMenuItem
+    ) {
+        val menuGroup = internalViewState.menu ?: return
+        menuUseCase.editMenuItem(menuGroup, oldPreMenuItem, preMenuItem)
     }
 
+    fun delete(preMenuItem: MenuGroupData.PreMenuItem) {
+        val menuGroup = internalViewState.menu ?: return
+        viewModelScope.launch {
+            menuUseCase.deleteMenuItem(menuGroup, preMenuItem)
+        }
+    }
+
+    sealed class Action
 
     sealed class Result {
         object Clear : Result()

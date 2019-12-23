@@ -49,5 +49,25 @@
         <argument
             android:name="MenuGroup"
             app:argType="net.arwix.gastro.library.menu.data.MenuGroupData" />
+        <action
+            android:id="@+id/action_to_adminMenuItemEditFragment"
+            app:destination="@id/adminMenuItemEditFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/adminMenuItemEditFragment"
+        android:name="net.arwix.gastro.admin.feature.menu.ui.AdminMenuItemEditFragment"
+        android:label=""
+        tools:layout="@layout/fragment_admin_menu_item_edit">
+        <argument
+            android:name="Mode"
+            app:argType="net.arwix.gastro.admin.data.AddEditMode" />
+        <argument
+            android:name="MenuGroup"
+            app:argType="net.arwix.gastro.library.menu.data.MenuGroupData" />
+        <argument
+            android:name="MenuItem"
+            android:defaultValue="@null"
+            app:argType="net.arwix.gastro.library.menu.data.MenuGroupData$PreMenuItem"
+            app:nullable="true" />
     </fragment>
 </navigation>

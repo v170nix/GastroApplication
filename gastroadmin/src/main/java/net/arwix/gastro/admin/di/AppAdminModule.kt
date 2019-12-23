@@ -19,7 +19,7 @@ val AppAdminModule = module {
         val firebaseFirestore = Firebase.firestore(Firebase.app).apply {
             clearPersistence()
         }
-        FirestoreDbApp("test-", firebaseFirestore)
+        FirestoreDbApp("", firebaseFirestore)
     }
 
     single { MenuUseCase(MenuRepository(get<FirestoreDbApp>().refs.menu)) }

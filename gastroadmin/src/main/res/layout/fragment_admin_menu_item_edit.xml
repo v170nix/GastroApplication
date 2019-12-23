@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".feature.menu.ui.AdminMenuGroupEditFragment">
+    tools:context=".feature.menu.ui.AdminMenuItemEditFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -15,7 +15,7 @@
 
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/admin_menu_group_edit_name"
+            android:id="@+id/admin_menu_item_edit_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
@@ -26,105 +26,150 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Name"
+                android:imeOptions="actionNext"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/admin_menu_group_edit_printer_address"
+            android:id="@+id/admin_menu_item_edit_price"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:nextFocusRight="@id/admin_menu_item_edit_position"
+            android:nextFocusDown="@id/admin_menu_item_edit_position"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/admin_menu_item_edit_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Price"
+                android:imeOptions="actionNext"
+                android:inputType="numberDecimal"
+                android:nextFocusRight="@id/admin_menu_item_edit_position"
+                android:nextFocusDown="@id/admin_menu_item_edit_position"
+                android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/admin_menu_item_edit_printer_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:nextFocusRight="@id/item_admin_menu_item_color"
+            android:nextFocusDown="@id/item_admin_menu_item_color"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/admin_menu_group_edit_name">
+            app:layout_constraintTop_toBottomOf="@+id/admin_menu_item_edit_price">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Printer address"
+                android:imeOptions="actionNext"
                 android:inputType="textNoSuggestions"
+                android:nextFocusRight="@id/item_admin_menu_item_color"
+                android:nextFocusDown="@id/item_admin_menu_item_color"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/admin_menu_group_edit_position"
-            android:layout_width="match_parent"
+            android:id="@+id/admin_menu_item_edit_position"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
+            android:nextFocusRight="@id/item_admin_menu_item_color"
+            android:nextFocusDown="@id/item_admin_menu_item_color"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/admin_menu_group_edit_printer_address">
+            app:layout_constraintStart_toEndOf="@+id/admin_menu_item_edit_price"
+            app:layout_constraintTop_toBottomOf="@+id/admin_menu_item_edit_name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Position"
+                android:imeOptions="actionNext"
                 android:inputType="number"
+                android:nextFocusRight="@id/item_admin_menu_item_color"
+                android:nextFocusDown="@id/item_admin_menu_item_color"
                 android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/admin_menu_group_edit_color"
+            android:id="@+id/admin_menu_item_edit_color"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toStartOf="@+id/admin_menu_group_edit_color_dialog_button"
+            android:nextFocusRight="@id/admin_menu_item_edit_submit_button"
+            android:nextFocusDown="@id/admin_menu_item_edit_submit_button"
+            app:layout_constraintEnd_toStartOf="@+id/admin_menu_item_edit_color_dialog_button"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/admin_menu_group_edit_position">
+            app:layout_constraintTop_toBottomOf="@+id/admin_menu_item_edit_printer_address">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Color"
+                android:imeOptions="actionDone"
                 android:inputType="textNoSuggestions"
                 android:singleLine="true" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/admin_menu_group_edit_color_dialog_button"
+            android:id="@+id/admin_menu_item_edit_color_dialog_button"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:text="open picker"
-            app:layout_constraintBottom_toBottomOf="@+id/admin_menu_group_edit_color"
+            app:layout_constraintBottom_toBottomOf="@+id/admin_menu_item_edit_color"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/admin_menu_group_edit_color" />
+            app:layout_constraintTop_toTopOf="@+id/admin_menu_item_edit_color" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/admin_menu_group_edit_submit_button"
+            android:id="@+id/admin_menu_item_edit_submit_button"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:imeOptions="actionDone"
             android:text="Submit"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/admin_menu_group_edit_color" />
+            app:layout_constraintTop_toBottomOf="@+id/admin_menu_item_edit_color" />
 
         <Button
-            android:id="@+id/admin_menu_group_edit_back_button"
+            android:id="@+id/admin_menu_item_edit_back_button"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="Back"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/admin_menu_group_edit_color" />
+            app:layout_constraintTop_toBottomOf="@+id/admin_menu_item_edit_color" />
 
         <View
-            android:id="@+id/admin_menu_group_edit_color_view"
+            android:id="@+id/admin_menu_item_edit_color_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="@+id/admin_menu_group_edit_color"
+            app:layout_constraintBottom_toBottomOf="@+id/admin_menu_item_edit_color"
             app:layout_constraintDimensionRatio="h,1:1"
-            app:layout_constraintEnd_toEndOf="@+id/admin_menu_group_edit_color"
-            app:layout_constraintTop_toTopOf="@+id/admin_menu_group_edit_color" />
+            app:layout_constraintEnd_toEndOf="@+id/admin_menu_item_edit_color"
+            app:layout_constraintTop_toTopOf="@+id/admin_menu_item_edit_color" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.6" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

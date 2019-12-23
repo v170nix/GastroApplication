@@ -9,14 +9,17 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_admin_menu_item_list.*
 import kotlinx.android.synthetic.main.item_admin_menu_item_list.view.*
 import net.arwix.extension.gone
 import net.arwix.extension.visible
 import net.arwix.gastro.admin.R
+import net.arwix.gastro.admin.data.AddEditMode
 import net.arwix.gastro.library.common.SimpleRecyclerAdapter
 import net.arwix.gastro.library.common.createView
 import net.arwix.gastro.library.menu.data.MenuGroupData
@@ -28,7 +31,6 @@ class AdminMenuItemListFragment : Fragment() {
     private val itemViewModel: AdminMenuItemViewModel by sharedViewModel()
     private val args: AdminMenuItemListFragmentArgs by navArgs()
     private lateinit var adapter: MenuAdapter
-    private var isProgress: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,28 +42,25 @@ class AdminMenuItemListFragment : Fragment() {
         itemViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
         adapter = MenuAdapter(
             onEditGroup = {
-                //                findNavController().navigate(
-//                    AdminMenuGroupListFragmentDirections.actionToMenuGroupEditFragment(
-//                        it,
-//                        AddEditMode.Edit
-//                    )
-//                )
+                findNavController().navigate(
+                    AdminMenuItemListFragmentDirections.actionToAdminMenuItemEditFragment(
+                        AddEditMode.Edit,
+                        args.MenuGroup,
+                        it
+                    )
+                )
             },
             onDeleteGroup = { menu ->
-                //                MaterialAlertDialogBuilder(
-//                    requireContext(),
-//                    R.style.Body_ThemeOverlay_MaterialComponents_MaterialAlertDialog
-//                )
-//                    .setMessage("Delete menu item?")
-//                    .setNegativeButton("Cancel", null)
-//                    .setPositiveButton("Delete") { _, _ ->
-//                        menuGroupViewModel.nonCancelableIntent(
-//                            AdminMenuGroupViewModel.Action.DeleteMenu(
-//                                menu
-//                            )
-//                        )
-//                    }
-//                    .show()
+                MaterialAlertDialogBuilder(
+                    requireContext(),
+                    R.style.Body_ThemeOverlay_MaterialComponents_MaterialAlertDialog
+                )
+                    .setMessage("Delete menu item?")
+                    .setNegativeButton("Cancel", null)
+                    .setPositiveButton("Delete") { _, _ ->
+                        itemViewModel.delete(menu)
+                    }
+                    .show()
             }
         )
 
@@ -70,19 +69,19 @@ class AdminMenuItemListFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
         }
         admin_menu_item_add_button.setOnClickListener {
-            //            findNavController().navigate(
-//                AdminMenuGroupListFragmentDirections.actionToMenuGroupEditFragment(
-//                    null,
-//                    AddEditMode.Add
-//                )
-//            )
+            findNavController().navigate(
+                AdminMenuItemListFragmentDirections.actionToAdminMenuItemEditFragment(
+                    AddEditMode.Add,
+                    args.MenuGroup
+                )
+            )
         }
     }
 
     private fun render(state: AdminMenuItemViewModel.State) {
         state.menu?.run {
             setTitle(this)
-            items?.run(adapter::setItems)
+            items?.run(adapter::setItems) ?: adapter.setItems(listOf())
 //            val position = adapter.getPosition(submitMenuGroup) ?: return@run
 //            if (isFirstScrollPositionCompleted) return@run
 //            launch {

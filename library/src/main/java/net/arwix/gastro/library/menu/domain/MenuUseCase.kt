@@ -3,6 +3,7 @@ package net.arwix.gastro.library.menu.domain
 import com.google.firebase.firestore.FieldValue
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.menu.data.MenuGroupData
+import net.arwix.gastro.library.menu.data.MenuGroupDoc
 import net.arwix.gastro.library.menu.data.MenuRepository
 
 class MenuUseCase(private val repository: MenuRepository) {
@@ -42,10 +43,64 @@ class MenuUseCase(private val repository: MenuRepository) {
 
     suspend fun addMenuItem(menuGroupData: MenuGroupData, item: MenuGroupData.PreMenuItem) {
         repository.menuRef.firestore.runTransaction {
+            val itemsMap = it
+                .get(repository.menuRef.document(menuGroupData.name))
+                .toObject(MenuGroupDoc::class.java)!!.items?.toMutableMap() ?: mutableMapOf()
+
+            itemsMap[item.name!!] = item.toPreMenuItemValueDoc()
+
             it.update(
                 repository.menuRef.document(menuGroupData.name),
                 "items",
-                FieldValue.arrayUnion(item)
+                itemsMap
+            )
+            it.update(
+                repository.menuRef.document(menuGroupData.name),
+                "updatedTime",
+                FieldValue.serverTimestamp()
+            )
+        }.await()
+    }
+
+    suspend fun editMenuItem(
+        menuGroupData: MenuGroupData,
+        oldItem: MenuGroupData.PreMenuItem,
+        item: MenuGroupData.PreMenuItem
+    ) {
+        repository.menuRef.firestore.runTransaction {
+            val itemsMap = it
+                .get(repository.menuRef.document(menuGroupData.name))
+                .toObject(MenuGroupDoc::class.java)!!.items?.toMutableMap() ?: mutableMapOf()
+
+            itemsMap.remove(oldItem.name)
+            itemsMap[item.name!!] = item.toPreMenuItemValueDoc()
+
+            it.update(
+                repository.menuRef.document(menuGroupData.name),
+                "items",
+                itemsMap
+            )
+            it.update(
+                repository.menuRef.document(menuGroupData.name),
+                "updatedTime",
+                FieldValue.serverTimestamp()
+            )
+        }.await()
+    }
+
+    suspend fun deleteMenuItem(
+        menuGroupData: MenuGroupData,
+        item: MenuGroupData.PreMenuItem
+    ) {
+        repository.menuRef.firestore.runTransaction {
+            val itemsMap = it
+                .get(repository.menuRef.document(menuGroupData.name))
+                .toObject(MenuGroupDoc::class.java)!!.items?.toMutableMap() ?: mutableMapOf()
+            itemsMap.remove(item.name)
+            it.update(
+                repository.menuRef.document(menuGroupData.name),
+                "items",
+                itemsMap
             )
             it.update(
                 repository.menuRef.document(menuGroupData.name),

@@ -15,8 +15,8 @@ data class MenuGroupData(
     val metadata: Metadata
 ) : Parcelable {
 
-    fun toMenuDoc(): MenuDoc =
-        MenuDoc(
+    fun toMenuDoc(): MenuGroupDoc =
+        MenuGroupDoc(
             printer,
             metadata.order,
             metadata.color,
@@ -35,13 +35,13 @@ data class MenuGroupData(
 
     @Parcelize
     data class PreMenuItem(
-        val name: String? = null,
-        val price: Int = 0,
+        val name: MenuItemName? = null,
+        val price: Long = 0,
         val printer: String? = null,
         val color: Int? = null,
         val position: Int = 100
     ) : Parcelable {
-        fun toPreMenuItemValueDoc() = MenuDoc.PreMenuItemValueDoc(
+        fun toPreMenuItemValueDoc() = MenuGroupDoc.PreMenuItemValueDoc(
             price, printer, color, position
         )
     }

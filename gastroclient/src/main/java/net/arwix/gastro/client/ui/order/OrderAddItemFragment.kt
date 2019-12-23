@@ -14,6 +14,7 @@ import net.arwix.gastro.library.common.hideKeyboard
 import net.arwix.gastro.library.common.showSoftKeyboard
 import net.arwix.gastro.library.data.OrderItem
 import org.koin.android.viewmodel.ext.android.sharedViewModel
+import kotlin.math.roundToLong
 
 class OrderAddItemFragment : Fragment() {
 
@@ -40,7 +41,8 @@ class OrderAddItemFragment : Fragment() {
             val priceString = order_list_add_item_price_layout.editText?.editableText?.toString()
                 ?: return@setOnClickListener
             val priceDouble = priceString.toDoubleOrNull() ?: return@setOnClickListener
-            val item = OrderItem(name, (priceDouble * 100).toLong(), 1)
+            if (priceDouble <= 0) return@setOnClickListener
+            val item = OrderItem(name, (priceDouble * 100).roundToLong(), 1)
             orderViewModel.nonCancelableIntent(
                 OrderViewModel.Action.AddItem(
                     itemType,

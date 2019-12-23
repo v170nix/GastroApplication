@@ -18,13 +18,13 @@ class MenuRepository(val menuRef: CollectionReference) {
 
     fun getMenusFlow() = menuGroupAsFlow
     fun getMenuFlow(name: String) = menuRef.document(name).toFlow().map {
-        it.toObject(MenuDoc::class.java)?.toMenuData(it.id)
+        it.toObject(MenuGroupDoc::class.java)?.toMenuData(it.id)
     }.filterNotNull()
 
     suspend fun getData() = transformData(menuRef.orderBy("order").get().await()!!)
 
     private fun transformData(snapshot: QuerySnapshot) =
-        snapshot.map { it.toObject(MenuDoc::class.java).toMenuData(it.id) }
+        snapshot.map { it.toObject(MenuGroupDoc::class.java).toMenuData(it.id) }
 
 
 }

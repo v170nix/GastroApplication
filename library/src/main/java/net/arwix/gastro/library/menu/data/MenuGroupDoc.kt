@@ -4,7 +4,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
 import org.threeten.bp.Instant
 
-data class MenuDoc(
+data class MenuGroupDoc(
     val printer: String? = null,
     val order: Int? = null,
     val color: Int? = null,
@@ -21,7 +21,7 @@ data class MenuDoc(
         )
 
     data class PreMenuItemValueDoc(
-        val price: Int = 0,
+        val price: Long = 0,
         val printer: String? = null,
         val color: Int? = null,
         val position: Int = 100

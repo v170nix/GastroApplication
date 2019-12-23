@@ -11,8 +11,8 @@ import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.FirestoreDbApp
 import net.arwix.gastro.library.data.OrderData
-import net.arwix.gastro.library.menu.data.MenuDoc
 import net.arwix.gastro.library.menu.data.MenuGroupData
+import net.arwix.gastro.library.menu.data.MenuGroupDoc
 import net.arwix.mvi.SimpleIntentViewModel
 
 class HistoryOrderDetailViewModel(
@@ -25,7 +25,8 @@ class HistoryOrderDetailViewModel(
     init {
         viewModelScope.launch {
             val doc = firestoreDbApp.refs.menu.orderBy("order").get().await()!!
-            val menu = doc.documents.map { it.toObject(MenuDoc::class.java)!!.toMenuData(it.id) }
+            val menu =
+                doc.documents.map { it.toObject(MenuGroupDoc::class.java)!!.toMenuData(it.id) }
             menuGroupTypes = menu
         }
     }

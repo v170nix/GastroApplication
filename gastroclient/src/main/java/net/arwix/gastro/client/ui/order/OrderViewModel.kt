@@ -13,8 +13,8 @@ import kotlinx.coroutines.withContext
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.*
-import net.arwix.gastro.library.menu.data.MenuDoc
 import net.arwix.gastro.library.menu.data.MenuGroupData
+import net.arwix.gastro.library.menu.data.MenuGroupDoc
 import net.arwix.mvi.SimpleIntentViewModel
 
 class OrderViewModel(
@@ -33,7 +33,8 @@ class OrderViewModel(
         viewModelScope.launch {
             val doc = firestoreDbApp.refs.menu.orderBy("order").get().await()!!
             val menu = doc.documents.map { it.id }
-            val menuA = doc.documents.map { it.toObject(MenuDoc::class.java)!!.toMenuData(it.id) }
+            val menuA =
+                doc.documents.map { it.toObject(MenuGroupDoc::class.java)!!.toMenuData(it.id) }
             menuGroupData = menuA
             menuTypes = menu
             notificationFromObserver(Result.AddMenu(menu))
