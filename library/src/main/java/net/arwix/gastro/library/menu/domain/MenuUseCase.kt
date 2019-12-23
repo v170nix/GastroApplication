@@ -1,5 +1,6 @@
 package net.arwix.gastro.library.menu.domain
 
+import androidx.annotation.ColorInt
 import com.google.firebase.firestore.FieldValue
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.menu.data.MenuGroupData
@@ -29,12 +30,43 @@ class MenuUseCase(private val repository: MenuRepository) {
         oldMenuGroupData: MenuGroupData,
         newMenuGroupData: MenuGroupData
     ) {
-        val mergeGroup = newMenuGroupData.copy(items = oldMenuGroupData.items)
+        val mergeGroup = newMenuGroupData.copy(
+            items = updateMenuItemsData(
+                oldMenuGroupData.items,
+                oldMenuGroupData.printer,
+                newMenuGroupData.printer,
+                oldMenuGroupData.metadata.color,
+                newMenuGroupData.metadata.color
+            )
+        )
         val newMenuDoc = repository.menuRef.document(mergeGroup.name)
         repository.menuRef.firestore.runTransaction {
             it.delete(repository.menuRef.document(oldMenuGroupData.name))
             it.set(newMenuDoc, mergeGroup.toMenuDoc())
         }.await()
+    }
+
+    private fun updateMenuItemsData(
+        items: List<MenuGroupData.PreMenuItem>?,
+        oldPrinterAddress: String?,
+        newPrinterAddress: String?,
+        @ColorInt oldColor: Int?,
+        @ColorInt newColor: Int?
+    ): List<MenuGroupData.PreMenuItem> {
+        if (items == null) return listOf()
+        if (oldPrinterAddress == newPrinterAddress && oldColor == newColor) return items
+        return items.map {
+            val printer = if (it.printer == oldPrinterAddress || it.printer == null) {
+                newPrinterAddress
+            } else it.printer
+            val color = if (it.color == oldColor || it.color == null) {
+                newColor
+            } else it.color
+            it.copy(
+                printer = printer,
+                color = color
+            )
+        }
     }
 
     suspend fun deleteMenuGroup(menuGroupData: MenuGroupData) {

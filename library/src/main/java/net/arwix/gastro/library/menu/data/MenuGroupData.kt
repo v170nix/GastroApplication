@@ -9,7 +9,7 @@ import org.threeten.bp.Instant
 @Keep
 @Parcelize
 data class MenuGroupData(
-    val name: String,
+    val name: MenuGroupName,
     val printer: String?,
     val items: List<PreMenuItem>? = null,
     val metadata: Metadata
@@ -39,12 +39,16 @@ data class MenuGroupData(
         val price: Long = 0,
         val printer: String? = null,
         val color: Int? = null,
-        val position: Int = 100
+        val row: RowValue = 1,
+        val col: ColValue = 1
     ) : Parcelable {
         fun toPreMenuItemValueDoc() = MenuGroupDoc.PreMenuItemValueDoc(
-            price, printer, color, position
+            price, printer, color, row, col
         )
     }
 
-
 }
+
+typealias MenuGroupName = String
+typealias RowValue = Int
+typealias ColValue = Int

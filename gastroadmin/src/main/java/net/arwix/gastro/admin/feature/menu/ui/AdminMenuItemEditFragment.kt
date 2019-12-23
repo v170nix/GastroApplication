@@ -3,6 +3,7 @@ package net.arwix.gastro.admin.feature.menu.ui
 
 import android.os.Bundle
 import android.text.Editable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import net.arwix.gastro.admin.R
 import net.arwix.gastro.admin.data.AddEditMode
 import net.arwix.gastro.library.common.hideKeyboard
 import net.arwix.gastro.library.menu.data.MenuGroupData
+import net.arwix.gastro.library.menu.getNextCell
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import kotlin.math.roundToLong
 
@@ -74,11 +76,16 @@ class AdminMenuItemEditFragment : Fragment(), CoroutineScope by MainScope() {
             setData(inputMenuItem)
 //            (requireActivity() as AppCompatActivity).supportActionBar?.setTitle(R.string.admin_title_menu_group_edit)
         }
+
+        val cell = args.MenuGroup.getNextCell()
+        Log.e("menugroup", args.MenuGroup.toString())
+
         if (args.Mode == AddEditMode.Add) {
             inputMenuItem = MenuGroupData.PreMenuItem(
                 name = "",
                 color = args.MenuGroup.metadata.color,
-                position = 100,
+                row = cell.first,
+                col = cell.second,
                 price = 0,
                 printer = args.MenuGroup.printer
             )
@@ -138,25 +145,28 @@ class AdminMenuItemEditFragment : Fragment(), CoroutineScope by MainScope() {
             isErrors = true
         }
 
-        val position =
-            admin_menu_item_edit_position.editText?.text?.toString()?.toIntOrNull() ?: 100
+        val row = admin_menu_item_edit_row.editText?.text?.toString()?.toIntOrNull() ?: 1
+        val col = admin_menu_item_edit_col.editText?.text?.toString()?.toIntOrNull() ?: 1
+
         val color = getColorInt(admin_menu_item_edit_color.editText?.editableText)
         if (isErrors) return null
         return MenuGroupData.PreMenuItem(
             name = name,
             printer = printer,
             color = color,
-            position = position,
+            row = row,
+            col = col,
             price = (priceDouble!! * 100.0).roundToLong()
         )
     }
 
     private fun setData(data: MenuGroupData.PreMenuItem) {
         admin_menu_item_edit_name.editText?.setText(data.name)
-        admin_menu_item_edit_position.editText?.setText(data.position.toString())
+        admin_menu_item_edit_row.editText?.setText(data.row.toString())
+        admin_menu_item_edit_col.editText?.setText(data.col.toString())
         admin_menu_item_edit_printer_address.editText?.setText(data.printer ?: "")
 //        admin_menu_item_edit_printer_address.editText?.isEnabled = false
-////        admin_menu_item_edit_printer_address.editText?.focusable = NOT_FOCUSABLE
+//        admin_menu_item_edit_printer_address.editText?.focusable = NOT_FOCUSABLE
 //        admin_menu_item_edit_printer_address.editText?.inputType = InputType.TYPE_NULL
 //        admin_menu_item_edit_printer_address.isEnabled = false
         val color = data.color?.run(Integer::toHexString) ?: ""

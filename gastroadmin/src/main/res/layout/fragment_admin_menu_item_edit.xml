@@ -35,8 +35,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:nextFocusRight="@id/admin_menu_item_edit_position"
-            android:nextFocusDown="@id/admin_menu_item_edit_position"
+            android:nextFocusRight="@id/admin_menu_item_edit_row"
+            android:nextFocusDown="@id/admin_menu_item_edit_row"
             app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/admin_menu_item_edit_name">
@@ -47,9 +47,58 @@
                 android:hint="Price"
                 android:imeOptions="actionNext"
                 android:inputType="numberDecimal"
-                android:nextFocusRight="@id/admin_menu_item_edit_position"
-                android:nextFocusDown="@id/admin_menu_item_edit_position"
+                android:nextFocusRight="@id/admin_menu_item_edit_row"
+                android:nextFocusDown="@id/admin_menu_item_edit_row"
                 android:singleLine="true" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/admin_menu_item_edit_row"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="4dp"
+            android:nextFocusRight="@id/admin_menu_item_edit_col"
+            android:nextFocusDown="@id/admin_menu_item_edit_col"
+            app:layout_constraintEnd_toStartOf="@+id/admin_menu_item_edit_col"
+            app:layout_constraintStart_toEndOf="@+id/admin_menu_item_edit_price"
+            app:layout_constraintTop_toBottomOf="@+id/admin_menu_item_edit_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Row"
+                android:imeOptions="actionNext"
+                android:inputType="number"
+                android:nextFocusRight="@id/admin_menu_item_edit_col"
+                android:nextFocusDown="@id/admin_menu_item_edit_col"
+                android:singleLine="true" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/admin_menu_item_edit_col"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:nextFocusRight="@id/item_admin_menu_item_color"
+            android:nextFocusDown="@id/item_admin_menu_item_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/admin_menu_item_edit_row"
+            app:layout_constraintTop_toBottomOf="@+id/admin_menu_item_edit_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Col"
+                android:imeOptions="actionNext"
+                android:inputType="number"
+                android:nextFocusRight="@id/item_admin_menu_item_color"
+                android:nextFocusDown="@id/item_admin_menu_item_color"
+                android:singleLine="true" />
+
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -69,33 +118,9 @@
                 android:hint="Printer address"
                 android:imeOptions="actionNext"
                 android:inputType="textNoSuggestions"
-                android:nextFocusRight="@id/item_admin_menu_item_color"
-                android:nextFocusDown="@id/item_admin_menu_item_color"
+                android:nextFocusRight="@id/admin_menu_item_edit_color"
+                android:nextFocusDown="@id/admin_menu_item_edit_color"
                 android:singleLine="true" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/admin_menu_item_edit_position"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:nextFocusRight="@id/item_admin_menu_item_color"
-            android:nextFocusDown="@id/item_admin_menu_item_color"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/admin_menu_item_edit_price"
-            app:layout_constraintTop_toBottomOf="@+id/admin_menu_item_edit_name">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Position"
-                android:imeOptions="actionNext"
-                android:inputType="number"
-                android:nextFocusRight="@id/item_admin_menu_item_color"
-                android:nextFocusDown="@id/item_admin_menu_item_color"
-                android:singleLine="true" />
-
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -169,7 +194,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.6" />
+            app:layout_constraintGuide_percent="0.4" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

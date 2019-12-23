@@ -8,4 +8,5 @@
     <color name="colorSecondary">#00adb5</color>
     <color name="colorIconTint">#000000</color>
     <color name="colorAppBar">#8F230F</color>
+    <color name="colorCellIntersection">#ffc440</color>
 </resources>

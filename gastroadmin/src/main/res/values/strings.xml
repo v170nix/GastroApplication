@@ -4,7 +4,8 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="button_delete">Delete</string>
     <string name="button_edit">Edit</string>
-    <string name="admin_menu_group_item_order">position: %d</string>
+    <string name="admin_menu_group_item_order">position %d</string>
+    <string name="admin_menu_item_order">row: %d; col %d</string>
     <string name="admin_menu_group_item_items">items: %d</string>
     <string name="admin_menu_group_item_view_items">View Items</string>
     <string name="admin_title_menu_group_list">Menu groups</string>

@@ -41,6 +41,7 @@ class AdminMenuItemViewModel(private val menuUseCase: MenuUseCase) :
     }
 
     fun setMenu(menu: MenuGroupData) {
+        notificationFromObserver(Result.Clear)
         channelMenuGroupChange.offer(menu.name)
     }
 

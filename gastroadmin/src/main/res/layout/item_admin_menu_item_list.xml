@@ -49,12 +49,14 @@
             android:id="@+id/item_admin_menu_item_order_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="12dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             android:text="@string/admin_menu_group_item_order"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_item_printer_text"
-            tools:text="order: 20" />
+            tools:text="row:1; col 1" />
 
         <View
             android:id="@+id/item_admin_menu_item_color"

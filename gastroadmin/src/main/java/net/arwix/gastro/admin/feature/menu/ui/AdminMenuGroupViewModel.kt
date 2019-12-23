@@ -35,7 +35,7 @@ class AdminMenuGroupViewModel(private val menuUseCase: MenuUseCase) :
 
     override fun dispatchAction(action: Action): LiveData<Result> {
 
-        return liveData<Result> {
+        return liveData {
             when (action) {
                 is Action.DeleteMenu -> menuUseCase.deleteMenuGroup(action.menuGroupData)
             }
