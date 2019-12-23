@@ -4,6 +4,6 @@
         <item
             android:id="@id/adminMenuGroupListFragment"
             android:icon="@drawable/ic_restaurant_menu"
-            android:title="Menu Group" />
+            android:title="Menu Groups" />
     </group>
 </menu>
