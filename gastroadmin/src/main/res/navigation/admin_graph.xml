@@ -52,6 +52,9 @@
         <action
             android:id="@+id/action_to_adminMenuItemEditFragment"
             app:destination="@id/adminMenuItemEditFragment" />
+        <action
+            android:id="@+id/action_to_adminMenuPreviewItemsFragment"
+            app:destination="@id/adminMenuPreviewItemsFragment" />
     </fragment>
     <fragment
         android:id="@+id/adminMenuItemEditFragment"
@@ -69,5 +72,14 @@
             android:defaultValue="@null"
             app:argType="net.arwix.gastro.library.menu.data.MenuGroupData$PreMenuItem"
             app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/adminMenuPreviewItemsFragment"
+        android:name="net.arwix.gastro.admin.feature.menu.ui.AdminMenuPreviewItemsFragment"
+        android:label="Menu / Preview items"
+        tools:layout="@layout/fragment_admin_menu_preview_items">
+        <argument
+            android:name="MenuGroup"
+            app:argType="net.arwix.gastro.library.menu.data.MenuGroupData" />
     </fragment>
 </navigation>

@@ -3,7 +3,6 @@ package net.arwix.gastro.admin.feature.menu.ui
 
 import android.os.Bundle
 import android.text.Editable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -78,7 +77,6 @@ class AdminMenuItemEditFragment : Fragment(), CoroutineScope by MainScope() {
         }
 
         val cell = args.MenuGroup.getNextCell()
-        Log.e("menugroup", args.MenuGroup.toString())
 
         if (args.Mode == AddEditMode.Add) {
             inputMenuItem = MenuGroupData.PreMenuItem(

@@ -98,7 +98,8 @@ class AdminMenuGroupListFragment : Fragment(), CoroutineScope by MainScope() {
             if (isFirstScrollPositionCompleted) return@run
             launch {
                 delay(100)
-                admin_menu_group_recycler_view.smoothScrollToPosition(position)
+                admin_menu_group_recycler_view.scrollToPosition(position)
+                isFirstScrollPositionCompleted = true
             }
         }
     }

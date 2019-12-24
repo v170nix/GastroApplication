@@ -1,13 +1,17 @@
 package net.arwix.gastro.library.menu
 
+import android.content.Context
+import androidx.recyclerview.widget.GridLayoutManager
 import net.arwix.gastro.library.menu.MenuUtils.getNextRowAndCol
 import net.arwix.gastro.library.menu.data.ColValue
+import net.arwix.gastro.library.menu.data.MenuGridItem
 import net.arwix.gastro.library.menu.data.MenuGroupData
 import net.arwix.gastro.library.menu.data.RowValue
+import net.arwix.gastro.library.menu.ui.MenuItemsGridAdapter
 
 object MenuUtils {
 
-    const val maxTableCols = 5
+    const val maxTableCols = 4
 
     fun getNextRowAndCol(menuGroup: MenuGroupData): Pair<RowValue, ColValue> {
         var maxRow = 1
@@ -28,6 +32,23 @@ object MenuUtils {
         }
 
         return maxRow to maxCol
+    }
+
+    fun createGridLayoutManager(
+        context: Context,
+        adapter: MenuItemsGridAdapter
+    ): GridLayoutManager {
+        return GridLayoutManager(context, maxTableCols).apply {
+            this.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
+                    val item = adapter.items.get(position)
+                    return when (item) {
+                        is MenuGridItem.Title -> maxTableCols
+                        else -> 1
+                    }
+                }
+            }
+        }
     }
 }
 

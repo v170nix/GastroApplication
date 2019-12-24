@@ -92,6 +92,15 @@ class AdminMenuItemListFragment : Fragment() {
                 )
             )
         }
+
+        admin_menu_item_list_preview_button.setOnClickListener {
+            val menuGroupData = itemViewModel.liveState.value?.menu ?: return@setOnClickListener
+            findNavController().navigate(
+                AdminMenuItemListFragmentDirections.actionToAdminMenuPreviewItemsFragment(
+                    menuGroupData
+                )
+            )
+        }
     }
 
     private fun render(state: AdminMenuItemViewModel.State) {
