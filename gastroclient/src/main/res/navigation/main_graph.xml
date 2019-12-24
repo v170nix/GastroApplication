@@ -77,7 +77,7 @@
     <fragment
         android:id="@+id/orderAddPreItemsFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderAddPreItemsFragment"
-        android:label="fragment_order_add_pre_items"
+        android:label="Add order / select item"
         tools:layout="@layout/fragment_order_add_pre_items">
         <action
             android:id="@+id/action_orderAddPreItemsFragment_to_orderListAddItemFragment"

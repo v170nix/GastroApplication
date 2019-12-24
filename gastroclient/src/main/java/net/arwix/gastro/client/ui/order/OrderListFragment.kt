@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.navigation.NavOptions
@@ -48,8 +47,7 @@ class OrderListFragment : Fragment() {
         adapterOrder = OrderListAdapter(
             onTypeClick = {
                 findNavController(this).navigate(
-                    R.id.orderListAddItemFragment,
-                    bundleOf(OrderViewModel.BUNDLE_ID_ITEM_TYPE to it)
+                    R.id.orderAddPreItemsFragment
                 )
             },
             onChangeCount = { type, orderItem, delta ->

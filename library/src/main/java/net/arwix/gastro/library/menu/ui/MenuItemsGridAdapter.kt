@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
@@ -20,7 +21,8 @@ import net.arwix.gastro.library.menu.data.MenuGroupData
 import java.text.NumberFormat
 
 class MenuItemsGridAdapter(
-    val onClickItem: (menu: MenuGroupData, item: MenuGroupData.PreMenuItem) -> Unit
+    val onClickItem: (menu: MenuGroupData, item: MenuGroupData.PreMenuItem) -> Unit,
+    val onAddCustomItem: ((menu: MenuGroupData) -> Unit)? = null
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val items = mutableListOf<MenuGridItem>()
@@ -29,6 +31,11 @@ class MenuItemsGridAdapter(
     private val doOnClickItem: View.OnClickListener = View.OnClickListener { view ->
         val adapterItem = view.tag as MenuGridItem.Item
         onClickItem(adapterItem.menu, adapterItem.value)
+    }
+
+    private val doAddCustomItem: View.OnClickListener = View.OnClickListener { view ->
+        val adapterItem = view.tag as MenuGridItem.Title
+        onAddCustomItem?.invoke(adapterItem.value)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -56,12 +63,28 @@ class MenuItemsGridAdapter(
                 holder.card.setOnClickListener(doOnClickItem)
             }
             is TitleViewHolder -> {
-                holder.bindTo(items[position] as MenuGridItem.Title)
+                val item = items[position] as MenuGridItem.Title
+                holder.bindTo(item)
+                holder.addCustomButton.tag = item
+                holder.addCustomButton.setOnClickListener(doAddCustomItem)
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int = items[position].getViewType()
+
+    fun setItems(list: List<MenuGroupData>) {
+        val newList = mutableListOf<MenuGridItem>()
+        list.forEach { menuGroup ->
+            val rawList = menuGroup.items
+            if (rawList.isNullOrEmpty()) return@forEach
+            newList.add(MenuGridItem.Title(menuGroup))
+            newList.addAll(rawList.map { MenuGridItem.Item(menuGroup, it) })
+        }
+        items.clear()
+        items.addAll(newList)
+        this.notifyDataSetChanged()
+    }
 
     fun setItems(menuGroupData: MenuGroupData) {
         val rawList = menuGroupData.items ?: return
@@ -100,6 +123,7 @@ class MenuItemsGridAdapter(
     private class TitleViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val name: TextView = view.item_menu_grid_title_name_text
         private val card: MaterialCardView = view.item_menu_grid_title_card
+        val addCustomButton: Button = view.item_menu_grid_add_custom_button
 
         fun bindTo(item: MenuGridItem.Title) {
             name.text = item.value.name
@@ -109,7 +133,7 @@ class MenuItemsGridAdapter(
 //                name.setTextColor(getTextColor(color))
 //            } else {
             card.setBackgroundColor(Color.TRANSPARENT)
-            name.setTextColor(Color.BLACK)
+//            name.setTextColor(Color.BLACK)
 //            }
         }
     }

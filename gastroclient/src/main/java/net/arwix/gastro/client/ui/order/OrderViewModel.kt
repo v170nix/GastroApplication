@@ -230,7 +230,21 @@ class OrderViewModel(
                     } ?: return@apply
                     val orderItems = this[menuGroupData]
                     if (orderItems == null) this[menuGroupData] = listOf(result.item)
-                    else this[menuGroupData] = orderItems + result.item
+                    else {
+                        // проверка на одинаковость
+                        val listOrderItem = orderItems.find {
+                            it.name == result.item.name && it.price == result.item.price
+                        }
+                        if (listOrderItem == null) {
+                            this[menuGroupData] = orderItems + result.item
+                        } else {
+                            this[menuGroupData] = orderItems.toMutableList().also {
+                                val indexItem = it.indexOf(listOrderItem)
+                                it[indexItem] =
+                                    listOrderItem.copy(count = listOrderItem.count + result.item.count)
+                            }
+                        }
+                    }
                 })
             }
 //            is Result.EditItem -> {
