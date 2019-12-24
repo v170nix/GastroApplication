@@ -22,7 +22,7 @@
         android:id="@+id/order_list_bottom_layout"
         android:layout_width="0dp"
         android:layout_height="64dp"
-        android:background="@color/colorBg"
+        android:background="@color/colorItemGroup"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

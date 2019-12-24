@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuCompat
@@ -18,6 +19,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
+import kotlinx.android.synthetic.main.activity_main_client.*
 import net.arwix.gastro.client.common.AppMenuHelper
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.hideKeyboard
@@ -32,6 +34,7 @@ class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChang
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_client)
+        setToolbar(app_main_toolbar)
         navController = findNavController(this, R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration.Builder(navController.graph).build()
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
@@ -129,6 +132,13 @@ class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChang
     override fun onPause() {
         super.onPause()
         navController.removeOnDestinationChangedListener(this)
+    }
+
+    private fun setToolbar(toolbar: Toolbar) {
+        setSupportActionBar(toolbar)
+//        val toogle = ActionBarDrawerToggle(
+//            this,
+//        )
     }
 
     override fun onDestinationChanged(
