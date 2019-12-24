@@ -44,7 +44,7 @@ class OrderViewModel(
     override fun dispatchAction(action: Action): LiveData<Result> = liveData {
         when (action) {
             is Action.AddItem -> emit(Result.AddItem(action.typeItem, action.item))
-            is Action.EditItem -> emit(Result.EditItem(action.typeItem, action.item))
+//            is Action.EditItem -> emit(Result.EditItem(action.typeItem, action.item))
             is Action.ChangeCountItem -> emit(
                 Result.ChangeCountItem(
                     action.typeItem,
@@ -233,28 +233,25 @@ class OrderViewModel(
                     else this[menuGroupData] = orderItems + result.item
                 })
             }
-            is Result.EditItem -> {
-                internalViewState.copy(orderItems = internalViewState.orderItems.apply {
-                    val menuGroupData = this.keys.find {
-                        it.name == result.typeItem
-                    } ?: return@apply
-                    val orderItems = this[menuGroupData] ?: return@apply
-                    val current = orderItems.map {
-                        if (it.name == result.item.name) result.item else it
-                    }
-                    this[menuGroupData] = current
-                })
-            }
+//            is Result.EditItem -> {
+//                internalViewState.copy(orderItems = internalViewState.orderItems.apply {
+//                    val menuGroupData = this.keys.find {
+//                        it.name == result.typeItem
+//                    } ?: return@apply
+//                    val orderItems = this[menuGroupData] ?: return@apply
+//                    val current = orderItems.map {
+//                        if (it.name == result.item.name) result.item else it
+//                    }
+//                    this[menuGroupData] = current
+//                })
+//            }
             is Result.SubmitOrder -> {
                 internalViewState.copy(isSubmit = true, resultPrint = result.resultPrint)
             }
             is Result.ChangeCountItem -> {
                 internalViewState.copy(orderItems = internalViewState.orderItems.apply {
-                    val menuGroupData = this.keys.find {
-                        it.name == result.typeItem
-                    } ?: return@apply
-                    val orderItems = this[menuGroupData] ?: return@apply
-                    this[menuGroupData] = orderItems.map {
+                    val orderItems = this[result.typeItem] ?: return@apply
+                    this[result.typeItem] = orderItems.map {
                         if (it.name == result.item.name) it.copy(count = it.count + result.delta) else it
                     }
                 })
@@ -264,11 +261,11 @@ class OrderViewModel(
 
     sealed class Action {
         data class AddItem(val typeItem: String, val item: OrderItem) : Action()
-        data class EditItem(val typeItem: String, val item: OrderItem) :
-            Action()
+//        data class EditItem(val typeItem: String, val item: OrderItem) :
+//            Action()
 
         data class ChangeCountItem(
-            val typeItem: String,
+            val typeItem: MenuGroupData,
             val item: OrderItem,
             val delta: Int
         ) : Action()
@@ -281,11 +278,11 @@ class OrderViewModel(
         data class InitOrder(val tableGroup: TableGroup) : Result()
         data class AddMenu(val list: List<MenuGroupData>) : Result()
         data class AddItem(val typeItem: String, val item: OrderItem) : Result()
-        data class EditItem(val typeItem: String, val item: OrderItem) :
-            Result()
+//        data class EditItem(val typeItem: String, val item: OrderItem) :
+//            Result()
 
         data class ChangeCountItem(
-            val typeItem: String,
+            val typeItem: MenuGroupData,
             val item: OrderItem,
             val delta: Int
         ) : Result()

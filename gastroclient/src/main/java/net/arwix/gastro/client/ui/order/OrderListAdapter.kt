@@ -14,8 +14,8 @@ import net.arwix.gastro.library.menu.data.MenuGroupData
 import java.text.NumberFormat
 
 class OrderListAdapter(
-    val onTypeClick: (type: String) -> Unit,
-    val onChangeCount: (type: String, orderItem: OrderItem, delta: Int) -> Unit
+    val onTypeClick: (type: MenuGroupData) -> Unit,
+    val onChangeCount: (type: MenuGroupData, orderItem: OrderItem, delta: Int) -> Unit
 ) : RecyclerView.Adapter<OrderListAdapter.AdapterItemHolder>() {
 
     var isClickable = true
@@ -24,18 +24,18 @@ class OrderListAdapter(
     private val doTypeClick = View.OnClickListener { view ->
         if (!isClickable) return@OnClickListener
         val type = view.tag as AdapterOrderItems.Type
-        onTypeClick(type.name)
+        onTypeClick(type.groupData)
     }
     private val doPlusCountClick = View.OnClickListener { view ->
         if (!isClickable) return@OnClickListener
         val orderItem = view.tag as AdapterOrderItems.Default
-        onChangeCount(orderItem.type.name, orderItem.order, 1)
+        onChangeCount(orderItem.type.groupData, orderItem.order, 1)
     }
     private val doMinusCountClick = View.OnClickListener { view ->
         if (!isClickable) return@OnClickListener
         val orderItem = view.tag as AdapterOrderItems.Default
         if (orderItem.order.count == 0) return@OnClickListener
-        onChangeCount(orderItem.type.name, orderItem.order, -1)
+        onChangeCount(orderItem.type.groupData, orderItem.order, -1)
     }
 
     fun setItems(newMap: MutableMap<MenuGroupData, List<OrderItem>>) {
@@ -43,7 +43,7 @@ class OrderListAdapter(
         newMap.forEach { (type, list) ->
             val typeItem =
                 AdapterOrderItems.Type(
-                    type.name
+                    type
                 )
             newList.add(typeItem)
             newList.addAll(list.map {
@@ -118,7 +118,7 @@ class OrderListAdapter(
     }
 
     sealed class AdapterOrderItems {
-        data class Type(val name: String) : AdapterOrderItems()
+        data class Type(val groupData: MenuGroupData) : AdapterOrderItems()
         data class Default(val type: Type, val order: OrderItem) : AdapterOrderItems()
     }
 
@@ -140,7 +140,7 @@ class OrderListAdapter(
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
             if (oldItem is AdapterOrderItems.Type && newItem is AdapterOrderItems.Type) {
-                return oldItem.name == newItem.name
+                return oldItem.groupData.name == newItem.groupData.name
             }
             if (oldItem is AdapterOrderItems.Default && newItem is AdapterOrderItems.Default) {
                 return oldItem.order.name == newItem.order.name &&
@@ -172,7 +172,7 @@ class OrderListAdapter(
             val addItemButton: View = view.item_type_list_add_plus_one_button
 
             fun bindTo(item: AdapterOrderItems.Type) {
-                title.text = item.name
+                title.text = item.groupData.name
             }
         }
     }
