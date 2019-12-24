@@ -9,12 +9,26 @@
         android:id="@+id/signInFragment"
         android:name="net.arwix.gastro.client.ui.profile.SignInFragment"
         android:label="@string/title_sign_in"
-        tools:layout="@layout/fragment_sign_in" />
+        tools:layout="@layout/fragment_sign_in">
+        <action
+            android:id="@+id/action_signInFragment_to_openTablesFragment"
+            app:destination="@id/openTablesFragment" />
+    </fragment>
     <fragment
         android:id="@+id/openTablesFragment"
         android:name="net.arwix.gastro.client.ui.table.OpenTablesFragment"
         android:label="@string/title_open_tables"
-        tools:layout="@layout/fragment_open_tables" />
+        tools:layout="@layout/fragment_open_tables">
+        <action
+            android:id="@+id/action_openTablesFragment_to_orderAddTableFragment"
+            app:destination="@id/orderAddTableFragment" />
+        <action
+            android:id="@+id/action_openTablesFragment_to_orderListFragment"
+            app:destination="@id/orderListFragment" />
+        <action
+            android:id="@+id/action_openTablesFragment_to_payListFragment"
+            app:destination="@id/payListFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/orderAddTableFragment"
@@ -31,8 +45,8 @@
         android:label="@string/title_order_add"
         tools:layout="@layout/fragment_order_list">
         <action
-            android:id="@+id/action_orderListFragment_to_orderListAddItemFragment"
-            app:destination="@id/orderListAddItemFragment" />
+            android:id="@+id/action_orderListFragment_to_orderAddPreItemsFragment"
+            app:destination="@id/orderAddPreItemsFragment" />
 
     </fragment>
     <fragment
@@ -60,4 +74,13 @@
         android:name="net.arwix.gastro.client.ui.report.day.ReportDayFragment"
         android:label="Daily report"
         tools:layout="@layout/fragment_report_day" />
+    <fragment
+        android:id="@+id/orderAddPreItemsFragment"
+        android:name="net.arwix.gastro.client.ui.order.OrderAddPreItemsFragment"
+        android:label="fragment_order_add_pre_items"
+        tools:layout="@layout/fragment_order_add_pre_items">
+        <action
+            android:id="@+id/action_orderAddPreItemsFragment_to_orderListAddItemFragment"
+            app:destination="@id/orderListAddItemFragment" />
+    </fragment>
 </navigation>

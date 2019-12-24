@@ -20,6 +20,7 @@ import net.arwix.gastro.client.R
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.data.TableGroup
+import net.arwix.gastro.library.menu.data.MenuGroupData
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.text.NumberFormat
 
@@ -108,7 +109,7 @@ class OrderListFragment : Fragment() {
         }
     }
 
-    private fun renderTotalPrice(map: Map<String, List<OrderItem>>) {
+    private fun renderTotalPrice(map: Map<MenuGroupData, List<OrderItem>>) {
         val price =
             map.values.sumBy { it.sumBy { orderItem -> orderItem.price.toInt() * orderItem.count } }
         val counts = map.values.sumBy { it.sumBy { orderItem -> orderItem.count } }

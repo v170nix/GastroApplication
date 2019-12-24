@@ -10,6 +10,7 @@ import kotlinx.android.synthetic.main.item_order_list.view.*
 import kotlinx.android.synthetic.main.item_type_list.view.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.data.OrderItem
+import net.arwix.gastro.library.menu.data.MenuGroupData
 import java.text.NumberFormat
 
 class OrderListAdapter(
@@ -37,12 +38,12 @@ class OrderListAdapter(
         onChangeCount(orderItem.type.name, orderItem.order, -1)
     }
 
-    fun setItems(newMap: MutableMap<String, List<OrderItem>>) {
+    fun setItems(newMap: MutableMap<MenuGroupData, List<OrderItem>>) {
         val newList = mutableListOf<AdapterOrderItems>()
         newMap.forEach { (type, list) ->
             val typeItem =
                 AdapterOrderItems.Type(
-                    type
+                    type.name
                 )
             newList.add(typeItem)
             newList.addAll(list.map {

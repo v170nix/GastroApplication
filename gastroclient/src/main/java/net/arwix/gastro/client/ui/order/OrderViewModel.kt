@@ -24,20 +24,20 @@ class OrderViewModel(
 ) :
     SimpleIntentViewModel<OrderViewModel.Action, OrderViewModel.Result, OrderViewModel.State>() {
 
-    private lateinit var menuGroupData: List<MenuGroupData>
+    private var menuGroupData: List<MenuGroupData> = mutableListOf()
 
     override var internalViewState: State = State()
-    private var menuTypes: List<String>? = null
+//    private var menuTypes: List<MenuGroupName>? = null
 
     init {
         viewModelScope.launch {
             val doc = firestoreDbApp.refs.menu.orderBy("order").get().await()!!
-            val menu = doc.documents.map { it.id }
+//            val menu = doc.documents.map { it.id }
             val menuA =
                 doc.documents.map { it.toObject(MenuGroupDoc::class.java)!!.toMenuData(it.id) }
             menuGroupData = menuA
-            menuTypes = menu
-            notificationFromObserver(Result.AddMenu(menu))
+//            menuTypes = menu
+            notificationFromObserver(Result.AddMenu(menuA))
         }
     }
 
@@ -63,12 +63,12 @@ class OrderViewModel(
                             internalViewState.tableGroup!!.tablePart,
                             internalViewState.orderItems.filter {
                                 it.value.isNotEmpty()
-                            }.let { filterMap ->
+                            }.let { filterMap: Map<MenuGroupData, List<OrderItem>> ->
                                 mutableMapOf<String, List<OrderItem>>().apply {
                                     filterMap.forEach { (key, list) ->
                                         val filterList = list.filter { it.count > 0 }
                                         if (filterList.isNotEmpty()) {
-                                            this[key] = filterList
+                                            this[key.name] = filterList
                                         }
                                     }
                                 }
@@ -197,10 +197,13 @@ class OrderViewModel(
             is Result.InitOrder -> {
                 internalViewState.copy(
                     tableGroup = result.tableGroup,
-                    orderItems = mutableMapOf<String, List<OrderItem>>().apply {
-                        menuTypes?.forEach { menuType ->
-                            this[menuType] = listOf()
+                    orderItems = mutableMapOf<MenuGroupData, List<OrderItem>>().apply {
+                        menuGroupData.forEach {
+                            this[it] = listOf()
                         }
+//                        menuTypes?.forEach { menuType ->
+//                            this[menuType] = listOf()
+//                        }
                     }
                 )
             }
@@ -214,26 +217,32 @@ class OrderViewModel(
             is Result.AddMenu -> {
                 internalViewState.copy(
                     isLoadingMenu = false,
-                    orderItems = mutableMapOf<String, List<OrderItem>>().apply {
-                        result.list.forEach { menuType -> this[menuType] = listOf() }
+                    orderItems = mutableMapOf<MenuGroupData, List<OrderItem>>().apply {
+                        result.list.forEach { menuGroup -> this[menuGroup] = listOf() }
                     }
                 )
 
             }
             is Result.AddItem -> {
                 internalViewState.copy(orderItems = internalViewState.orderItems.apply {
-                    val orderItems = this[result.typeItem]
-                    if (orderItems == null) this[result.typeItem] = listOf(result.item)
-                    else this[result.typeItem] = orderItems + result.item
+                    val menuGroupData = this.keys.find {
+                        it.name == result.typeItem
+                    } ?: return@apply
+                    val orderItems = this[menuGroupData]
+                    if (orderItems == null) this[menuGroupData] = listOf(result.item)
+                    else this[menuGroupData] = orderItems + result.item
                 })
             }
             is Result.EditItem -> {
                 internalViewState.copy(orderItems = internalViewState.orderItems.apply {
-                    val orderItems = this[result.typeItem] ?: return@apply
+                    val menuGroupData = this.keys.find {
+                        it.name == result.typeItem
+                    } ?: return@apply
+                    val orderItems = this[menuGroupData] ?: return@apply
                     val current = orderItems.map {
                         if (it.name == result.item.name) result.item else it
                     }
-                    this[result.typeItem] = current
+                    this[menuGroupData] = current
                 })
             }
             is Result.SubmitOrder -> {
@@ -241,8 +250,11 @@ class OrderViewModel(
             }
             is Result.ChangeCountItem -> {
                 internalViewState.copy(orderItems = internalViewState.orderItems.apply {
-                    val orderItems = this[result.typeItem] ?: return@apply
-                    this[result.typeItem] = orderItems.map {
+                    val menuGroupData = this.keys.find {
+                        it.name == result.typeItem
+                    } ?: return@apply
+                    val orderItems = this[menuGroupData] ?: return@apply
+                    this[menuGroupData] = orderItems.map {
                         if (it.name == result.item.name) it.copy(count = it.count + result.delta) else it
                     }
                 })
@@ -267,7 +279,7 @@ class OrderViewModel(
     sealed class Result {
         object Clear : Result()
         data class InitOrder(val tableGroup: TableGroup) : Result()
-        data class AddMenu(val list: List<String>) : Result()
+        data class AddMenu(val list: List<MenuGroupData>) : Result()
         data class AddItem(val typeItem: String, val item: OrderItem) : Result()
         data class EditItem(val typeItem: String, val item: OrderItem) :
             Result()
@@ -285,7 +297,7 @@ class OrderViewModel(
     data class State(
         val isLoadingMenu: Boolean = true,
         val tableGroup: TableGroup? = null,
-        val orderItems: MutableMap<String, List<OrderItem>> = mutableMapOf(),
+        val orderItems: MutableMap<MenuGroupData, List<OrderItem>> = mutableMapOf(),
         val resultPrint: List<Int>? = null,
         val isSubmit: Boolean = false
     )
