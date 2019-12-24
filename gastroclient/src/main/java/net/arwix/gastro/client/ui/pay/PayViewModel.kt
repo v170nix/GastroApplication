@@ -189,10 +189,20 @@ class PayViewModel(
         return residualCount == 0
     }
 
-    private suspend fun ordersToSum(openTableData: OpenTableData): MutableMap<String, MutableList<PayOrderItem>> {
+    private suspend fun ordersToSum(openTableData: OpenTableData): MutableMap<String, MutableList<PayOrderItem>> =
+        supervisorScope {
         val summaryOrder = mutableMapOf<String, MutableList<PayOrderItem>>()
-        openTableData.orders?.forEach { doc ->
-            val orderData = doc.get().await()!!.toObject(OrderData::class.java)!!
+
+            val ordersAsync = openTableData.orders?.map { doc ->
+                //            doc.firestore.collection("orders").whereIn(FieldPath.documentId(), )
+                async(Dispatchers.IO) { doc.get().await()!!.toObject(OrderData::class.java)!! }
+            }
+            val checksAsync = openTableData.checks?.map { doc ->
+                async(Dispatchers.IO) { doc.get().await()!!.toObject(CheckData::class.java)!! }
+            }
+
+            ordersAsync?.awaitAll()?.forEach { orderData ->
+                //            val orderData = doc.get().await()!!.toObject(OrderData::class.java)!!
             orderData.orderItems?.forEach { (type, orderItems) ->
                 val summaryOrderItemsOfCurrentType = summaryOrder[type]
                 if (summaryOrderItemsOfCurrentType == null) {
@@ -217,8 +227,8 @@ class PayViewModel(
                 }
             }
         }
-        openTableData.checks?.forEach { doc ->
-            val checkData = doc.get().await()!!.toObject(CheckData::class.java)!!
+            checksAsync?.awaitAll()?.forEach { checkData ->
+                //            val checkData = doc.get().await()!!.toObject(CheckData::class.java)!!
             checkData.checkItems?.forEach { (type, checkItems) ->
                 //                if (checkData.isReturnOrder) {
 //                      //TODO
@@ -250,7 +260,7 @@ class PayViewModel(
             }
         }
 
-        return summaryOrder
+            summaryOrder
     }
 
     sealed class Action {
