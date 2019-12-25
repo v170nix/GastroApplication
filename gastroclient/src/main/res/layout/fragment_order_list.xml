@@ -7,48 +7,41 @@
     tools:context=".ui.order.OrderListFragment">
 
 
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/order_list_add_process_bar"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_useIntrinsicPadding="false" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/order_list_recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingBottom="64dp"
+        android:paddingBottom="88dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/order_list_add_process_bar" />
 
-    <View
-        android:id="@+id/order_list_bottom_layout"
+    <include
+        android:id="@+id/order_list_submit_layout"
+        layout="@layout/merge_multiline_button"
         android:layout_width="0dp"
         android:layout_height="64dp"
-        android:background="@color/colorItemGroup"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/order_list_submit_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:text="submit"
-        app:layout_constraintBottom_toBottomOf="@+id/order_list_total_price_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/order_list_total_price_text" />
-
-    <TextView
-        android:id="@+id/order_list_total_price_text"
-        style="@style/TextAppearance.MaterialComponents.Body1"
-        android:layout_width="0dp"
-        android:layout_height="48dp"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="center"
-        android:text="Total price: 22,90 e \n(5 items)"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/order_list_submit_button"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

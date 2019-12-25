@@ -6,15 +6,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_order_list.view.*
-import kotlinx.android.synthetic.main.item_type_list.view.*
+import kotlinx.android.synthetic.main.item_order_add_menu_group.view.*
+import kotlinx.android.synthetic.main.item_order_add_menu_item.view.*
+import net.arwix.extension.setBackgroundDrawableCompat
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.menu.data.MenuGroupData
 import java.text.NumberFormat
 
 class OrderListAdapter(
-    val onTypeClick: (type: MenuGroupData) -> Unit,
+    val onMenuGroupClick: (type: MenuGroupData) -> Unit,
     val onChangeCount: (type: MenuGroupData, orderItem: OrderItem, delta: Int) -> Unit
 ) : RecyclerView.Adapter<OrderListAdapter.AdapterItemHolder>() {
 
@@ -24,7 +25,7 @@ class OrderListAdapter(
     private val doTypeClick = View.OnClickListener { view ->
         if (!isClickable) return@OnClickListener
         val type = view.tag as AdapterOrderItems.Type
-        onTypeClick(type.groupData)
+        onMenuGroupClick(type.groupData)
     }
     private val doPlusCountClick = View.OnClickListener { view ->
         if (!isClickable) return@OnClickListener
@@ -71,7 +72,7 @@ class OrderListAdapter(
             TYPE_ID_ITEM_ORDER -> {
                 AdapterItemHolder.ListItemHolder(
                     inflater.inflate(
-                        R.layout.item_order_list,
+                        R.layout.item_order_add_menu_item,
                         parent,
                         false
                     )
@@ -80,7 +81,7 @@ class OrderListAdapter(
             TYPE_ID_ITEM_TYPE -> {
                 AdapterItemHolder.TypeItemHolder(
                     inflater.inflate(
-                        R.layout.item_type_list,
+                        R.layout.item_order_add_menu_group,
                         parent,
                         false
                     )
@@ -113,6 +114,9 @@ class OrderListAdapter(
             holder as AdapterItemHolder.TypeItemHolder
             holder.addItemButton.tag = item
             holder.addItemButton.setOnClickListener(doTypeClick)
+            holder.itemView.tag = item
+            holder.itemView.setOnClickListener(doTypeClick)
+            holder.itemView.setBackgroundDrawableCompat(R.drawable.selected_list_item)
             holder.bindTo(item)
         }
     }

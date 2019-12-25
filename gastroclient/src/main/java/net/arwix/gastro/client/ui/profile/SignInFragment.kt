@@ -24,6 +24,12 @@ class SignInFragment : Fragment() {
         requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         profileViewModel.liveState.observe(viewLifecycleOwner, Observer(this::renderProfile))
         signin_button.setOnClickListener { login() }
+//        val text = "<small style=\"float:left\"><font color='#000000'>" +
+//                "Mon-Sat 5:00 pm" + "</font> </small>"+ "<br/>" +
+//                "<small style=\"float:right\"> <font color='#000000'>" + "Closed on Sunday" +
+//                "</font> </small>"
+//
+//        signin_button.text = Html.fromHtml(text)
         password_text_edit.setOnEditorActionListener { v, actionId, event ->
             if ((event != null && event.keyCode == KeyEvent.KEYCODE_ENTER) ||
                 actionId == EditorInfo.IME_ACTION_DONE

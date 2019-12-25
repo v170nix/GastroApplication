@@ -16,7 +16,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_order_list.*
+import kotlinx.android.synthetic.main.fragment_order_list.view.*
+import kotlinx.coroutines.*
+import net.arwix.extension.gone
+import net.arwix.extension.visible
 import net.arwix.gastro.client.R
+import net.arwix.gastro.client.common.MultilineButtonHelper
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.data.TableGroup
@@ -24,11 +29,13 @@ import net.arwix.gastro.library.menu.data.MenuGroupData
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.text.NumberFormat
 
-class OrderListFragment : Fragment() {
+class OrderListFragment : Fragment(), CoroutineScope by MainScope() {
 
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private val profileViewModel: ProfileViewModel by sharedViewModel()
     private lateinit var adapterOrder: OrderListAdapter
+    private lateinit var multilineButtonHelper: MultilineButtonHelper
+    private lateinit var animationViewHelper: AnimationViewHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,14 +46,16 @@ class OrderListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        orderViewModel.liveState.observe(this, ::render)
+        multilineButtonHelper = MultilineButtonHelper(view.order_list_submit_layout, false)
+        animationViewHelper = AnimationViewHelper()
+        orderViewModel.liveState.observe(viewLifecycleOwner, ::render)
 //        order_list_add_button.setOnClickListener {
 //            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(
 //                R.id.orderListAddItemFragment
 //            )
 //        }
         adapterOrder = OrderListAdapter(
-            onTypeClick = {
+            onMenuGroupClick = {
                 findNavController().navigate(
                     OrderListFragmentDirections.actionToOrderAddPreItemsFragment(
                         it
@@ -67,18 +76,25 @@ class OrderListFragment : Fragment() {
             addItemDecoration(DividerItemDecoration(context, linearLayoutManager.orientation))
             adapter = this@OrderListFragment.adapterOrder
         }
-        order_list_submit_button.setOnClickListener {
-            setIsEnableButtons(false)
+        multilineButtonHelper.setOnClickListener(View.OnClickListener {
             putToDb()
-        }
+        })
     }
 
     private fun putToDb() {
-        orderViewModel.nonCancelableIntent(OrderViewModel.Action.SubmitOrder(profileViewModel.liveState.value!!.userId!!))
+        launch {
+            animationViewHelper.toSubmitAction {
+                orderViewModel.nonCancelableIntent(
+                    OrderViewModel.Action.SubmitOrder(
+                        profileViewModel.liveState.value!!.userId!!
+                    )
+                )
+            }
+        }
     }
 
     private fun render(state: OrderViewModel.State) {
-        setIsEnableButtons(true)
+        animationViewHelper.enableActions()
         if (state.isSubmit) {
             if (state.resultPrint != null) {
                 Toast.makeText(requireContext(), "code: ${state.resultPrint}", Toast.LENGTH_LONG)
@@ -98,9 +114,9 @@ class OrderListFragment : Fragment() {
         }
     }
 
-    private fun setIsEnableButtons(isEnabled: Boolean) {
-        order_list_submit_button.isEnabled = isEnabled
-        adapterOrder.isClickable = isEnabled
+    override fun onDestroy() {
+        super.onDestroy()
+        cancel()
     }
 
     private fun setTitle(tableGroup: TableGroup) {
@@ -115,8 +131,34 @@ class OrderListFragment : Fragment() {
             map.values.sumBy { it.sumBy { orderItem -> orderItem.price.toInt() * orderItem.count } }
         val counts = map.values.sumBy { it.sumBy { orderItem -> orderItem.count } }
         val formatter = NumberFormat.getCurrencyInstance()
-        order_list_total_price_text.text =
-            "Total price: ${formatter.format(price / 100.0)}\n($counts items)"
+
+        multilineButtonHelper.setTexts(
+            "Items", "Total price",
+            counts.toString(), formatter.format(price / 100.0)
+        )
+//
+//        order_list_total_price_text.text =
+//            "Total price: ${formatter.format(price / 100.0)}\n($counts items)"
+    }
+
+    private inner class AnimationViewHelper {
+
+        fun enableActions() {
+            multilineButtonHelper.isEnabled = true
+            adapterOrder.isClickable = true
+            multilineButtonHelper.visible()
+            order_list_add_process_bar.gone()
+        }
+
+        suspend fun toSubmitAction(callback: () -> Unit) {
+            multilineButtonHelper.isEnabled = false
+            adapterOrder.isClickable = false
+            multilineButtonHelper.hide()
+            callback()
+            delay(500L)
+            order_list_add_process_bar.visible()
+        }
+
     }
 
 }

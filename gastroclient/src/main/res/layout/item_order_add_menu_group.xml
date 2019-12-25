@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="56dp"
-    android:background="@color/colorItemGroup">
+    android:background="?attr/colorSurface">
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/item_type_list_add_plus_one_button"
@@ -12,6 +12,8 @@
         android:layout_height="56dp"
         android:layout_marginEnd="8dp"
         android:text="+"
+        android:textSize="32sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -22,8 +24,10 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:text="TextView"
-        android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-        app:autoSizeMaxTextSize="16sp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+        android:textColor="?attr/colorOnSurface"
+        android:textStyle="normal"
+        app:autoSizeMaxTextSize="20sp"
         app:autoSizeMinTextSize="12sp"
         app:autoSizeStepGranularity="1sp"
         app:autoSizeTextType="uniform"

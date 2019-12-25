@@ -12,6 +12,7 @@ import androidx.navigation.ui.setupWithNavController
 import kotlinx.android.synthetic.main.activity_admin.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import net.arwix.gastro.library.common.hideKeyboard
 import net.arwix.gastro.library.data.FirestoreDbApp
 import org.koin.android.ext.android.inject
@@ -41,6 +42,21 @@ class AdminActivity : AppCompatActivity(), CoroutineScope by MainScope() {
                 )
             )
         )
+        launch {
+            //            val docs = dbApp.refs.menu.get().await()!!
+//            val colref = dbApp.firestore.collection("test-menu")
+//            dbApp.firestore.runBatch {w ->
+//                docs.forEach {
+//                    w.set(colref.document(it.id), it.data)
+//                }
+//            }.await()
+//            val items = doc.items
+//            Log.e("doc", doc.toString())
+//            dbApp.refs.menu.document("Nachspeise").update("items", items).await()
+//            dbApp.refs.menu.document("Hauptspeise").update("items", items).await()
+
+
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

@@ -21,6 +21,10 @@
 
     <style name="AppToolbarStyle" parent="Widget.MaterialComponents.Toolbar.Primary"></style>
 
+    <style name="AppMultilineButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
+        <item name="android:backgroundTint">@color/colorSecondary</item>
+
+    </style>
 
     <style name="TextInputLayoutAppearance" parent="Widget.Design.TextInputLayout">
         <!-- reference our hint & error styles -->
