@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_order_list.*
@@ -46,8 +47,10 @@ class OrderListFragment : Fragment() {
 //        }
         adapterOrder = OrderListAdapter(
             onTypeClick = {
-                findNavController(this).navigate(
-                    R.id.orderAddPreItemsFragment
+                findNavController().navigate(
+                    OrderListFragmentDirections.actionToOrderAddPreItemsFragment(
+                        it
+                    )
                 )
             },
             onChangeCount = { type, orderItem, delta ->

@@ -5,18 +5,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.fragment_order_add_pre_items.*
+import net.arwix.extension.toDp
 import net.arwix.gastro.client.R
-import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.menu.MenuUtils
 import net.arwix.gastro.library.menu.ui.MenuItemsGridAdapter
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class OrderAddPreItemsFragment : Fragment() {
+
+    private val args: OrderAddPreItemsFragmentArgs by navArgs()
 
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private lateinit var itemsAdapter: MenuItemsGridAdapter
@@ -29,20 +32,20 @@ class OrderAddPreItemsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         itemsAdapter = MenuItemsGridAdapter(
-            onClickItem = { menu, item ->
-                orderViewModel.nonCancelableIntent(
-                    OrderViewModel.Action.AddItem(
-                        menu.name,
-                        OrderItem(item.name!!, item.price, 1)
-                    )
-                )
-                findNavController(this).navigateUp()
-            },
-            onAddCustomItem = {
-                findNavController(this).navigate(
-                    R.id.orderListAddItemFragment,
-                    bundleOf(OrderViewModel.BUNDLE_ID_ITEM_TYPE to it)
-                )
+            onChangeSelectedItems = { menus ->
+                if (menus.isNotEmpty()) {
+                    order_add_pre_items_add_selected_button.show()
+                    order_add_pre_items_to_custom_item_button.animate()
+                        .setDuration(150L)
+                        .translationX(-resources.toDp(60f))
+                        .start()
+                } else {
+                    order_add_pre_items_add_selected_button.hide()
+                    order_add_pre_items_to_custom_item_button.animate()
+                        .setDuration(150L)
+                        .translationX(0f)
+                        .start()
+                }
             }
         )
         with(order_add_pre_items_recycler_view) {
@@ -50,17 +53,29 @@ class OrderAddPreItemsFragment : Fragment() {
             layoutManager = MenuUtils.createGridLayoutManager(requireContext(), itemsAdapter)
         }
         orderViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
-//        order_add_custom_item_button.setOnClickListener {
-//                    findNavController(this).navigate(
-//                    R.id.orderListAddItemFragment,
-//                    bundleOf(OrderViewModel.BUNDLE_ID_ITEM_TYPE to it)
-//                )
-//        }
+        order_add_pre_items_add_selected_button.setOnClickListener {
+            val selectedItems = itemsAdapter.getSelectedItems()
+            if (selectedItems.isEmpty()) return@setOnClickListener
+            orderViewModel.nonCancelableIntent(
+                OrderViewModel.Action.AddItems(selectedItems)
+            )
+            findNavController(this).navigateUp()
+        }
+        itemsAdapter.setItems(args.menuGroup)
+        order_add_pre_items_to_custom_item_button.setOnClickListener {
+            findNavController().navigate(
+                OrderAddPreItemsFragmentDirections.actionToOrderListAddItemFragment(args.menuGroup)
+            )
+        }
     }
 
     private fun render(state: OrderViewModel.State) {
-        val list = state.orderItems.keys.toSortedSet(compareBy { it.metadata.order }).toList()
-        itemsAdapter.setItems(list)
+        state.orderItems
+        if (state.orderItems.keys.indexOf(args.menuGroup) == -1) {
+            // group delete
+            itemsAdapter.setItems(listOf())
+            findNavController().navigateUp()
+        }
     }
 
 

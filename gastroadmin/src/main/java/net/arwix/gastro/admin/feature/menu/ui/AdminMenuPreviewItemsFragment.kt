@@ -2,7 +2,6 @@ package net.arwix.gastro.admin.feature.menu.ui
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,10 +26,11 @@ class AdminMenuPreviewItemsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         itemsAdapter = MenuItemsGridAdapter(
-            onClickItem = { menu, item ->
-                Log.e("item", item.toString())
-
-            }
+            onChangeSelectedItems = {}
+//            onClickItem = { menu, item ->
+//                Log.e("item", item.toString())
+//
+//            }
         )
         itemsAdapter.setItems(args.MenuGroup)
         with(admin_menu_preview_items_recycler_view) {

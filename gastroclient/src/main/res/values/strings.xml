@@ -13,6 +13,7 @@
 
     <string name="title_open_tables">Open tables</string>
     <string name="button_add_order">Add order</string>
+    <string name="button_add_selected_items">Add to order</string>
 
     <string name="title_order_add">Add order</string>
     <string name="subtitle_order_add_table">Set table</string>

@@ -13,6 +13,7 @@ import kotlinx.coroutines.withContext
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.*
+import net.arwix.gastro.library.menu.data.MenuGridItem
 import net.arwix.gastro.library.menu.data.MenuGroupData
 import net.arwix.gastro.library.menu.data.MenuGroupDoc
 import net.arwix.mvi.SimpleIntentViewModel
@@ -52,6 +53,20 @@ class OrderViewModel(
                     action.delta
                 )
             )
+
+            is Action.AddItems -> {
+                if (action.items.isEmpty()) return@liveData
+                withContext(Dispatchers.Main) {
+                    action.items.map {
+                        notificationFromObserver(
+                            Result.AddItem(
+                                it.menu.name,
+                                OrderItem(it.value.name!!, it.value.price, 1)
+                            )
+                        )
+                    }
+                }
+            }
 
             is Action.SubmitOrder -> {
                 withContext(Dispatchers.Main) {
@@ -275,6 +290,7 @@ class OrderViewModel(
 
     sealed class Action {
         data class AddItem(val typeItem: String, val item: OrderItem) : Action()
+        data class AddItems(val items: Set<MenuGridItem.Item>) : Action()
 //        data class EditItem(val typeItem: String, val item: OrderItem) :
 //            Action()
 
@@ -312,9 +328,5 @@ class OrderViewModel(
         val resultPrint: List<Int>? = null,
         val isSubmit: Boolean = false
     )
-
-    companion object {
-        const val BUNDLE_ID_ITEM_TYPE = "gastro.order.type"
-    }
 
 }

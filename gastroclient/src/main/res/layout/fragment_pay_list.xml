@@ -25,9 +25,11 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:text="to pay"
+        android:visibility="invisible"
         app:icon="@drawable/ic_payment"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/pay_list_delete_button"
@@ -38,10 +40,12 @@
         android:layout_marginBottom="16dp"
 
         android:text="delete"
+        android:visibility="invisible"
         app:backgroundTint="@color/design_default_color_error"
         app:fabCustomSize="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_delete" />
+        app:srcCompat="@drawable/ic_delete"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

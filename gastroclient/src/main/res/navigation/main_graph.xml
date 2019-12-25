@@ -45,7 +45,7 @@
         android:label="@string/title_order_add"
         tools:layout="@layout/fragment_order_list">
         <action
-            android:id="@+id/action_orderListFragment_to_orderAddPreItemsFragment"
+            android:id="@+id/action_to_orderAddPreItemsFragment"
             app:destination="@id/orderAddPreItemsFragment" />
 
     </fragment>
@@ -53,7 +53,11 @@
         android:id="@+id/orderListAddItemFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderAddItemFragment"
         android:label=""
-        tools:layout="@layout/fragment_order_add_item" />
+        tools:layout="@layout/fragment_order_add_item">
+        <argument
+            android:name="menuGroup"
+            app:argType="net.arwix.gastro.library.menu.data.MenuGroupData" />
+    </fragment>
 
     <fragment
         android:id="@+id/payListFragment"
@@ -80,7 +84,10 @@
         android:label="Add order / select item"
         tools:layout="@layout/fragment_order_add_pre_items">
         <action
-            android:id="@+id/action_orderAddPreItemsFragment_to_orderListAddItemFragment"
+            android:id="@+id/action_to_orderListAddItemFragment"
             app:destination="@id/orderListAddItemFragment" />
+        <argument
+            android:name="menuGroup"
+            app:argType="net.arwix.gastro.library.menu.data.MenuGroupData" />
     </fragment>
 </navigation>

@@ -12,8 +12,6 @@ import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_pay_list.*
-import net.arwix.extension.gone
-import net.arwix.extension.visible
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.data.TableGroup
@@ -144,18 +142,18 @@ class PayListFragment : Fragment() {
     private fun updateTextAndVisiblePayButton(state: PayViewModel.State?) {
         getPayCountAndPrice(state)?.let { (price, count) ->
             if (price > 0) {
-                pay_list_submit_button.visible()
-                pay_list_delete_button.visible()
+                pay_list_submit_button.show()
+                pay_list_delete_button.show()
             } else {
-                pay_list_submit_button.gone()
-                pay_list_delete_button.gone()
+                pay_list_submit_button.hide()
+                pay_list_delete_button.hide()
                 return
             }
             val formatter = NumberFormat.getCurrencyInstance()
             pay_list_submit_button.text = "To pay: ${formatter.format(price / 100.0)}"
         } ?: run {
-            pay_list_submit_button.gone()
-            pay_list_delete_button.gone()
+            pay_list_submit_button.hide()
+            pay_list_delete_button.hide()
         }
     }
 
