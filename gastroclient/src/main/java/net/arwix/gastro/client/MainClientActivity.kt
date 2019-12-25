@@ -19,7 +19,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
-import kotlinx.android.synthetic.main.activity_main_client.*
+import kotlinx.android.synthetic.main.include_main_app_bar.*
 import net.arwix.gastro.client.common.AppMenuHelper
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.hideKeyboard
@@ -36,7 +36,8 @@ class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChang
         setContentView(R.layout.activity_main_client)
         setToolbar(app_main_toolbar)
         navController = findNavController(this, R.id.nav_host_fragment)
-        appBarConfiguration = AppBarConfiguration.Builder(navController.graph).build()
+        appBarConfiguration = AppBarConfiguration.Builder(navController.graph)
+            .build()
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         profileViewModel.liveState.observe(this, Observer(this::renderProfile))
         requestRuntimePermission()

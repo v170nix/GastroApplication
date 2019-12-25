@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_order_add_menu_group.view.*
-import kotlinx.android.synthetic.main.item_order_add_menu_item.view.*
+import kotlinx.android.synthetic.main.item_order_menu_group.view.*
+import kotlinx.android.synthetic.main.item_order_menu_item.view.*
 import net.arwix.extension.setBackgroundDrawableCompat
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.data.OrderItem
@@ -72,7 +72,7 @@ class OrderListAdapter(
             TYPE_ID_ITEM_ORDER -> {
                 AdapterItemHolder.ListItemHolder(
                     inflater.inflate(
-                        R.layout.item_order_add_menu_item,
+                        R.layout.item_order_menu_item,
                         parent,
                         false
                     )
@@ -81,7 +81,7 @@ class OrderListAdapter(
             TYPE_ID_ITEM_TYPE -> {
                 AdapterItemHolder.TypeItemHolder(
                     inflater.inflate(
-                        R.layout.item_order_add_menu_group,
+                        R.layout.item_order_menu_group,
                         parent,
                         false
                     )
