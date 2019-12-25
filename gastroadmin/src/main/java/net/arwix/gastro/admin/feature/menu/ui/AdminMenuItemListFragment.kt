@@ -155,7 +155,6 @@ class AdminMenuItemListFragment : Fragment() {
                 cellsCount[cell] = count + 1
             }
             super.setItems(list)
-            cellsCount.clear()
         }
 
         override fun onBindViewHolder(holder: Holder<MenuGroupData.PreMenuItem>, position: Int) {

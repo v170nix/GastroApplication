@@ -16,6 +16,7 @@ object MenuUtils {
     fun getNextRowAndCol(menuGroup: MenuGroupData): Pair<RowValue, ColValue> {
         var maxRow = 1
         var maxCol = 1
+        if (menuGroup.items.isNullOrEmpty()) return 1 to 1
         menuGroup.items?.forEach {
             if (maxRow == it.row && maxCol < it.col) {
                 maxCol = it.col
