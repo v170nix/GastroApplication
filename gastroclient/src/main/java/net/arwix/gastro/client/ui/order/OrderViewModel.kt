@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.epson.epos2.Epos2Exception
 import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
@@ -16,6 +17,7 @@ import net.arwix.gastro.library.data.*
 import net.arwix.gastro.library.menu.data.MenuGridItem
 import net.arwix.gastro.library.menu.data.MenuGroupData
 import net.arwix.gastro.library.menu.data.MenuGroupDoc
+import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 
 class OrderViewModel(
@@ -26,19 +28,16 @@ class OrderViewModel(
     SimpleIntentViewModel<OrderViewModel.Action, OrderViewModel.Result, OrderViewModel.State>() {
 
     private var menuGroupData: List<MenuGroupData> = mutableListOf()
-
     override var internalViewState: State = State()
-//    private var menuTypes: List<MenuGroupName>? = null
 
     init {
         viewModelScope.launch {
-            val doc = firestoreDbApp.refs.menu.orderBy("order").get().await()!!
-//            val menu = doc.documents.map { it.id }
-            val menuA =
-                doc.documents.map { it.toObject(MenuGroupDoc::class.java)!!.toMenuData(it.id) }
-            menuGroupData = menuA
-//            menuTypes = menu
-            notificationFromObserver(Result.AddMenu(menuA))
+            firestoreDbApp.refs.menu.orderBy("order").toFlow()
+                .collect { docs ->
+                    val menus = docs.map { it.toObject(MenuGroupDoc::class.java).toMenuData(it.id) }
+                    menuGroupData = menus
+                    notificationFromObserver(Result.AddMenu(menus))
+                }
         }
     }
 
