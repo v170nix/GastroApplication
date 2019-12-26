@@ -5,21 +5,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.fragment_order_add_pre_items.*
 import net.arwix.extension.toDp
 import net.arwix.gastro.client.R
+import net.arwix.gastro.library.common.CustomToolbarFragment
 import net.arwix.gastro.library.common.navigate
+import net.arwix.gastro.library.common.setToolbarTitle
+import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.menu.MenuUtils
+import net.arwix.gastro.library.menu.data.MenuGroupData
 import net.arwix.gastro.library.menu.ui.MenuItemsGridAdapter
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class OrderAddPreItemsFragment : Fragment() {
+class OrderAddPreItemsFragment : CustomToolbarFragment() {
+
+    override val idResToolbar: Int = R.id.order_add_pre_items_toolbar
 
     private val args: OrderAddPreItemsFragmentArgs by navArgs()
-
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private lateinit var itemsAdapter: MenuItemsGridAdapter
 
@@ -31,6 +35,7 @@ class OrderAddPreItemsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         itemsAdapter = MenuItemsGridAdapter(
+            isViewMenuGroup = false,
             onChangeSelectedItems = { menus ->
                 if (menus.isNotEmpty()) {
                     order_add_pre_items_add_selected_button.show()
@@ -68,6 +73,15 @@ class OrderAddPreItemsFragment : Fragment() {
                 .actionToOrderListAddItemFragment(args.menuGroup)
                 .navigate(this)
         }
+        orderViewModel.liveState.value?.tableGroup?.run {
+            setTitle(this, args.menuGroup)
+        }
+    }
+
+    private fun setTitle(tableGroup: TableGroup, menuGroup: MenuGroupData) {
+        setToolbarTitle(menuGroup.name)
+        collapsing_toolbar_subtitle_text.text =
+            "Table ${tableGroup.tableId}/${tableGroup.tablePart}"
     }
 
     private fun render(state: OrderViewModel.State) {

@@ -26,6 +26,7 @@ class AdminMenuPreviewItemsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         itemsAdapter = MenuItemsGridAdapter(
+            isViewMenuGroup = true,
             onChangeSelectedItems = {}
 //            onClickItem = { menu, item ->
 //                Log.e("item", item.toString())

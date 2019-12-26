@@ -25,8 +25,8 @@ import net.arwix.gastro.library.menu.data.MenuGroupData
 import java.text.NumberFormat
 
 class MenuItemsGridAdapter(
-    val onChangeSelectedItems: (setMenuItems: Set<MenuGridItem.Item>) -> Unit,
-    val onAddCustomItem: ((menu: MenuGroupData) -> Unit)? = null
+    val isViewMenuGroup: Boolean,
+    val onChangeSelectedItems: (setMenuItems: Set<MenuGridItem.Item>) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     val items = mutableListOf<MenuGridItem>()

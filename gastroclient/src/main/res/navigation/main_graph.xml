@@ -44,7 +44,17 @@
             android:name="showExpandToolbar"
             android:defaultValue="true"
             app:argType="boolean" />
-
+    </fragment>
+    <fragment
+        android:id="@+id/orderAddPreItemsFragment"
+        android:name="net.arwix.gastro.client.ui.order.OrderAddPreItemsFragment"
+        tools:layout="@layout/fragment_order_add_pre_items">
+        <action
+            android:id="@+id/action_to_orderListAddItemFragment"
+            app:destination="@id/orderListAddItemFragment" />
+        <argument
+            android:name="menuGroup"
+            app:argType="net.arwix.gastro.library.menu.data.MenuGroupData" />
     </fragment>
     <fragment
         android:id="@+id/orderListAddItemFragment"
@@ -75,18 +85,6 @@
         android:name="net.arwix.gastro.client.ui.report.day.ReportDayFragment"
         android:label="Daily report"
         tools:layout="@layout/fragment_report_day" />
-    <fragment
-        android:id="@+id/orderAddPreItemsFragment"
-        android:name="net.arwix.gastro.client.ui.order.OrderAddPreItemsFragment"
-        android:label="Add order / select item"
-        tools:layout="@layout/fragment_order_add_pre_items">
-        <action
-            android:id="@+id/action_to_orderListAddItemFragment"
-            app:destination="@id/orderListAddItemFragment" />
-        <argument
-            android:name="menuGroup"
-            app:argType="net.arwix.gastro.library.menu.data.MenuGroupData" />
-    </fragment>
     <action
         android:id="@+id/action_global_orderListFragment"
         app:destination="@id/orderListFragment"

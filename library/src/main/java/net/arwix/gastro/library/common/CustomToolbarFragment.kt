@@ -2,7 +2,6 @@ package net.arwix.gastro.library.common
 
 import android.os.Bundle
 import android.view.View
-
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 

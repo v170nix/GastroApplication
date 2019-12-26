@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.observe
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
@@ -24,6 +23,7 @@ import net.arwix.gastro.client.R
 import net.arwix.gastro.client.common.MultilineButtonHelper
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.CustomToolbarFragment
+import net.arwix.gastro.library.common.setToolbarTitle
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.menu.data.MenuGroupData
@@ -32,15 +32,16 @@ import java.text.NumberFormat
 
 class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope() {
 
-    private val args: OrderListFragmentArgs by navArgs()
     override val idResToolbar: Int = R.id.order_list_toolbar
 
-
+    private val args: OrderListFragmentArgs by navArgs()
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private val profileViewModel: ProfileViewModel by sharedViewModel()
     private lateinit var adapterOrder: OrderListAdapter
     private lateinit var multilineButtonHelper: MultilineButtonHelper
     private lateinit var animationViewHelper: AnimationViewHelper
+
+    private var isCollapsed: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,16 +55,7 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
         multilineButtonHelper = MultilineButtonHelper(view.order_list_submit_layout, false)
         animationViewHelper = AnimationViewHelper()
         order_list_collapsing_app_bar_layout.setExpanded(args.showExpandToolbar, false)
-
         orderViewModel.liveState.observe(viewLifecycleOwner, ::render)
-//        order_list_add_button.setOnClickListener {
-//            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(
-//                R.id.orderListAddItemFragment
-//            )
-//        }
-
-//        Log.e("currentDestination")
-
         adapterOrder = OrderListAdapter(
             onMenuGroupClick = {
                 findNavController().navigate(
@@ -130,11 +122,9 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
     }
 
     private fun setTitle(tableGroup: TableGroup) {
-        (requireActivity() as AppCompatActivity).supportActionBar?.run {
-            title = getString(R.string.title_order_add)
-            collapsing_toolbar_subtitle_text.text =
-                "Table ${tableGroup.tableId}/${tableGroup.tablePart}"
-        }
+        setToolbarTitle(getString(R.string.title_order_add))
+        collapsing_toolbar_subtitle_text.text =
+            "Table ${tableGroup.tableId}/${tableGroup.tablePart}"
     }
 
     private fun renderTotalPrice(map: Map<MenuGroupData, List<OrderItem>>) {
@@ -147,9 +137,6 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
             "Items", "Total price",
             counts.toString(), formatter.format(price / 100.0)
         )
-//
-//        order_list_total_price_text.text =
-//            "Total price: ${formatter.format(price / 100.0)}\n($counts items)"
     }
 
     private inner class AnimationViewHelper {

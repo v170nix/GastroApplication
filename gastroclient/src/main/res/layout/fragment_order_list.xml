@@ -8,74 +8,44 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/order_list_collapsing_app_bar_layout"
-        style="@style/Widget.MaterialComponents.AppBarLayout.PrimarySurface"
+        style="@style/AppCollapsingStyle.AppBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/order_list_collapsing_toolbar_layout"
+            style="@style/AppCollapsingStyle.CollapsingToolbarLayout"
             android:layout_width="match_parent"
-            android:layout_height="160dp"
-            app:collapsedTitleTextAppearance="@style/AppCollapsedToolbarStyle"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleGravity="top"
-            app:expandedTitleMarginStart="36dp"
-            app:expandedTitleMarginTop="28dp"
-            app:expandedTitleTextAppearance="@style/AppExpandToolbarStyle"
-            app:layout_scrollFlags="scroll|enterAlways|exitUntilCollapsed|snap"
-            app:toolbarId="@+id/order_list_toolbar">
+            android:layout_height="@dimen/collapsing_toolbar_layout_height">
 
             <ImageView
+                style="@style/AppCollapsingStyle.ImageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:alpha="0.1"
-                android:scaleType="centerCrop"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.35"
-                app:srcCompat="@drawable/brassonions_d1" />
+                app:srcCompat="@drawable/brassonions_d1"
+                tools:ignore="ContentDescription" />
 
             <TextView
+                style="@style/AppCollapsingStyle.SubTitleTextView"
                 android:id="@+id/collapsing_toolbar_subtitle_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:layout_marginStart="36dp"
-                android:layout_marginTop="80dp"
-                android:text="Table 21/2"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                android:textColor="?attr/colorOnPrimary"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.72" />
+                tools:text="Table 21/2" />
 
             <TextView
+                style="@style/AppCollapsingStyle.ActionTextView"
                 android:id="@+id/collapsing_toolbar_action_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="?attr/actionBarSize"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:text="Select menu folder"
-                android:textAppearance="@style/TextAppearance.MaterialComponents.Overline"
-                android:textColor="?attr/colorOnPrimary"
-                app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.4" />
+                android:text="@string/order_list_action_select_menu_folder" />
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/order_list_toolbar"
-                style="@style/AppToolbarStyle"
+                style="@style/AppCollapsingStyle.Toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:elevation="0dp"
-                app:contentInsetStartWithNavigation="0dp"
-                app:layout_collapseMode="pin"
-                app:layout_scrollFlags="scroll|exitUntilCollapsed"
-
-                />
+                android:layout_height="?attr/actionBarSize" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
-
-
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView

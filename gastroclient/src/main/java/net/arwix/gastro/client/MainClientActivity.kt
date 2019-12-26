@@ -35,6 +35,7 @@ class MainClientActivity : AppCompatActivity(),
     private val profileViewModel by viewModel<ProfileViewModel>()
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navController: NavController
+    private var isDestinationChanged = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -145,6 +146,7 @@ class MainClientActivity : AppCompatActivity(),
         destination: NavDestination,
         arguments: Bundle?
     ) {
+        isDestinationChanged = true
         invalidateOptionsMenu()
     }
 
@@ -158,18 +160,18 @@ class MainClientActivity : AppCompatActivity(),
     }
 
     override fun setCustomToolbar(toolbar: Toolbar?) {
-        if (toolbar == null) {
+        if (toolbar == null && isDestinationChanged) {
             setSupportActionBar(app_main_toolbar)
             app_main_toolbar.visible()
+            isDestinationChanged = false
             return
         }
+        if (toolbar == null) return
         if (toolbar != app_main_toolbar) {
             app_main_toolbar.gone()
         }
         setSupportActionBar(toolbar)
-//        val toogle = ActionBarDrawerToggle(
-//            this,
-//        )
+        isDestinationChanged = false
     }
 
 }

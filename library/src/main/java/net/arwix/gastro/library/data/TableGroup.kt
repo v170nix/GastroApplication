@@ -1,6 +1,10 @@
 package net.arwix.gastro.library.data
 
-data class TableGroup(val tableId: Int, val tablePart: Int = 1) {
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
+data class TableGroup(val tableId: Int, val tablePart: Int = 1) : Parcelable {
 
     companion object {
         fun fromString(string: String) = string.split("-").let {

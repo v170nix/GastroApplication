@@ -1,10 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.order.OrderAddPreItemsFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/order_add_pre_items_app_bar_layout"
+        style="@style/AppCollapsingStyle.AppBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            style="@style/AppCollapsingStyle.CollapsingToolbarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/collapsing_toolbar_layout_height">
+
+            <ImageView
+                style="@style/AppCollapsingStyle.ImageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/brassonions_d1"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/collapsing_toolbar_subtitle_text"
+                style="@style/AppCollapsingStyle.SubTitleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Table 21/2" />
+
+            <TextView
+                android:id="@+id/collapsing_toolbar_action_text"
+                style="@style/AppCollapsingStyle.ActionTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/order_add_pre_items_action_select_menu_items" />
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/order_add_pre_items_toolbar"
+                style="@style/AppCollapsingStyle.Toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/order_add_pre_items_recycler_view"
@@ -18,6 +59,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -29,6 +71,7 @@
         android:layout_marginBottom="16dp"
         android:src="@drawable/ic_create"
         app:fabSize="mini"
+        android:layout_gravity="bottom|end"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -40,10 +83,11 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:src="@drawable/ic_add_shopping_cart"
+        android:layout_gravity="bottom|end"
         android:text="@string/button_add_selected_items"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:visibility="visible" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
