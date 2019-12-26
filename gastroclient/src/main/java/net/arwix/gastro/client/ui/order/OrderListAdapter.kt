@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_order_menu_group.view.*
 import kotlinx.android.synthetic.main.item_order_menu_item.view.*
+import net.arwix.extension.invisible
 import net.arwix.extension.setBackgroundDrawableCompat
+import net.arwix.extension.visible
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.menu.data.MenuGroupData
@@ -20,8 +22,19 @@ class OrderListAdapter(
 ) : RecyclerView.Adapter<OrderListAdapter.AdapterItemHolder>() {
 
     var isClickable = true
+        set(value) {
+            field = value
+            items.forEachIndexed { index, item ->
+                if (item is AdapterOrderItems.Default) {
+                    if (item.order.count > 0) {
+                        notifyItemChanged(index)
+                    }
+                }
+            }
+        }
 
     private val items = mutableListOf<AdapterOrderItems>()
+
     private val doTypeClick = View.OnClickListener { view ->
         if (!isClickable) return@OnClickListener
         val type = view.tag as AdapterOrderItems.Type
@@ -108,6 +121,13 @@ class OrderListAdapter(
             holder.minusItemButton.setOnClickListener(doMinusCountClick)
             holder.plusItemButton.setOnClickListener(doPlusCountClick)
             holder.minusItemButton.isEnabled = item.order.count != 0
+            if (isClickable) {
+                holder.minusItemButton.visible()
+                holder.plusItemButton.visible()
+            } else {
+                holder.minusItemButton.invisible()
+                holder.plusItemButton.invisible()
+            }
             holder.bindTo(item)
         }
         if (item is AdapterOrderItems.Type) {
@@ -116,7 +136,7 @@ class OrderListAdapter(
             holder.addItemButton.setOnClickListener(doTypeClick)
             holder.itemView.tag = item
             holder.itemView.setOnClickListener(doTypeClick)
-            holder.itemView.setBackgroundDrawableCompat(R.drawable.selected_list_item)
+            holder.itemView.setBackgroundDrawableCompat(R.drawable.selected_list_group)
             holder.bindTo(item)
         }
     }

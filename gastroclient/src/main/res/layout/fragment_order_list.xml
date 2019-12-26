@@ -86,40 +86,32 @@
         android:paddingBottom="144dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/order_list_add_process_bar"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="4dp"
+        android:layout_gravity="top"
+        android:indeterminate="true"
+        android:visibility="visible"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/order_list_collapsing_app_bar_layout"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_useIntrinsicPadding="false" />
 
-        >
-
-
-        <me.zhanghai.android.materialprogressbar.MaterialProgressBar
-            android:id="@+id/order_list_add_process_bar"
-            style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
-            android:layout_width="0dp"
-            android:layout_height="4dp"
-            android:indeterminate="true"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:mpb_progressStyle="horizontal"
-            app:mpb_useIntrinsicPadding="false" />
-
-
-        <include
-            android:id="@+id/order_list_submit_layout"
-            layout="@layout/merge_multiline_button"
-            android:layout_width="0dp"
-            android:layout_height="64dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <include
+        android:id="@+id/order_list_submit_layout"
+        layout="@layout/merge_multiline_button"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
