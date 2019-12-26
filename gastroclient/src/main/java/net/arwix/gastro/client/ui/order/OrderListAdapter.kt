@@ -8,9 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_order_menu_group.view.*
 import kotlinx.android.synthetic.main.item_order_menu_item.view.*
-import net.arwix.extension.invisible
 import net.arwix.extension.setBackgroundDrawableCompat
-import net.arwix.extension.visible
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.menu.data.MenuGroupData
@@ -120,14 +118,15 @@ class OrderListAdapter(
             holder.plusItemButton.tag = item
             holder.minusItemButton.setOnClickListener(doMinusCountClick)
             holder.plusItemButton.setOnClickListener(doPlusCountClick)
-            holder.minusItemButton.isEnabled = item.order.count != 0
             if (isClickable) {
-                holder.minusItemButton.visible()
-                holder.plusItemButton.visible()
+                holder.minusItemButton.animate().alpha(1f).setDuration(75).start()
+                holder.plusItemButton.animate().alpha(1f).setDuration(75).start()
             } else {
-                holder.minusItemButton.invisible()
-                holder.plusItemButton.invisible()
+                holder.minusItemButton.animate().alpha(0.4f).setDuration(75).start()
+                holder.plusItemButton.animate().alpha(0.4f).setDuration(75).start()
             }
+            holder.minusItemButton.isEnabled = (item.order.count != 0) && isClickable
+            holder.plusItemButton.isEnabled = isClickable
             holder.bindTo(item)
         }
         if (item is AdapterOrderItems.Type) {
