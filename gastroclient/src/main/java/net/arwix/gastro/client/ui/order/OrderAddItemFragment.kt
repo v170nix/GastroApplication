@@ -7,12 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.fragment_order_add_item.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.common.hideKeyboard
+import net.arwix.gastro.library.common.navigate
 import net.arwix.gastro.library.common.showSoftKeyboard
 import net.arwix.gastro.library.data.OrderItem
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -51,10 +51,10 @@ class OrderAddItemFragment : Fragment() {
                 )
             )
             hideKeyboard()
-            val navOptions = NavOptions.Builder()
-                .setPopUpTo(R.id.orderListFragment, true)
-                .build()
-            findNavController(this).navigate(R.id.orderListFragment, null, navOptions)
+            OrderAddItemFragmentDirections
+                .actionGlobalOrderListFragment(false)
+                .navigate(this)
+
         }
         order_list_add_item_back_button.setOnClickListener {
             requireActivity().hideKeyboard()

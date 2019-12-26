@@ -7,13 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_open_tables.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.ui.order.OrderViewModel
 import net.arwix.gastro.client.ui.pay.PayViewModel
+import net.arwix.gastro.library.common.navigate
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class OpenTablesFragment : Fragment() {
@@ -35,17 +36,18 @@ class OpenTablesFragment : Fragment() {
         openTablesViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
         open_tables_add_order_button.setOnClickListener {
             orderViewModel.clear()
-            findNavController(this).navigate(R.id.orderAddTableFragment)
+            findNavController().navigate(R.id.orderAddTableFragment)
         }
 
         adapter = OpenTablesAdapter(
             onItemClick = {
                 payViewModel.setTable(it)
-                findNavController(this).navigate(R.id.payListFragment)
+                findNavController().navigate(R.id.payListFragment)
             },
             onAddOrderClick = {
                 orderViewModel.selectTable(it)
-                findNavController(this).navigate(R.id.orderListFragment)
+                OpenTablesFragmentDirections.actionGlobalOrderListFragment(true)
+                    .navigate(this)
             }
         )
         with(open_tables_recycler_view) {

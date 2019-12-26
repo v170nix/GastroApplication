@@ -7,10 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
 import kotlinx.android.synthetic.main.fragment_order_add_table.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.common.hideKeyboard
+import net.arwix.gastro.library.common.navigate
 import net.arwix.gastro.library.common.showSoftKeyboard
 import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -55,9 +55,9 @@ class OrderAddTableFragment : Fragment() {
 
     private fun toOrderList(tableGroup: TableGroup) {
         orderViewModel.selectTable(tableGroup)
-        Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(
-            R.id.orderListFragment
-        )
+        OrderAddTableFragmentDirections
+            .actionGlobalOrderListFragment(true)
+            .navigate(this)
     }
 
 }

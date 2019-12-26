@@ -19,7 +19,17 @@
         </item>
     </style>
 
-    <style name="AppToolbarStyle" parent="Widget.MaterialComponents.Toolbar.Primary"></style>
+    <style name="AppToolbarStyle" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="AppExpandToolbarStyle" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
+
+    <style name="AppCollapsedToolbarStyle" parent="Widget.MaterialComponents.Toolbar.Primary">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+    </style>
 
     <style name="AppMultilineButton" parent="Widget.MaterialComponents.ExtendedFloatingActionButton">
         <item name="android:backgroundTint">@color/colorSecondary</item>

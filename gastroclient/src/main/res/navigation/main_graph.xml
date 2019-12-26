@@ -23,9 +23,6 @@
             android:id="@+id/action_openTablesFragment_to_orderAddTableFragment"
             app:destination="@id/orderAddTableFragment" />
         <action
-            android:id="@+id/action_openTablesFragment_to_orderListFragment"
-            app:destination="@id/orderListFragment" />
-        <action
             android:id="@+id/action_openTablesFragment_to_payListFragment"
             app:destination="@id/payListFragment" />
     </fragment>
@@ -34,11 +31,7 @@
         android:id="@+id/orderAddTableFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderAddTableFragment"
         android:label="@string/title_order_add"
-        tools:layout="@layout/fragment_order_add_table">
-        <action
-            android:id="@+id/action_orderAddTableFragment_to_orderListFragment"
-            app:destination="@id/orderListFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_order_add_table" />
     <fragment
         android:id="@+id/orderListFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderListFragment"
@@ -47,6 +40,10 @@
         <action
             android:id="@+id/action_to_orderAddPreItemsFragment"
             app:destination="@id/orderAddPreItemsFragment" />
+        <argument
+            android:name="showExpandToolbar"
+            android:defaultValue="true"
+            app:argType="boolean" />
 
     </fragment>
     <fragment
@@ -90,4 +87,9 @@
             android:name="menuGroup"
             app:argType="net.arwix.gastro.library.menu.data.MenuGroupData" />
     </fragment>
+    <action
+        android:id="@+id/action_global_orderListFragment"
+        app:destination="@id/orderListFragment"
+        app:popUpTo="@+id/orderListFragment"
+        app:popUpToInclusive="true" />
 </navigation>

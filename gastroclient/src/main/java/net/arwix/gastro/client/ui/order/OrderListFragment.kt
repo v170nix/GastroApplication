@@ -8,11 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_order_list.*
@@ -23,13 +23,18 @@ import net.arwix.extension.visible
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.common.MultilineButtonHelper
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
+import net.arwix.gastro.library.common.CustomToolbarFragment
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.menu.data.MenuGroupData
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.text.NumberFormat
 
-class OrderListFragment : Fragment(), CoroutineScope by MainScope() {
+class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope() {
+
+    private val args: OrderListFragmentArgs by navArgs()
+    override val idResToolbar: Int = R.id.order_list_toolbar
+
 
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private val profileViewModel: ProfileViewModel by sharedViewModel()
@@ -48,12 +53,17 @@ class OrderListFragment : Fragment(), CoroutineScope by MainScope() {
         super.onViewCreated(view, savedInstanceState)
         multilineButtonHelper = MultilineButtonHelper(view.order_list_submit_layout, false)
         animationViewHelper = AnimationViewHelper()
+        order_list_collapsing_app_bar_layout.setExpanded(args.showExpandToolbar, false)
+
         orderViewModel.liveState.observe(viewLifecycleOwner, ::render)
 //        order_list_add_button.setOnClickListener {
 //            Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).navigate(
 //                R.id.orderListAddItemFragment
 //            )
 //        }
+
+//        Log.e("currentDestination")
+
         adapterOrder = OrderListAdapter(
             onMenuGroupClick = {
                 findNavController().navigate(
@@ -122,7 +132,8 @@ class OrderListFragment : Fragment(), CoroutineScope by MainScope() {
     private fun setTitle(tableGroup: TableGroup) {
         (requireActivity() as AppCompatActivity).supportActionBar?.run {
             title = getString(R.string.title_order_add)
-            subtitle = "Table ${tableGroup.tableId}/${tableGroup.tablePart}"
+            collapsing_toolbar_subtitle_text.text =
+                "Table ${tableGroup.tableId}/${tableGroup.tablePart}"
         }
     }
 

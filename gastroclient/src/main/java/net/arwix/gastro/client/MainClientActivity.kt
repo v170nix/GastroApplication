@@ -20,12 +20,17 @@ import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import kotlinx.android.synthetic.main.include_main_app_bar.*
+import net.arwix.extension.gone
+import net.arwix.extension.visible
 import net.arwix.gastro.client.common.AppMenuHelper
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
+import net.arwix.gastro.library.common.CustomToolbarActivity
 import net.arwix.gastro.library.common.hideKeyboard
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChangedListener {
+class MainClientActivity : AppCompatActivity(),
+    CustomToolbarActivity,
+    NavController.OnDestinationChangedListener {
 
     private val profileViewModel by viewModel<ProfileViewModel>()
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -34,7 +39,7 @@ class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChang
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_client)
-        setToolbar(app_main_toolbar)
+        setCustomToolbar(app_main_toolbar)
         navController = findNavController(this, R.id.nav_host_fragment)
         appBarConfiguration = AppBarConfiguration.Builder(navController.graph)
             .build()
@@ -135,13 +140,6 @@ class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChang
         navController.removeOnDestinationChangedListener(this)
     }
 
-    private fun setToolbar(toolbar: Toolbar) {
-        setSupportActionBar(toolbar)
-//        val toogle = ActionBarDrawerToggle(
-//            this,
-//        )
-    }
-
     override fun onDestinationChanged(
         controller: NavController,
         destination: NavDestination,
@@ -157,6 +155,21 @@ class MainClientActivity : AppCompatActivity(), NavController.OnDestinationChang
         }
         if (navController.currentDestination?.id != R.id.signInFragment
         ) navigateTo(R.id.signInFragment, true)
+    }
+
+    override fun setCustomToolbar(toolbar: Toolbar?) {
+        if (toolbar == null) {
+            setSupportActionBar(app_main_toolbar)
+            app_main_toolbar.visible()
+            return
+        }
+        if (toolbar != app_main_toolbar) {
+            app_main_toolbar.gone()
+        }
+        setSupportActionBar(toolbar)
+//        val toogle = ActionBarDrawerToggle(
+//            this,
+//        )
     }
 
 }
