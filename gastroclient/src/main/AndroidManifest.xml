@@ -27,6 +27,7 @@
             android:name=".MainClientActivity"
             android:configChanges="orientation"
             android:hardwareAccelerated="false"
+            android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
