@@ -17,6 +17,7 @@ import net.arwix.extension.invisible
 import net.arwix.extension.visible
 import net.arwix.gastro.library.R
 import net.arwix.gastro.library.common.getTextColor
+import net.arwix.gastro.library.menu.MenuUtils
 import net.arwix.gastro.library.menu.data.MenuGridItem
 import net.arwix.gastro.library.menu.data.MenuGridItem.Companion.VIEW_TYPE_EMPTY
 import net.arwix.gastro.library.menu.data.MenuGridItem.Companion.VIEW_TYPE_ITEM
@@ -94,9 +95,8 @@ class MenuItemsGridAdapter(
     fun setItems(list: List<MenuGroupData>) {
         val newList = mutableListOf<MenuGridItem>()
         list.forEach { menuGroup ->
-            val rawList = menuGroup.items
-            if (rawList.isNullOrEmpty()) return@forEach
-            newList.add(MenuGridItem.Title(menuGroup))
+            val rawList = menuGroup.items ?: return@forEach
+            if (isViewMenuGroup) newList.add(MenuGridItem.Title(menuGroup))
             newList.addAll(rawList.map { MenuGridItem.Item(menuGroup, it) })
         }
         items.clear()
@@ -106,11 +106,19 @@ class MenuItemsGridAdapter(
     }
 
     fun setItems(menuGroupData: MenuGroupData) {
+        val newList = mutableListOf<MenuGridItem>()
         val rawList = menuGroupData.items ?: return
-        val newList = mutableListOf(MenuGridItem.Title(menuGroupData)) +
-                rawList.map {
-                    MenuGridItem.Item(menuGroupData, it)
-                }
+        if (isViewMenuGroup) newList.add(MenuGridItem.Title(menuGroupData))
+
+        var currentPosition = 1 * MenuUtils.maxTableCols + 1
+        rawList.map {
+            val itemPosition = it.row * MenuUtils.maxTableCols + it.col
+            repeat(itemPosition - currentPosition - 1) {
+                newList.add(MenuGridItem.Empty)
+            }
+            newList.add(MenuGridItem.Item(menuGroupData, it))
+            currentPosition = itemPosition
+        }
         items.clear()
         items.addAll(newList)
         selectedItems.clear()

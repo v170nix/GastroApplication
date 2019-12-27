@@ -21,7 +21,7 @@
                 style="@style/AppCollapsingStyle.ImageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:srcCompat="@drawable/brassonions_d1"
+                app:srcCompat="@drawable/menu_pre_items"
                 tools:ignore="ContentDescription" />
 
             <TextView
