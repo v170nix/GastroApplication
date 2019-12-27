@@ -41,7 +41,7 @@ class OrderAddPreItemsFragment : CustomToolbarFragment() {
                     order_add_pre_items_add_selected_button.show()
                     order_add_pre_items_to_custom_item_button.animate()
                         .setDuration(150L)
-                        .translationX(-resources.toDp(60f))
+                        .translationX(-resources.toDp(72f))
                         .start()
                 } else {
                     order_add_pre_items_add_selected_button.hide()
@@ -56,15 +56,14 @@ class OrderAddPreItemsFragment : CustomToolbarFragment() {
             adapter = itemsAdapter
             layoutManager = MenuUtils.createGridLayoutManager(requireContext(), itemsAdapter)
         }
+
         orderViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
         order_add_pre_items_add_selected_button.setOnClickListener {
             val selectedItems = itemsAdapter.getSelectedItems()
             if (selectedItems.isEmpty()) return@setOnClickListener
-            orderViewModel.nonCancelableIntent(
-                OrderViewModel.Action.AddItems(selectedItems)
-            )
+            orderViewModel.nonCancelableIntent(OrderViewModel.Action.AddItems(selectedItems))
             OrderAddPreItemsFragmentDirections
-                .actionGlobalOrderListFragment(false)
+                .actionGlobalOrderListFragment()
                 .navigate(this)
         }
         itemsAdapter.setItems(args.menuGroup)

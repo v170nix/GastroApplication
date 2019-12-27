@@ -10,19 +10,23 @@ import android.widget.Toast
 import androidx.lifecycle.observe
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_order_list.*
 import kotlinx.android.synthetic.main.fragment_order_list.view.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import net.arwix.extension.gone
 import net.arwix.extension.visible
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.common.MultilineButtonHelper
+import net.arwix.gastro.client.domain.InnerFragmentStateViewModel
+import net.arwix.gastro.client.domain.InnerFragmentStateViewModel.InnerFragmentState.OrderListFragmentState
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.CustomToolbarFragment
+import net.arwix.gastro.library.common.asCollapsedFlow
+import net.arwix.gastro.library.common.navigate
 import net.arwix.gastro.library.common.setToolbarTitle
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.data.TableGroup
@@ -35,8 +39,10 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
     override val idResToolbar: Int = R.id.order_list_toolbar
 
     private val args: OrderListFragmentArgs by navArgs()
+    private val fragmentModel: InnerFragmentStateViewModel by sharedViewModel()
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private val profileViewModel: ProfileViewModel by sharedViewModel()
+    private lateinit var stateViewHelper: StateViewHelper
     private lateinit var adapterOrder: OrderListAdapter
     private lateinit var multilineButtonHelper: MultilineButtonHelper
     private lateinit var animationViewHelper: AnimationViewHelper
@@ -52,17 +58,16 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        stateViewHelper = StateViewHelper()
         multilineButtonHelper = MultilineButtonHelper(view.order_list_submit_layout, false)
         animationViewHelper = AnimationViewHelper()
-        order_list_collapsing_app_bar_layout.setExpanded(args.showExpandToolbar, false)
         orderViewModel.liveState.observe(viewLifecycleOwner, ::render)
         adapterOrder = OrderListAdapter(
             onMenuGroupClick = {
-                findNavController().navigate(
-                    OrderListFragmentDirections.actionToOrderAddPreItemsFragment(
-                        it
-                    )
-                )
+                OrderListFragmentDirections.actionToOrderAddPreItemsFragment(
+                    it
+                ).navigate(this)
+
             },
             onChangeCount = { type, orderItem, delta ->
                 orderViewModel.nonCancelableIntent(
@@ -81,6 +86,16 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
         multilineButtonHelper.setOnClickListener(View.OnClickListener {
             putToDb()
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        stateViewHelper.attach(args.clearInnerState)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        stateViewHelper.detach()
     }
 
     private fun putToDb() {
@@ -113,6 +128,7 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
         } else if (!isSubmit) {
             animationViewHelper.enableActions()
             adapterOrder.setItems(state.orderItems)
+            stateViewHelper.updateAdapterPositions()
             state.tableGroup?.run(::setTitle)
             renderTotalPrice(state.orderItems)
         }
@@ -141,6 +157,58 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
         )
     }
 
+    private inner class StateViewHelper {
+
+        private var job: Job? = null
+        private var isFirstAdapterLoadingItems = true
+
+        fun attach(isClearPreviousState: Boolean = false) {
+            isFirstAdapterLoadingItems = true
+            if (isClearPreviousState) {
+                fragmentModel.setState<OrderListFragmentState>(
+                    this@OrderListFragment::class.java
+                ) {
+                    OrderListFragmentState(true, null)
+                }
+            }
+            fragmentModel.getState<OrderListFragmentState>(this@OrderListFragment::class.java).run {
+                order_list_collapsing_app_bar_layout.setExpanded(isExpandTitle, false)
+            }
+            job?.cancel()
+            job = launch {
+                order_list_collapsing_app_bar_layout.asCollapsedFlow(null).collect { isCollapsed ->
+                    fragmentModel.setState<OrderListFragmentState>(
+                        this@OrderListFragment::class.java
+                    ) {
+                        it.copy(isExpandTitle = !isCollapsed)
+                    }
+                }
+            }
+        }
+
+        fun updateAdapterPositions() {
+            if (isFirstAdapterLoadingItems) {
+                isFirstAdapterLoadingItems = false
+                val state =
+                    fragmentModel.getState<OrderListFragmentState>(this@OrderListFragment::class.java)
+                order_list_recycler_view.layoutManager?.onRestoreInstanceState(state.listState)
+            }
+        }
+
+        fun detach() {
+            job?.cancel()
+            isFirstAdapterLoadingItems = false
+            val recyclerViewState = order_list_recycler_view.layoutManager?.onSaveInstanceState()
+            val state =
+                fragmentModel.getState<OrderListFragmentState>(this@OrderListFragment::class.java)
+            fragmentModel.setState<OrderListFragmentState>(this@OrderListFragment::class.java) {
+                state.copy(listState = recyclerViewState)
+            }
+
+        }
+
+    }
+
     private inner class AnimationViewHelper {
 
         fun enableActions() {
@@ -154,6 +222,7 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
             multilineButtonHelper.isEnabled = false
             adapterOrder.isClickable = false
             multilineButtonHelper.hide()
+            delay(300L)
             callback()
             delay(500L)
             order_list_add_process_bar.visible()

@@ -4,6 +4,7 @@ import android.content.Context.MODE_PRIVATE
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.app
+import net.arwix.gastro.client.domain.InnerFragmentStateViewModel
 import net.arwix.gastro.client.ui.history.check.HistoryCheckDetailViewModel
 import net.arwix.gastro.client.ui.history.order.HistoryOrderDetailViewModel
 import net.arwix.gastro.client.ui.order.OrderViewModel
@@ -32,6 +33,7 @@ val mainModule = module {
         ReportDayUseCase(get(), androidContext())
     }
 
+    viewModel { InnerFragmentStateViewModel() }
     viewModel { OpenTablesViewModel(get()) }
     viewModel { OrderViewModel(get(), get(), androidContext()) }
     viewModel { ProfileViewModel() }

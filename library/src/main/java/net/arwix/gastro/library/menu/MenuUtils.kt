@@ -42,7 +42,7 @@ object MenuUtils {
         return GridLayoutManager(context, maxTableCols).apply {
             this.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
-                    val item = adapter.items.get(position)
+                    val item = adapter.items[position]
                     return when (item) {
                         is MenuGridItem.Title -> maxTableCols
                         else -> 1

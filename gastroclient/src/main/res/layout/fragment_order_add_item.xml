@@ -7,7 +7,7 @@
     tools:context=".ui.order.OrderAddItemFragment">
 
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/TextInputLayoutAppearance"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         android:id="@+id/order_list_add_item_name_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/TextInputLayoutAppearance"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:id="@+id/order_list_add_item_price_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
