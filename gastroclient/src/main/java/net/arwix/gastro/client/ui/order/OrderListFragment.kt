@@ -41,7 +41,7 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
     private lateinit var multilineButtonHelper: MultilineButtonHelper
     private lateinit var animationViewHelper: AnimationViewHelper
 
-    private var isCollapsed: Boolean = false
+    private var isSubmit: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -96,7 +96,8 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
     }
 
     private fun render(state: OrderViewModel.State) {
-        animationViewHelper.enableActions()
+        //lock
+        isSubmit = if (!isSubmit) state.isSubmit else true
         if (state.isSubmit) {
             if (state.resultPrint != null) {
                 Toast.makeText(requireContext(), "code: ${state.resultPrint}", Toast.LENGTH_LONG)
@@ -109,7 +110,8 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
                 .setPopUpTo(R.id.openTablesFragment, true)
                 .build()
             findNavController(this).navigate(R.id.openTablesFragment, null, options)
-        } else {
+        } else if (!isSubmit) {
+            animationViewHelper.enableActions()
             adapterOrder.setItems(state.orderItems)
             state.tableGroup?.run(::setTitle)
             renderTotalPrice(state.orderItems)

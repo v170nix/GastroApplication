@@ -31,6 +31,7 @@
 
     <style name="AppCollapsingStyle.CollapsingToolbarLayout">
         <item name="contentScrim">?attr/colorPrimary</item>
+        <item name="android:background">?attr/colorPrimary</item>
         <item name="expandedTitleGravity">top</item>
         <item name="expandedTitleMarginStart">36dp</item>
         <item name="expandedTitleMarginTop">28dp</item>
