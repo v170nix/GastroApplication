@@ -11,6 +11,8 @@ import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.fragment_order_add_item.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.common.CustomToolbarFragment
 import net.arwix.gastro.library.common.hideKeyboard
@@ -22,12 +24,13 @@ import net.arwix.gastro.library.menu.data.MenuGroupData
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import kotlin.math.roundToLong
 
-class OrderAddItemFragment : CustomToolbarFragment() {
+class OrderAddItemFragment : CustomToolbarFragment(), CoroutineScope by MainScope() {
 
-    override val idResToolbar: Int = R.id.order_add_items_toolbar
+    override val idResToolbar: Int = R.id.order_add_item_toolbar
 
     private val args: OrderAddItemFragmentArgs by navArgs()
     private val orderViewModel: OrderViewModel by sharedViewModel()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,7 +41,14 @@ class OrderAddItemFragment : CustomToolbarFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        order_list_add_item_name_layout.editText?.requestFocus()
         showSoftKeyboard()
+//        order_add_items_app_bar_layout.setExpanded(false, true)
+//        requireActivity().window.decorView.viewTreeObserver.addOnGlobalLayoutListener {
+//            val r = Rect()
+//            requireActivity().window.decorView.getWindowVisibleDisplayFrame(r)
+//            order_add_item_coordinator.setPadding(0, 0, 0, resources.displayMetrics.heightPixels - r.bottom)
+//        }
         orderViewModel.liveState.value?.run {
             setTitle(tableGroup!!, args.menuGroup)
         }

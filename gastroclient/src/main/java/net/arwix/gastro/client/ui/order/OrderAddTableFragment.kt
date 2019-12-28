@@ -30,6 +30,7 @@ class OrderAddTableFragment : CustomToolbarFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        order_table_custom_input_layout.editText?.requestFocus()
         showSoftKeyboard()
         order_table_custom_button.setOnClickListener {
             submitTable()

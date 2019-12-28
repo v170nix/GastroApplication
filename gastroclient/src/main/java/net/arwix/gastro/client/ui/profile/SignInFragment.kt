@@ -2,7 +2,10 @@ package net.arwix.gastro.client.ui.profile
 
 
 import android.os.Bundle
-import android.view.*
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -21,7 +24,6 @@ class SignInFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         profileViewModel.liveState.observe(viewLifecycleOwner, Observer(this::renderProfile))
         signin_button.setOnClickListener { login() }
 //        val text = "<small style=\"float:left\"><font color='#000000'>" +

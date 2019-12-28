@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/order_add_item_coordinator"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        tools:context=".ui.order.OrderAddItemFragment">
+    tools:context=".ui.order.OrderAddItemFragment">
 
         <!--    https://stackoverflow.com/questions/55512896/collapsingtoolbarlayout-not-collapsing-when-softkeyboard-is-visible-->
 
@@ -23,10 +17,9 @@
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
                 style="@style/AppCollapsingStyle.CollapsingToolbarLayout"
-                android:id="@+id/order_add_items_collapsing_toolbar_layout"
+                android:id="@+id/order_add_item_collapsing_toolbar_layout"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/collapsing_toolbar_layout_height"
-                android:fitsSystemWindows="true">
+                android:layout_height="@dimen/collapsing_toolbar_layout_height">
 
                 <ImageView
                     style="@style/AppCollapsingStyle.ImageView"
@@ -50,7 +43,7 @@
                     android:text="@string/order_add_custom_item_action_select_menu_items" />
 
                 <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/order_add_items_toolbar"
+                    android:id="@+id/order_add_item_toolbar"
                     style="@style/AppCollapsingStyle.Toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize" />
@@ -61,8 +54,8 @@
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scrollview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
+            android:layout_height="wrap_content"
+            android:fillViewport="false"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -138,5 +131,3 @@
 
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-</RelativeLayout>
