@@ -32,8 +32,10 @@
     <string name="order_add_custom_item_add_button">Add</string>
     <string name="order_add_custom_item_back_button">Back</string>
     <!--    <string name="title_order_add_pre_items">Add order / select item</string>-->
-
-    <string name="title_admin_edit_menu">Edit menu</string>
+    <plurals name="pay_list_item_count_text">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
