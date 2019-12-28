@@ -3,7 +3,6 @@ package net.arwix.gastro.client.ui.table
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -62,15 +61,15 @@ class OpenTablesAdapter(
 
     class ItemsHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val table: TextView = view.item_open_tables_table_id_text
-        val addOrderButton: Button = view.item_open_tables_add_order_button
+        val addOrderButton: View = view.item_open_tables_add_order_button
 
         init {
             view.setBackgroundResource(R.drawable.selected_list_item)
         }
 
         fun bindTo(item: OpenTableAdapterItem) {
-            table.text =
-                "${item.tableGroup.tableId}/${item.tableGroup.tablePart} - count(${item.tableData.orders?.size})"
+//            item.tableData.updated
+            table.text = "${item.tableGroup.tableId}/${item.tableGroup.tablePart}"
         }
     }
 

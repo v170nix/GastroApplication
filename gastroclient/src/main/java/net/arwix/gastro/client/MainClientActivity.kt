@@ -12,7 +12,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuCompat
-import androidx.core.view.forEach
 import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -117,14 +116,14 @@ class MainClientActivity : AppCompatActivity(),
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.app_menu, menu)
-        menu?.forEach { it.isVisible = false }
+//        menu?.forEach { it.isVisible = false }
         MenuCompat.setGroupDividerEnabled(menu, true)
         return true
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         navController.currentDestination?.id?.run {
-            AppMenuHelper.updateVisibleMenu(this, menu)
+            //            AppMenuHelper.updateVisibleMenu(this, menu)
             supportActionBar?.let {
                 AppMenuHelper.updateActionBar(this@MainClientActivity, this, it)
             }

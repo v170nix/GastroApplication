@@ -1,17 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pay_list_coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.pay.PayListFragment">
 
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/pay_list_collapsing_app_bar_layout"
+        style="@style/AppCollapsingStyle.AppBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/pay_list_collapsing_toolbar_layout"
+            style="@style/AppCollapsingStyle.CollapsingToolbarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/collapsing_toolbar_layout_height">
+
+            <ImageView
+                style="@style/AppCollapsingStyle.ImageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/table"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/collapsing_toolbar_subtitle_text"
+                style="@style/AppCollapsingStyle.SubTitleTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Table 21/2" />
+
+            <TextView
+                android:id="@+id/collapsing_toolbar_action_text"
+                style="@style/AppCollapsingStyle.ActionTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pay_list_action_add_pay_items" />
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/pay_list_toolbar"
+                style="@style/AppCollapsingStyle.Toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/pay_list_add_all_to_pay_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/ic_playlist_add"
+        app:layout_anchor="@id/pay_list_collapsing_app_bar_layout"
+        app:layout_anchorGravity="bottom|end" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/pay_list_order_recycler_view"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:clipToPadding="false"
         android:paddingBottom="72dp"
+        android:layout_gravity="top"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,6 +78,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
+        android:layout_gravity="bottom|end"
         android:text="to pay"
         android:visibility="invisible"
         app:icon="@drawable/ic_payment"
@@ -38,8 +93,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
-
-        android:text="delete"
+        android:layout_gravity="bottom|start"
         android:visibility="invisible"
         app:backgroundTint="@color/design_default_color_error"
         app:fabCustomSize="48dp"
@@ -48,4 +102,4 @@
         app:srcCompat="@drawable/ic_delete"
         tools:visibility="visible" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -2,23 +2,28 @@ package net.arwix.gastro.client.ui.pay
 
 
 import android.os.Bundle
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_pay_list.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
+import net.arwix.gastro.library.common.CustomToolbarFragment
+import net.arwix.gastro.library.common.setToolbarTitle
 import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.text.NumberFormat
 
-class PayListFragment : Fragment() {
+class PayListFragment : CustomToolbarFragment() {
+
+    override val idResToolbar: Int = R.id.pay_list_toolbar
 
     private val payViewModel: PayViewModel by sharedViewModel()
     private val profileViewModel: ProfileViewModel by sharedViewModel()
@@ -27,7 +32,7 @@ class PayListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         payViewModel.liveState.observe(this, Observer(this::render))
-        setHasOptionsMenu(true)
+//        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -60,6 +65,10 @@ class PayListFragment : Fragment() {
                 )
             )
             adapter = this@PayListFragment.adapter
+        }
+
+        pay_list_add_all_to_pay_button.setOnClickListener {
+            payViewModel.nonCancelableIntent(PayViewModel.Action.AddAllItemsToPay)
         }
 
         pay_list_submit_button.setOnClickListener {
@@ -100,7 +109,7 @@ class PayListFragment : Fragment() {
                     this.setGravity(Gravity.CENTER, 0, 0)
                 }
                 .show()
-            findNavController(this).navigateUp()
+            findNavController().navigateUp()
         }
     }
 
@@ -119,8 +128,11 @@ class PayListFragment : Fragment() {
 
 
     private fun setTitle(tableGroup: TableGroup) {
-        (requireActivity() as AppCompatActivity).supportActionBar?.title =
-            "Table ${tableGroup.tableId}/${tableGroup.tablePart} "
+        setToolbarTitle(resources.getString(R.string.pay_list_title))
+        collapsing_toolbar_subtitle_text.text =
+            "Table ${tableGroup.tableId}/${tableGroup.tablePart}"
+//        (requireActivity() as AppCompatActivity).supportActionBar?.title =
+//            "Table ${tableGroup.tableId}/${tableGroup.tablePart} "
     }
 
     private fun getPayCountAndPrice(state: PayViewModel.State?): Pair<Long, Int>? {
@@ -157,15 +169,15 @@ class PayListFragment : Fragment() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_pay_add_items -> {
-                payViewModel.nonCancelableIntent(PayViewModel.Action.AddAllItemsToPay)
-                return true
-            }
-        }
-        return false
-    }
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        when (item.itemId) {
+//            R.id.menu_pay_add_items -> {
+//                payViewModel.nonCancelableIntent(PayViewModel.Action.AddAllItemsToPay)
+//                return true
+//            }
+//        }
+//        return false
+//    }
 
 
 }

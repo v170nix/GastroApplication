@@ -31,7 +31,6 @@ class OrderAddItemFragment : CustomToolbarFragment(), CoroutineScope by MainScop
     private val args: OrderAddItemFragmentArgs by navArgs()
     private val orderViewModel: OrderViewModel by sharedViewModel()
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
