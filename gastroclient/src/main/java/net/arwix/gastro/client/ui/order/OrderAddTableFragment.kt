@@ -6,9 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_order_add_table.*
 import net.arwix.gastro.client.R
+import net.arwix.gastro.library.common.CustomToolbarFragment
 import net.arwix.gastro.library.common.hideKeyboard
 import net.arwix.gastro.library.common.navigate
 import net.arwix.gastro.library.common.showSoftKeyboard
@@ -16,8 +16,9 @@ import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
-class OrderAddTableFragment : Fragment() {
+class OrderAddTableFragment : CustomToolbarFragment() {
 
+    override val idResToolbar: Int = R.id.order_set_table_toolbar
     private val orderViewModel: OrderViewModel by sharedViewModel()
 
     override fun onCreateView(
@@ -33,7 +34,7 @@ class OrderAddTableFragment : Fragment() {
         order_table_custom_button.setOnClickListener {
             submitTable()
         }
-        order_table_custom_part_input_layout.editText!!.setOnEditorActionListener { _, actionId, event ->
+        order_table_custom_part_input_layout.editText?.setOnEditorActionListener { _, actionId, event ->
             if ((event != null && event.keyCode == KeyEvent.KEYCODE_ENTER) ||
                 actionId == EditorInfo.IME_ACTION_DONE
             ) submitTable()
@@ -55,6 +56,8 @@ class OrderAddTableFragment : Fragment() {
 
     private fun toOrderList(tableGroup: TableGroup) {
         orderViewModel.selectTable(tableGroup)
+
+
         OrderAddTableFragmentDirections
             .actionGlobalOrderListFragment(true)
             .navigate(this)

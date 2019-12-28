@@ -26,10 +26,14 @@
     <style name="AppCollapsingStyle" />
 
     <style name="AppCollapsingStyle.AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.PrimarySurface">
-
+        <item name="android:translationZ">4dp</item>
+        <!--        <item name="android:popupElevation">16dp</item>-->
+        <!--        <item name="android:windowElevation">16dp</item>-->
+        <!--        <item name="android:elevation">16dp</item>-->
+        <!--        <item name="elevation">16dp</item>-->
     </style>
 
-    <style name="AppCollapsingStyle.CollapsingToolbarLayout">
+    <style name="AppCollapsingStyle.CollapsingToolbarLayout" parent="TextAppearanceCollapsedToolbarStyle">
         <item name="contentScrim">?attr/colorPrimary</item>
         <item name="android:background">?attr/colorPrimary</item>
         <item name="expandedTitleGravity">top</item>

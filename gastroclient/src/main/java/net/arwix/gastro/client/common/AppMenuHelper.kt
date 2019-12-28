@@ -35,7 +35,7 @@ object AppMenuHelper {
 
         when (fragmentId) {
             R.id.orderAddTableFragment -> {
-                actionBar.subtitle = activity.getString(R.string.subtitle_order_add_table)
+                actionBar.subtitle = activity.getString(R.string.order_add_set_table_subtitle)
             }
             R.id.orderListFragment -> {
             }

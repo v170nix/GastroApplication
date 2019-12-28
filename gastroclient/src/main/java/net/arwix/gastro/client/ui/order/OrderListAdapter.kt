@@ -21,17 +21,19 @@ class OrderListAdapter(
 
     var isClickable = true
         set(value) {
-            field = value
-            items.forEachIndexed { index, item ->
-                if (item is AdapterOrderItems.Default) {
-                    if (item.order.count > 0) {
-                        notifyItemChanged(index)
+            if (field != value) {
+                items.forEachIndexed { index, item ->
+                    if (item is AdapterOrderItems.Default) {
+                        if (item.order.count > 0) {
+                            notifyItemChanged(index)
+                        }
                     }
                 }
+                field = value
             }
         }
 
-    private val items = mutableListOf<AdapterOrderItems>()
+    private var items = mutableListOf<AdapterOrderItems>()
 
     private val doTypeClick = View.OnClickListener { view ->
         if (!isClickable) return@OnClickListener
@@ -72,6 +74,7 @@ class OrderListAdapter(
             )
         val diffResult =
             DiffUtil.calculateDiff(diffCallback)
+//        items = newList
         items.clear()
         items.addAll(newList)
         diffResult.dispatchUpdatesTo(this)
@@ -156,7 +159,11 @@ class OrderListAdapter(
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
-            return (oldItem == newItem)
+            return (oldItem == newItem).also {
+                //                if (it) {
+//                    Log.e("asSame", oldItem.toString())
+//                }
+            }
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -166,9 +173,13 @@ class OrderListAdapter(
                 return oldItem.groupData.name == newItem.groupData.name
             }
             if (oldItem is AdapterOrderItems.Default && newItem is AdapterOrderItems.Default) {
-                return oldItem.order.name == newItem.order.name &&
+                return (oldItem.order.name == newItem.order.name &&
                         oldItem.order.count == newItem.order.count &&
-                        oldItem.order.price == newItem.order.price
+                        oldItem.order.price == newItem.order.price).also {
+                    //                    if (it) {
+//                        Log.e("asContentsSame", oldItem.order.toString())
+//                    }
+                }
             }
             return false
         }
@@ -191,7 +202,7 @@ class OrderListAdapter(
         }
 
         class TypeItemHolder(view: View) : AdapterItemHolder(view) {
-            private val title: TextView = view.item_type_list_add_name_text
+            val title: TextView = view.item_type_list_add_name_text
             val addItemButton: View = view.item_type_list_add_plus_one_button
 
             fun bindTo(item: AdapterOrderItems.Type) {

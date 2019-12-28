@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.fragment_order_add_pre_items.*
 import net.arwix.extension.toDp
@@ -62,9 +63,10 @@ class OrderAddPreItemsFragment : CustomToolbarFragment() {
             val selectedItems = itemsAdapter.getSelectedItems()
             if (selectedItems.isEmpty()) return@setOnClickListener
             orderViewModel.nonCancelableIntent(OrderViewModel.Action.AddItems(selectedItems))
-            OrderAddPreItemsFragmentDirections
-                .actionGlobalOrderListFragment()
-                .navigate(this)
+            findNavController().popBackStack()
+//            OrderAddPreItemsFragmentDirections
+//                .actionGlobalOrderListFragment()
+//                .navigate(this)
         }
         itemsAdapter.setItems(args.menuGroup)
         order_add_pre_items_to_custom_item_button.setOnClickListener {

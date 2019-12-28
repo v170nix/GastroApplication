@@ -26,7 +26,6 @@
         <activity
             android:name=".MainClientActivity"
             android:configChanges="orientation"
-            android:hardwareAccelerated="false"
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait">
             <intent-filter>

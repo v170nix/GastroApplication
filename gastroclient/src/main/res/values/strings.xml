@@ -16,10 +16,11 @@
     <string name="button_add_selected_items">Add to order</string>
 
     <string name="title_order_add">Add order</string>
-    <string name="subtitle_order_add_table">Set table</string>
-    <string name="hint_order_add_table_id">Table №</string>
-    <string name="hint_order_add_table_part">Part</string>
-    <string name="button_order_add_set_table">Set table</string>
+    <string name="order_add_set_table_subtitle">Set table</string>
+    <string name="order_add_set_table_action_title">Input</string>
+    <string name="order_add_set_table_hint_id">Table №</string>
+    <string name="order_add_set_table_hint_part">Part</string>
+    <string name="order_add_set_table_submit_button">Set</string>
 
     <string name="order_list_action_select_menu_folder">Select menu folder</string>
 

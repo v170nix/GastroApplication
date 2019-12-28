@@ -12,7 +12,7 @@
         style="@style/AppCollapsingStyle.AppBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="false">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             style="@style/AppCollapsingStyle.CollapsingToolbarLayout"
@@ -50,11 +50,11 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
+        android:layout_gravity="top"
+        android:fitsSystemWindows="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -104,9 +104,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
             android:text="@string/order_add_custom_item_add_button"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/order_list_add_item_price_layout" />
 
@@ -117,9 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="16dp"
             android:text="@string/order_add_custom_item_back_button"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/order_list_add_item_price_layout" />
 

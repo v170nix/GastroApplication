@@ -8,10 +8,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.android.synthetic.main.fragment_order_add_item.*
 import net.arwix.gastro.client.R
-import net.arwix.gastro.library.common.*
+import net.arwix.gastro.library.common.CustomToolbarFragment
+import net.arwix.gastro.library.common.hideKeyboard
+import net.arwix.gastro.library.common.setToolbarTitle
+import net.arwix.gastro.library.common.showSoftKeyboard
 import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.menu.data.MenuGroupData
@@ -72,8 +76,6 @@ class OrderAddItemFragment : CustomToolbarFragment() {
             )
         )
         hideKeyboard()
-        OrderAddItemFragmentDirections
-            .actionGlobalOrderListFragment()
-            .navigate(this)
+        findNavController().popBackStack(R.id.orderListFragment, false)
     }
 }
