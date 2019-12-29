@@ -2,6 +2,8 @@ package net.arwix.gastro.library.data
 
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Transaction
+import net.arwix.gastro.library.preference.PrefGlobalData
 
 class FirestoreDbApp(
     prefix: String = "",
@@ -16,16 +18,17 @@ class FirestoreDbApp(
             orders = firestore.collection(prefix + "orders"),
             openTables = firestore.collection(prefix + "open tables"),
             checks = firestore.collection(prefix + "checks"),
-            closeTables = firestore.collection(prefix + "close tables")
+            closeTables = firestore.collection(prefix + "close tables"),
+            prefs = firestore.collection(prefix + "pref")
         )
+    }
 
-//        GlobalScope.launch {
-//            val oldMenuRef = firestore.collection("menu")
-//            oldMenuRef.get().await()?.forEach {
-//                refs.menu.document(it.id).set(it.data).await()
-//            }
-//        }
+    fun getGlobalPrefs(transaction: Transaction): PrefGlobalData? {
+        return transaction.get(refs.prefs.document("global")).toObject(PrefGlobalData::class.java)
+    }
 
+    fun setGlobalPrefs(transaction: Transaction, pref: PrefGlobalData) {
+        transaction.set(refs.prefs.document("global"), pref)
     }
 
     data class CollectionRef(
@@ -33,7 +36,8 @@ class FirestoreDbApp(
         val orders: CollectionReference,
         val openTables: CollectionReference,
         val checks: CollectionReference,
-        val closeTables: CollectionReference
+        val closeTables: CollectionReference,
+        val prefs: CollectionReference
     )
 
 

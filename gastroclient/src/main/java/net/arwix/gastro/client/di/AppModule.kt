@@ -35,7 +35,7 @@ val mainModule = module {
 
     viewModel { InnerFragmentStateViewModel() }
     viewModel { OpenTablesViewModel(get()) }
-    viewModel { OrderViewModel(get(), get(), androidContext()) }
+    viewModel { OrderViewModel(get(), androidContext()) }
     viewModel { ProfileViewModel() }
     viewModel { PayViewModel(get()) }
     viewModel { HistoryCheckDetailViewModel(get()) }

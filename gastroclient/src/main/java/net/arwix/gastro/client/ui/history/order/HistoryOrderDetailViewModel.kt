@@ -54,19 +54,19 @@ class HistoryOrderDetailViewModel(
     }
 
     suspend fun print(context: Context): List<Int> {
-        var orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
+//        var orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
         val printers = transformMenuToPrinters(menuGroupTypes)
         val partsOrders = transformOrders(printers, internalViewState.orderData!!)
         val resultCodes = mutableListOf<Int>()
 
         partsOrders.forEach { (printerAddress, orderData) ->
             val result = internalViewState.orderData?.run {
-                PrinterOrderUseCase(context).printOrder(printerAddress, orderData, orderBonNumber)
-            } ?: orderBonNumber to -100
-            orderBonNumber = result.first
-            resultCodes.add(result.second)
+                PrinterOrderUseCase(context).printOrder(printerAddress, orderData)
+            } ?: -100
+//            orderBonNumber = result.first
+            resultCodes.add(result)
         }
-        sharedPreferences.edit().putLong("orderBonNumber", orderBonNumber).apply()
+//        sharedPreferences.edit().putLong("orderBonNumber", orderBonNumber).apply()
         return resultCodes
     }
 

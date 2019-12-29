@@ -20,10 +20,9 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
     //Bon Nr: 120555
 
     // return first bonNumber last code
-    suspend fun printOrder(addressPrinter: String, orderData: OrderData, bonNumber: Long) =
-        suspendCancellableCoroutine<Pair<Long, Int>> { cont ->
+    suspend fun printOrder(addressPrinter: String, orderData: OrderData) =
+        suspendCancellableCoroutine<Int> { cont ->
 
-            var innerBonNumber = bonNumber
             val printer = Printer(Printer.TM_M30, Printer.MODEL_ANK, applicationContext)
 
             printer.setReceiveEventListener { ptr: Printer?,
@@ -31,7 +30,7 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
                                               printerStatusInfo: PrinterStatusInfo?,
                                               s: String? ->
                 if (ptr != null) disconnectPrinter(ptr)
-                cont.resume(innerBonNumber to code)
+                cont.resume(code)
                 printer.clearCommandBuffer()
                 printer.setReceiveEventListener(null)
             }
@@ -53,13 +52,20 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
             val timeFormatter =
                 DateTimeFormatter.ofPattern("dd.MM. HH:mm:ss")
 
+            val bonNumbers = orderData.bonNumbers
+
             orderData.orderItems?.forEach { (type: String, items: List<OrderItem>) ->
+                val bonNumber = bonNumbers?.get(type)
                 //==============================================
                 printer.addTextFont(Printer.FONT_A)
                 printer.addTextSize(2, 2)
                 printer.addText("Tisch: $printTable   ")
                 printer.addTextSize(1, 1)
-                printer.addText("Bon Nr: $innerBonNumber\n")
+                if (bonNumber == null) {
+                    printer.addText("\n")
+                } else {
+                    printer.addText("Bon Nr: $bonNumber\n")
+                }
                 //==============================================
                 printer.addTextSize(2, 2)
                 printer.addText(timeFormatter.format(data) + "\n")
@@ -101,7 +107,6 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
                     printer.addText(createCharString(46, "-"))
                 }
                 printer.addCut(Printer.CUT_FEED)
-                innerBonNumber++
             }
 
             printer.connect(addressPrinter, Printer.PARAM_DEFAULT)

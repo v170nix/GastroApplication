@@ -1,7 +1,6 @@
 package net.arwix.gastro.client.ui.order
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -22,7 +21,6 @@ import net.arwix.mvi.SimpleIntentViewModel
 
 class OrderViewModel(
     private val firestoreDbApp: FirestoreDbApp,
-    private val sharedPreferences: SharedPreferences,
     private val context: Context
 ) :
     SimpleIntentViewModel<OrderViewModel.Action, OrderViewModel.Result, OrderViewModel.State>() {
@@ -70,24 +68,24 @@ class OrderViewModel(
             is Action.SubmitOrder -> {
                 withContext(Dispatchers.Main) {
                     val orders = firestoreDbApp.refs.orders
-                    val orderData =
-                        OrderData(
-                            action.userId,
-                            internalViewState.tableGroup!!.tableId,
-                            internalViewState.tableGroup!!.tablePart,
-                            internalViewState.orderItems.filter {
-                                it.value.isNotEmpty()
-                            }.let { filterMap: Map<MenuGroupData, List<OrderItem>> ->
-                                mutableMapOf<String, List<OrderItem>>().apply {
-                                    filterMap.forEach { (key, list) ->
-                                        val filterList = list.filter { it.count > 0 }
-                                        if (filterList.isNotEmpty()) {
-                                            this[key.name] = filterList
-                                        }
+                    var orderData = OrderData(
+                        action.userId,
+                        internalViewState.tableGroup!!.tableId,
+                        internalViewState.tableGroup!!.tablePart,
+                        null,
+                        internalViewState.orderItems.filter {
+                            it.value.isNotEmpty()
+                        }.let { filterMap: Map<MenuGroupData, List<OrderItem>> ->
+                            mutableMapOf<String, List<OrderItem>>().apply {
+                                filterMap.forEach { (key, list) ->
+                                    val filterList = list.filter { it.count > 0 }
+                                    if (filterList.isNotEmpty()) {
+                                        this[key.name] = filterList
                                     }
                                 }
                             }
-                        )
+                        }
+                    )
                     if (!orderData.orderItems.isNullOrEmpty()) {
                         //   orders.add(orderData).await()!!
                         val orderDoc = orders.document()
@@ -96,9 +94,20 @@ class OrderViewModel(
                             orderData.tablePart.toString().toIntOrNull() ?: return@withContext
                         val docId = "$tableId-$tablePart"
                         firestoreDbApp.firestore.runTransaction {
+                            // ------- update bans
+                            val prefs = firestoreDbApp.getGlobalPrefs(it)!!
+                            var initOrderBon = prefs.orderBon
+                            val bonNumbers = mutableMapOf<String, Int>()
+                            orderData.orderItems!!.keys.forEach { menuGroupName ->
+                                initOrderBon++
+                                bonNumbers[menuGroupName] = initOrderBon
+                            }
+                            orderData = orderData.copy(bonNumbers = bonNumbers)
+                            // -------------------
                             val openTableDoc =
                                 it.get(firestoreDbApp.refs.openTables.document(docId))
                             it.set(orderDoc, orderData)
+                            firestoreDbApp.setGlobalPrefs(it, prefs.copy(orderBon = initOrderBon))
                             if (openTableDoc.exists()) {
                                 it.update(
                                     openTableDoc.reference,
@@ -136,24 +145,24 @@ class OrderViewModel(
     }
 
     suspend fun print(context: Context, orderData: OrderData): List<Int> {
-        var orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
+//        var orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
         val printers = transformMenuToPrinters(menuGroupData)
         val partsOrders = transformOrders(printers, orderData)
         val resultCodes = mutableListOf<Int>()
 
         partsOrders.forEach { (printerAddress, orderData) ->
             orderData.runCatching {
-                PrinterOrderUseCase(context).printOrder(printerAddress, orderData, orderBonNumber)
+                PrinterOrderUseCase(context).printOrder(printerAddress, orderData)
             }.onSuccess {
-                orderBonNumber = it.first
-                resultCodes.add(it.second)
+                //                orderBonNumber = it.first
+                resultCodes.add(it)
             }.onFailure {
                 if (it is Epos2Exception) {
                     resultCodes.add(it.errorStatus)
                 }
             }
         }
-        sharedPreferences.edit().putLong("orderBonNumber", orderBonNumber).apply()
+//        sharedPreferences.edit().putLong("orderBonNumber", orderBonNumber).apply()
         return resultCodes
     }
 
