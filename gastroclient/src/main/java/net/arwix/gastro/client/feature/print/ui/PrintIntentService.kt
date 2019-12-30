@@ -3,8 +3,13 @@ package net.arwix.gastro.client.feature.print.ui
 import android.app.IntentService
 import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
+import android.text.Html
+import android.text.SpannableString
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.epson.epos2.Epos2Exception
 import com.epson.epos2.Epos2Exception.*
@@ -28,6 +33,7 @@ class PrintIntentService : IntentService("PrintIntentService") {
     private val binder = PrintBinder()
     private val firestoreDbApp: FirestoreDbApp by inject()
     private val broadcastChannel = BroadcastChannel<PrintResult>(3)
+    private var isBinded = false
 
     fun getResultAsFlow() = broadcastChannel.asFlow()
 
@@ -35,7 +41,15 @@ class PrintIntentService : IntentService("PrintIntentService") {
         super.onCreate()
     }
 
-    override fun onBind(intent: Intent?): IBinder = binder
+    override fun onBind(intent: Intent?): IBinder {
+        isBinded = true
+        return binder
+    }
+
+    override fun unbindService(conn: ServiceConnection) {
+        super.unbindService(conn)
+        isBinded = false
+    }
 
     override fun onHandleIntent(intent: Intent?) {
         when (intent?.action) {
@@ -49,12 +63,43 @@ class PrintIntentService : IntentService("PrintIntentService") {
                     "Print service", NotificationManagerCompat.IMPORTANCE_LOW
                 )
                     .setSmallIcon(R.drawable.ic_print)
-                    .setTicker("tic")
                     .setContentTitle("Printing order")
                     .setContentText("Table ${orderData.table}/${orderData.tablePart}")
                     .build()
                 startForeground(NOTIFICATION_FOREGROUND_ID, notification)
+
                 val result = runBlocking { handlePrintOrder(orderData) }
+
+                if ((result is PrintResult.Error)) {
+                    val title = "Error printing order ${orderData.table}/${orderData.tablePart}"
+                    val errorText = result.printList.joinToString("<br>") {
+                        "${it.printerAddress}: ${it.message}"
+                    }
+                    val formattedBody = SpannableString(
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) Html.fromHtml(errorText)
+                        else Html.fromHtml(errorText, Html.FROM_HTML_MODE_LEGACY)
+                    )
+
+                    val notificationError = notificationCompatBuilderChannel(
+                        this,
+                        NOTIFICATION_ERROR_ORDER_CHANNEL_ID,
+                        "Error orders channel", NotificationManagerCompat.IMPORTANCE_HIGH
+                    )
+                        .setSmallIcon(R.drawable.ic_print)
+                        .setContentTitle(title)
+                        .setColor(this.resources.getColor(R.color.design_default_color_error))
+                        .setStyle(
+                            NotificationCompat.BigTextStyle().bigText(formattedBody).setBigContentTitle(
+                                title
+                            )
+                        )
+                        .setContentText(formattedBody)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setAutoCancel(true)
+                        .build()
+                    NotificationManagerCompat.from(this).notify(3423, notificationError)
+
+                }
                 broadcastChannel.offer(result)
                 stopForeground(true)
             }

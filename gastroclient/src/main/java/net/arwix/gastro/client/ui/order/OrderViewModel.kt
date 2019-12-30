@@ -5,13 +5,12 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.epson.epos2.Epos2Exception
 import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.arwix.gastro.client.domain.PrinterOrderUseCase
+import net.arwix.gastro.client.feature.print.ui.PrintIntentService
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.FirestoreDbApp
 import net.arwix.gastro.library.data.OpenTableData
@@ -138,14 +137,16 @@ class OrderViewModel(
                                 it.set(openTableDoc.reference, newOpenTableData)
                             }
                         }.await()
-
-                        withContext(Dispatchers.IO) {
-                            orderDoc.get().await()
-                            val openTableDoc =
-                                orderDoc.get().await()!!.toObject(OrderData::class.java)!!
-                            val result = print(context, openTableDoc)
-                            emit(Result.SubmitOrder(result))
-                        }
+                        Log.e("order doc id", orderDoc.id)
+                        PrintIntentService.startPrintOrder(context, orderDoc.id)
+//
+//                        withContext(Dispatchers.IO) {
+//                            orderDoc.get().await()
+//                            val openTableDoc =
+//                                orderDoc.get().await()!!.toObject(OrderData::class.java)!!
+//                            val result = print(context, openTableDoc)
+//                            emit(Result.SubmitOrder(result))
+//                        }
                         return@withContext
                     }
                 }
@@ -154,28 +155,28 @@ class OrderViewModel(
         }
     }
 
-    suspend fun print(context: Context, orderData: OrderData): List<Int> {
-//        var orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
-        val printers = transformMenuToPrinters(menuGroupData)
-        val partsOrders = transformOrders(printers, orderData)
-        val resultCodes = mutableListOf<Int>()
-
-        partsOrders.forEach { (printerAddress, orderData) ->
-            Log.e("printerOld", printerAddress)
-            orderData.runCatching {
-                PrinterOrderUseCase(context).printOrder(printerAddress, orderData)
-            }.onSuccess {
-                //                orderBonNumber = it.first
-                resultCodes.add(it)
-            }.onFailure {
-                if (it is Epos2Exception) {
-                    resultCodes.add(it.errorStatus)
-                }
-            }
-        }
-//        sharedPreferences.edit().putLong("orderBonNumber", orderBonNumber).apply()
-        return resultCodes
-    }
+//    suspend fun print(context: Context, orderData: OrderData): List<Int> {
+////        var orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
+//        val printers = transformMenuToPrinters(menuGroupData)
+//        val partsOrders = transformOrders(printers, orderData)
+//        val resultCodes = mutableListOf<Int>()
+//
+//        partsOrders.forEach { (printerAddress, orderData) ->
+//            Log.e("printerOld", printerAddress)
+//            orderData.runCatching {
+//                PrinterOrderUseCase(context).printOrder(printerAddress, orderData)
+//            }.onSuccess {
+//                //                orderBonNumber = it.first
+//                resultCodes.add(it)
+//            }.onFailure {
+//                if (it is Epos2Exception) {
+//                    resultCodes.add(it.errorStatus)
+//                }
+//            }
+//        }
+////        sharedPreferences.edit().putLong("orderBonNumber", orderBonNumber).apply()
+//        return resultCodes
+//    }
 
     fun clear() {
         notificationFromObserver(Result.Clear)
@@ -185,46 +186,46 @@ class OrderViewModel(
         notificationFromObserver(Result.InitOrder(tableGroup))
     }
 
-    private fun transformMenuToPrinters(menuGroups: List<MenuGroupData>): MutableMap<String, MutableList<String>> {
-        // address list menu
-        val printersAddress = mutableMapOf<String, MutableList<String>>()
-        menuGroups.forEach {
-            val printer = it.printer ?: return@forEach
-            val items = printersAddress.getOrPut(printer) {
-                mutableListOf()
-            }
-            items.add(it.name)
-        }
-        return printersAddress
-    }
-
-    private fun transformOrders(
-        printerMap: Map<String, List<String>>,
-        summaryOrderData: OrderData
-    ): Map<String, OrderData> {
-        val result = mutableMapOf<String, OrderData>()
-        summaryOrderData.orderItems!!.forEach { (menu, listOrders) ->
-            var printerAddress: String? = null
-            printerMap.forEach printerMap@{ (printer, partMenusInPrinter) ->
-                if (partMenusInPrinter.indexOf(menu) > -1) {
-                    printerAddress = printer
-                    return@printerMap
-                }
-            }
-            if (printerAddress == null) throw IllegalStateException("menu error")
-            val orderData = result.getOrPut(printerAddress!!) {
-                summaryOrderData.copy(
-                    orderItems = mutableMapOf()
-                )
-            }
-            val orderItemsMap = orderData.orderItems as MutableMap
-            val orderItemsList = orderItemsMap.getOrPut(menu) {
-                mutableListOf()
-            } as MutableList
-            orderItemsList.addAll(listOrders)
-        }
-        return result
-    }
+//    private fun transformMenuToPrinters(menuGroups: List<MenuGroupData>): MutableMap<String, MutableList<String>> {
+//        // address list menu
+//        val printersAddress = mutableMapOf<String, MutableList<String>>()
+//        menuGroups.forEach {
+//            val printer = it.printer ?: return@forEach
+//            val items = printersAddress.getOrPut(printer) {
+//                mutableListOf()
+//            }
+//            items.add(it.name)
+//        }
+//        return printersAddress
+//    }
+//
+//    private fun transformOrders(
+//        printerMap: Map<String, List<String>>,
+//        summaryOrderData: OrderData
+//    ): Map<String, OrderData> {
+//        val result = mutableMapOf<String, OrderData>()
+//        summaryOrderData.orderItems!!.forEach { (menu, listOrders) ->
+//            var printerAddress: String? = null
+//            printerMap.forEach printerMap@{ (printer, partMenusInPrinter) ->
+//                if (partMenusInPrinter.indexOf(menu) > -1) {
+//                    printerAddress = printer
+//                    return@printerMap
+//                }
+//            }
+//            if (printerAddress == null) throw IllegalStateException("menu error")
+//            val orderData = result.getOrPut(printerAddress!!) {
+//                summaryOrderData.copy(
+//                    orderItems = mutableMapOf()
+//                )
+//            }
+//            val orderItemsMap = orderData.orderItems as MutableMap
+//            val orderItemsList = orderItemsMap.getOrPut(menu) {
+//                mutableListOf()
+//            } as MutableList
+//            orderItemsList.addAll(listOrders)
+//        }
+//        return result
+//    }
 
     override fun reduce(result: Result): State {
         return when (result) {
