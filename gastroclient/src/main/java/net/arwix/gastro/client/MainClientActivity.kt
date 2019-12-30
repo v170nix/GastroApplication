@@ -1,11 +1,17 @@
 package net.arwix.gastro.client
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.IBinder
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -19,10 +25,9 @@ import androidx.navigation.NavOptions
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
-import kotlinx.android.synthetic.main.include_main_app_bar.*
-import net.arwix.extension.gone
-import net.arwix.extension.visible
+import com.crashlytics.android.Crashlytics
 import net.arwix.gastro.client.common.AppMenuHelper
+import net.arwix.gastro.client.feature.print.ui.PrintIntentService
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.CustomToolbarActivity
 import net.arwix.gastro.library.common.hideKeyboard
@@ -33,21 +38,66 @@ class MainClientActivity : AppCompatActivity(),
     NavController.OnDestinationChangedListener {
 
     private val profileViewModel by viewModel<ProfileViewModel>()
+    private var printService: PrintIntentService? = null
+    private var isBoundPrintService = false
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navController: NavController
     private var isDestinationChanged = false
+
+    private val printConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            if (service == null) {
+                Toast.makeText(
+                    this@MainClientActivity,
+                    "print service connected false", Toast.LENGTH_LONG
+                ).show()
+                Crashlytics.logException(Exception("print service connected false"))
+                return
+            }
+            printService = (service as PrintIntentService.PrintBinder).getService()
+
+//            launch {
+//                printService?.getResultAsFlow()?.collect {
+//                    val text = when (it) {
+//                        is PrintIntentService.PrintResult.Success -> "Success"
+//                        is PrintIntentService.PrintResult.Error -> "Error ${it.printList}"
+//                    }
+//                    Snackbar.make(this@MainClientActivity.findViewById<View>(android.R.id.content),
+//                        text, Snackbar.LENGTH_LONG).show()
+//                }
+//            }
+
+            isBoundPrintService = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isBoundPrintService = false
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_client)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-        setCustomToolbar(app_main_toolbar)
+//        setCustomToolbar(app_main_toolbar)
         navController = findNavController(this, R.id.nav_host_fragment)
+//        navController.addOnDestinationChangedListener(this)
         appBarConfiguration = AppBarConfiguration.Builder(navController.graph)
             .build()
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
+//        NavigationUI
+//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
         profileViewModel.liveState.observe(this, Observer(this::renderProfile))
         requestRuntimePermission()
+        runCatching {
+            bindService(
+                Intent(this, PrintIntentService::class.java),
+                printConnection,
+                Context.BIND_AUTO_CREATE
+            )
+        }.onFailure {
+            Crashlytics.logException(it)
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -90,7 +140,7 @@ class MainClientActivity : AppCompatActivity(),
             }
             R.id.menu_history_checks ->
                 if (profileViewModel.isLogin()) {
-                    navigateTo(R.id.historyCheckDetailFragment, true)
+                    navigateTo(R.id.historyCheckDetailFragment, false)
                     return true
                 }
             R.id.menu_report_day ->
@@ -100,7 +150,7 @@ class MainClientActivity : AppCompatActivity(),
                 }
             R.id.menu_history_orders ->
                 if (profileViewModel.isLogin()) {
-                    navigateTo(R.id.historyOrderDetailFragment, true)
+                    navigateTo(R.id.historyOrderDetailFragment, false)
                     return true
                 }
         }
@@ -132,14 +182,22 @@ class MainClientActivity : AppCompatActivity(),
         return super.onPrepareOptionsMenu(menu)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         navController.addOnDestinationChangedListener(this)
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onStop() {
+        super.onStop()
         navController.removeOnDestinationChangedListener(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (isBoundPrintService) {
+            unbindService(printConnection)
+            isBoundPrintService = false
+        }
     }
 
     override fun onDestinationChanged(
@@ -161,18 +219,19 @@ class MainClientActivity : AppCompatActivity(),
     }
 
     override fun setCustomToolbar(toolbar: Toolbar?) {
-        if (toolbar == null && isDestinationChanged) {
-            setSupportActionBar(app_main_toolbar)
-            app_main_toolbar.visible()
-            isDestinationChanged = false
-            return
-        }
-        if (toolbar == null) return
-        if (toolbar != app_main_toolbar) {
-            app_main_toolbar.gone()
-        }
+//        if (toolbar == null && isDestinationChanged) {
+//            setSupportActionBar(app_main_toolbar)
+//            app_main_toolbar.visible()
+//            isDestinationChanged = false
+//            return
+//        }
+//        if (toolbar == null) return
+//        if (toolbar != app_main_toolbar) {
+//            app_main_toolbar.gone()
+//        }
         setSupportActionBar(toolbar)
-        isDestinationChanged = false
+//        toolbar.visible()
+//        isDestinationChanged = false
     }
 
 }

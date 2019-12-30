@@ -18,9 +18,9 @@ import net.arwix.gastro.library.common.CustomToolbarFragment
 import net.arwix.gastro.library.common.hideKeyboard
 import net.arwix.gastro.library.common.setToolbarTitle
 import net.arwix.gastro.library.common.showSoftKeyboard
-import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.menu.data.MenuGroupData
+import net.arwix.gastro.library.order.data.OrderItem
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import kotlin.math.roundToLong
 
@@ -77,7 +77,11 @@ class OrderAddItemFragment : CustomToolbarFragment(), CoroutineScope by MainScop
             order_list_add_item_price_layout.editText?.editableText?.toString() ?: return
         val priceDouble = priceString.toDoubleOrNull() ?: return
         if (priceDouble <= 0) return
-        val item = OrderItem(name, (priceDouble * 100).roundToLong(), 1)
+        val item = OrderItem(
+            name,
+            (priceDouble * 100).roundToLong(),
+            1
+        )
         orderViewModel.nonCancelableIntent(
             OrderViewModel.Action.AddItem(
                 args.menuGroup.name,

@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.arwix.gastro.library.data.FirestoreDbApp
 import net.arwix.gastro.library.data.OpenTableData
-import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.data.TableGroup
+import net.arwix.gastro.library.order.data.OrderItem
 import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 

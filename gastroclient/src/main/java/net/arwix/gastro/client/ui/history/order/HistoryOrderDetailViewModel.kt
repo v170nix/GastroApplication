@@ -1,7 +1,6 @@
 package net.arwix.gastro.client.ui.history.order
 
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -10,20 +9,28 @@ import kotlinx.coroutines.launch
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.FirestoreDbApp
-import net.arwix.gastro.library.data.OrderData
 import net.arwix.gastro.library.menu.data.MenuGroupData
 import net.arwix.gastro.library.menu.data.MenuGroupDoc
+import net.arwix.gastro.library.order.data.OrderData
 import net.arwix.mvi.SimpleIntentViewModel
 
 class HistoryOrderDetailViewModel(
-    private val firestoreDbApp: FirestoreDbApp,
-    private val sharedPreferences: SharedPreferences
-) : SimpleIntentViewModel<HistoryOrderDetailViewModel.Action, HistoryOrderDetailViewModel.Result, HistoryOrderDetailViewModel.State>() {
+    private val firestoreDbApp: FirestoreDbApp
+) : SimpleIntentViewModel<HistoryOrderDetailViewModel.Action,
+        HistoryOrderDetailViewModel.Result,
+        HistoryOrderDetailViewModel.State>() {
 
     private lateinit var menuGroupTypes: List<MenuGroupData>
+    lateinit var orderRef: String
 
     init {
         viewModelScope.launch {
+            val lastOrder =
+                firestoreDbApp.refs.orders.orderBy("created", Query.Direction.DESCENDING)
+                    .limit(1).get().await()
+
+            orderRef = lastOrder?.documents?.first()!!.id
+
             val doc = firestoreDbApp.refs.menu.orderBy("order").get().await()!!
             val menu =
                 doc.documents.map { it.toObject(MenuGroupDoc::class.java)!!.toMenuData(it.id) }
@@ -54,15 +61,15 @@ class HistoryOrderDetailViewModel(
     }
 
     suspend fun print(context: Context): List<Int> {
-//        var orderBonNumber = sharedPreferences.getLong("orderBonNumber", 120555)
         val printers = transformMenuToPrinters(menuGroupTypes)
         val partsOrders = transformOrders(printers, internalViewState.orderData!!)
         val resultCodes = mutableListOf<Int>()
-
         partsOrders.forEach { (printerAddress, orderData) ->
             val result = internalViewState.orderData?.run {
-                PrinterOrderUseCase(context).printOrder(printerAddress, orderData)
-            } ?: -100
+                runCatching {
+                    PrinterOrderUseCase(context).printOrder(printerAddress, orderData)
+                }.getOrNull()
+            } ?: 2
 //            orderBonNumber = result.first
             resultCodes.add(result)
         }

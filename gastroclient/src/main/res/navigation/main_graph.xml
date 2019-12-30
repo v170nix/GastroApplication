@@ -59,7 +59,6 @@
     <fragment
         android:id="@+id/orderListAddItemFragment"
         android:name="net.arwix.gastro.client.ui.order.OrderAddItemFragment"
-        android:label=""
         tools:layout="@layout/fragment_order_add_item">
         <argument
             android:name="menuGroup"
@@ -69,17 +68,14 @@
     <fragment
         android:id="@+id/payListFragment"
         android:name="net.arwix.gastro.client.ui.pay.PayListFragment"
-        android:label=""
         tools:layout="@layout/fragment_pay_list" />
     <fragment
         android:id="@+id/historyCheckDetailFragment"
         android:name="net.arwix.gastro.client.ui.history.check.HistoryCheckDetailFragment"
-        android:label="fragment_check_detail"
         tools:layout="@layout/fragment_history_check_detail" />
     <fragment
         android:id="@+id/historyOrderDetailFragment"
-        android:name="net.arwix.gastro.client.ui.history.order.HistoryOrderDetailFragment"
-        android:label="HistoryOrderDetailFragment" />
+        android:name="net.arwix.gastro.client.ui.history.order.HistoryOrderDetailFragment" />
     <fragment
         android:id="@+id/reportDayFragment"
         android:name="net.arwix.gastro.client.ui.report.day.ReportDayFragment"

@@ -29,12 +29,6 @@ class PayListFragment : CustomToolbarFragment() {
     private val profileViewModel: ProfileViewModel by sharedViewModel()
     private lateinit var adapter: PayListItemAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        payViewModel.liveState.observe(this, Observer(this::render))
-//        setHasOptionsMenu(true)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -89,7 +83,7 @@ class PayListFragment : CustomToolbarFragment() {
                 }
                 .show()
         }
-
+        payViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
     }
 
     private fun render(state: PayViewModel.State) {

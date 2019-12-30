@@ -28,7 +28,7 @@ import net.arwix.gastro.boss.MainBossActivity
 import net.arwix.gastro.boss.R
 import net.arwix.gastro.boss.domain.PrintJobUseCase
 import net.arwix.gastro.library.await
-import net.arwix.gastro.library.data.OrderData
+import net.arwix.gastro.library.order.data.OrderData
 import net.arwix.gastro.library.toFlow
 import org.koin.android.ext.android.inject
 import java.text.SimpleDateFormat

@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_check_detail_default.view.*
 import net.arwix.gastro.client.R
-import net.arwix.gastro.library.data.OrderItem
+import net.arwix.gastro.library.order.data.OrderItem
 import java.text.NumberFormat
 
 class HistoryCheckDetailAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

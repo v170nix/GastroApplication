@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,12 +15,17 @@ import com.epson.epos2.Epos2Exception
 import kotlinx.android.synthetic.main.fragment_history_order_detail.*
 import kotlinx.coroutines.*
 import net.arwix.gastro.client.R
+import net.arwix.gastro.client.feature.print.ui.PrintIntentService
 import net.arwix.gastro.client.ui.history.check.HistoryCheckDetailAdapter
+import net.arwix.gastro.library.common.CustomToolbarFragment
+import net.arwix.gastro.library.common.setToolbarTitle
 import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
-class HistoryOrderDetailFragment : Fragment(), CoroutineScope by MainScope() {
+class HistoryOrderDetailFragment : CustomToolbarFragment(), CoroutineScope by MainScope() {
+
+    override val idResToolbar: Int = R.id.app_main_toolbar
 
     private val orderDetailViewModel: HistoryOrderDetailViewModel by sharedViewModel()
     private lateinit var adapterHistory: HistoryCheckDetailAdapter
@@ -37,6 +41,7 @@ class HistoryOrderDetailFragment : Fragment(), CoroutineScope by MainScope() {
         super.onViewCreated(view, savedInstanceState)
         adapterHistory = HistoryCheckDetailAdapter()
         val linearLayoutManager = LinearLayoutManager(requireContext())
+        setToolbarTitle("")
 
 //        val priceTotal = 340 * 2
 //        var itemString = createCharString(42, " ")
@@ -60,6 +65,14 @@ class HistoryOrderDetailFragment : Fragment(), CoroutineScope by MainScope() {
         }
         orderDetailViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
         orderDetailViewModel.nonCancelableIntent(HistoryOrderDetailViewModel.Action.GetLastOrder)
+
+        test_print_2.setOnClickListener {
+            PrintIntentService.startPrintOrder(
+                requireContext().applicationContext,
+                orderDetailViewModel.orderRef
+            )
+        }
+
         history_order_detail_print_button.setOnClickListener {
             launch(Dispatchers.IO) {
                 runCatching {
@@ -93,7 +106,7 @@ class HistoryOrderDetailFragment : Fragment(), CoroutineScope by MainScope() {
 
     private fun render(state: HistoryOrderDetailViewModel.State) {
         state.orderData?.run {
-            orderItems?.run(adapterHistory::setItems)
+            orderItems.run(adapterHistory::setItems)
             val t = table ?: return@run
             val tp = tablePart ?: return@run
             setTitle(TableGroup(t, tp))

@@ -17,13 +17,13 @@ abstract class CustomToolbarFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        val activity = requireActivity()
-        if (activity is CustomToolbarActivity) {
-            activity.setCustomToolbar(null)
-        }
-    }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        val activity = requireActivity()
+//        if (activity is CustomToolbarActivity) {
+//            activity.setCustomToolbar(null)
+//        }
+//    }
 }
 
 interface CustomToolbarActivity {

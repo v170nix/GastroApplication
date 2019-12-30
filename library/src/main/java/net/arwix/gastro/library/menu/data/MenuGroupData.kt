@@ -4,13 +4,14 @@ import android.os.Parcelable
 import androidx.annotation.ColorInt
 import androidx.annotation.Keep
 import kotlinx.android.parcel.Parcelize
+import net.arwix.gastro.library.print.data.PrinterAddress
 import org.threeten.bp.Instant
 
 @Keep
 @Parcelize
 data class MenuGroupData(
     val name: MenuGroupName,
-    val printer: String?,
+    val printer: PrinterAddress?,
     val items: List<PreMenuItem>? = null,
     val metadata: Metadata
 ) : Parcelable {

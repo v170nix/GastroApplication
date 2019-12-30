@@ -1,6 +1,7 @@
 package net.arwix.gastro.client.ui.order
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -12,10 +13,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
 import net.arwix.gastro.library.await
-import net.arwix.gastro.library.data.*
+import net.arwix.gastro.library.data.FirestoreDbApp
+import net.arwix.gastro.library.data.OpenTableData
+import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.menu.data.MenuGridItem
 import net.arwix.gastro.library.menu.data.MenuGroupData
 import net.arwix.gastro.library.menu.data.MenuGroupDoc
+import net.arwix.gastro.library.order.data.OrderData
+import net.arwix.gastro.library.order.data.OrderItem
 import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 
@@ -58,7 +63,11 @@ class OrderViewModel(
                         notificationFromObserver(
                             Result.AddItem(
                                 it.menu.name,
-                                OrderItem(it.value.name!!, it.value.price, 1)
+                                OrderItem(
+                                    it.value.name!!,
+                                    it.value.price,
+                                    1
+                                )
                             )
                         )
                     }
@@ -68,24 +77,25 @@ class OrderViewModel(
             is Action.SubmitOrder -> {
                 withContext(Dispatchers.Main) {
                     val orders = firestoreDbApp.refs.orders
-                    var orderData = OrderData(
-                        action.userId,
-                        internalViewState.tableGroup!!.tableId,
-                        internalViewState.tableGroup!!.tablePart,
-                        null,
-                        internalViewState.orderItems.filter {
-                            it.value.isNotEmpty()
-                        }.let { filterMap: Map<MenuGroupData, List<OrderItem>> ->
-                            mutableMapOf<String, List<OrderItem>>().apply {
-                                filterMap.forEach { (key, list) ->
-                                    val filterList = list.filter { it.count > 0 }
-                                    if (filterList.isNotEmpty()) {
-                                        this[key.name] = filterList
+                    var orderData =
+                        OrderData(
+                            action.userId,
+                            internalViewState.tableGroup!!.tableId,
+                            internalViewState.tableGroup!!.tablePart,
+                            null,
+                            internalViewState.orderItems.filter {
+                                it.value.isNotEmpty()
+                            }.let { filterMap: Map<MenuGroupData, List<OrderItem>> ->
+                                mutableMapOf<String, List<OrderItem>>().apply {
+                                    filterMap.forEach { (key, list) ->
+                                        val filterList = list.filter { it.count > 0 }
+                                        if (filterList.isNotEmpty()) {
+                                            this[key.name] = filterList
+                                        }
                                     }
                                 }
                             }
-                        }
-                    )
+                        )
                     if (!orderData.orderItems.isNullOrEmpty()) {
                         //   orders.add(orderData).await()!!
                         val orderDoc = orders.document()
@@ -151,6 +161,7 @@ class OrderViewModel(
         val resultCodes = mutableListOf<Int>()
 
         partsOrders.forEach { (printerAddress, orderData) ->
+            Log.e("printerOld", printerAddress)
             orderData.runCatching {
                 PrinterOrderUseCase(context).printOrder(printerAddress, orderData)
             }.onSuccess {

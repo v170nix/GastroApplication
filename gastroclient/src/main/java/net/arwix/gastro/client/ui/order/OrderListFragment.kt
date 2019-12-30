@@ -24,9 +24,9 @@ import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.CustomToolbarFragment
 import net.arwix.gastro.library.common.navigate
 import net.arwix.gastro.library.common.setToolbarTitle
-import net.arwix.gastro.library.data.OrderItem
 import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.menu.data.MenuGroupData
+import net.arwix.gastro.library.order.data.OrderItem
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.text.NumberFormat
 

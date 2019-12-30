@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".ui.report.day.ReportDayFragment">
 
+    <include
+        android:id="@+id/appBarLayout"
+        layout="@layout/include_main_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/report_day_check_count_text"

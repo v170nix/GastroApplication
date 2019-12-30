@@ -7,12 +7,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import com.crashlytics.android.Crashlytics
 import com.epson.epos2.Epos2Exception
 import kotlinx.android.synthetic.main.fragment_report_day.*
 import kotlinx.coroutines.*
 import net.arwix.gastro.client.R
+import net.arwix.gastro.library.common.CustomToolbarFragment
+import net.arwix.gastro.library.common.setToolbarTitle
 import org.koin.android.ext.android.inject
 import org.threeten.bp.LocalDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -20,7 +21,9 @@ import org.threeten.bp.format.FormatStyle
 import java.text.NumberFormat
 
 
-class ReportDayFragment : Fragment(), CoroutineScope by MainScope() {
+class ReportDayFragment : CoroutineScope by MainScope(), CustomToolbarFragment() {
+
+    override val idResToolbar: Int = R.id.app_main_toolbar
 
     private val reportDayUseCase: ReportDayUseCase by inject()
     private var reportDayData: ReportDayData? = null
@@ -63,6 +66,11 @@ class ReportDayFragment : Fragment(), CoroutineScope by MainScope() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setToolbarTitle("Daily report")
     }
 
     private fun toToast(code: Int) {

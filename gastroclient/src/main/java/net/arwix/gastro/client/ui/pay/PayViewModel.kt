@@ -8,6 +8,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.*
+import net.arwix.gastro.library.order.data.OrderData
+import net.arwix.gastro.library.order.data.OrderItem
 import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 

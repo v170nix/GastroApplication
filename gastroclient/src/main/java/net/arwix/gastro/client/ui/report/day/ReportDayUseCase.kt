@@ -7,7 +7,7 @@ import net.arwix.gastro.client.domain.PrinterUtils
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.CheckData
 import net.arwix.gastro.library.data.FirestoreDbApp
-import net.arwix.gastro.library.data.OrderData
+import net.arwix.gastro.library.order.data.OrderData
 import org.threeten.bp.DateTimeUtils
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalDateTime

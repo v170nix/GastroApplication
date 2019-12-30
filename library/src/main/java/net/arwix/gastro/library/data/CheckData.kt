@@ -2,6 +2,7 @@ package net.arwix.gastro.library.data
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ServerTimestamp
+import net.arwix.gastro.library.order.data.OrderItem
 
 data class CheckData constructor(
     var waiterId: Int? = null,

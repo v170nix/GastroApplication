@@ -1,4 +1,4 @@
-package net.arwix.gastro.library.data
+package net.arwix.gastro.library.order.data
 
 data class OrderItem constructor(
     val name: String = "",

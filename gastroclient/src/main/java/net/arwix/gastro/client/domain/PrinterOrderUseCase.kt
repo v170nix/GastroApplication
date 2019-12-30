@@ -6,8 +6,8 @@ import com.epson.epos2.printer.Printer
 import com.epson.epos2.printer.PrinterStatusInfo
 import kotlinx.coroutines.suspendCancellableCoroutine
 import net.arwix.gastro.client.common.createCharString
-import net.arwix.gastro.library.data.OrderData
-import net.arwix.gastro.library.data.OrderItem
+import net.arwix.gastro.library.order.data.OrderData
+import net.arwix.gastro.library.order.data.OrderItem
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
