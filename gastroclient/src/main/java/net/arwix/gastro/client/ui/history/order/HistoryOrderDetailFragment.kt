@@ -17,9 +17,11 @@ import kotlinx.coroutines.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.feature.print.ui.PrintIntentService
 import net.arwix.gastro.client.ui.history.check.HistoryCheckDetailAdapter
+import net.arwix.gastro.client.ui.report.day.ReportDayUseCase
 import net.arwix.gastro.library.common.CustomToolbarFragment
 import net.arwix.gastro.library.common.setToolbarTitle
 import net.arwix.gastro.library.data.TableGroup
+import org.koin.android.ext.android.inject
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
@@ -28,6 +30,7 @@ class HistoryOrderDetailFragment : CustomToolbarFragment(), CoroutineScope by Ma
     override val idResToolbar: Int = R.id.app_main_toolbar
 
     private val orderDetailViewModel: HistoryOrderDetailViewModel by sharedViewModel()
+    private val reportDayUseCase: ReportDayUseCase by inject()
     private lateinit var adapterHistory: HistoryCheckDetailAdapter
 
     override fun onCreateView(
@@ -71,6 +74,12 @@ class HistoryOrderDetailFragment : CustomToolbarFragment(), CoroutineScope by Ma
                 requireContext().applicationContext,
                 orderDetailViewModel.orderRef
             )
+        }
+
+        test_print_3.setOnClickListener {
+            launch(Dispatchers.IO) {
+                reportDayUseCase.printTest()
+            }
         }
 
         history_order_detail_print_button.setOnClickListener {

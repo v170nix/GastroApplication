@@ -40,8 +40,6 @@ class PrintIntentService : IntentService("PrintIntentService") {
     override fun onHandleIntent(intent: Intent?) {
         when (intent?.action) {
             ACTION_PRINT_ORDER -> {
-
-
                 val orderRef = intent.getStringExtra(EXTRA_PRINT_ORDER_PARAMS) ?: return
                 val orderData = runBlocking {
                     firestoreDbApp.refs.orders.document(orderRef).get().await()?.toObject(OrderData::class.java)!!
@@ -53,49 +51,12 @@ class PrintIntentService : IntentService("PrintIntentService") {
                     .setSmallIcon(R.drawable.ic_print)
                     .setTicker("tic")
                     .setContentTitle("Printing order")
-                    .setContentText("Printing order\nTable ${orderData.table}/${orderData.tablePart}")
+                    .setContentText("Table ${orderData.table}/${orderData.tablePart}")
                     .build()
                 startForeground(NOTIFICATION_FOREGROUND_ID, notification)
-
                 val result = runBlocking { handlePrintOrder(orderData) }
-
-
-//                val notification = when (result) {
-//                    is PrintResult.Success -> {
-//                        notificationCompatBuilderChannel(
-//                            this,
-//                            NOTIFICATION_SUCCESS_ORDER_CHANNEL_ID,
-//                            "Success orders channel", NotificationManagerCompat.IMPORTANCE_LOW
-//                        ).setSmallIcon(R.drawable.ic_print)
-//                            .setContentTitle("Print order complete")
-//                            .setContentText("order id $orderRef")
-//                            .setPriority(NotificationCompat.PRIORITY_LOW)
-//                            .build()
-//                    }
-//                    is PrintResult.Error -> {
-//                        notificationCompatBuilderChannel(
-//                            this,
-//                            NOTIFICATION_ERROR_ORDER_CHANNEL_ID,
-//                            "Error orders channel", NotificationManagerCompat.IMPORTANCE_HIGH
-//                        ).setSmallIcon(R.drawable.ic_print)
-//                            .setContentTitle("Print order Error")
-//                            .setColor(this.resources.getColor(R.color.design_default_color_error))
-//                            .setContentText("status ${result.printList}")
-//                            .setPriority(NotificationCompat.PRIORITY_HIGH)
-//                            .build()
-//                    }
-//                }
-//                NotificationManagerCompat.from(this)
-//                    .notify(12233, notification)
-
                 broadcastChannel.offer(result)
                 stopForeground(true)
-
-//
-//                Handler(Looper.getMainLooper()).post {
-//                    Toast.makeText(this.applicationContext, result.toString(), Toast.LENGTH_LONG)
-//                        .show()
-//                }
             }
         }
     }
@@ -111,7 +72,7 @@ class PrintIntentService : IntentService("PrintIntentService") {
             printer ?: return@forEach
             val job = async(Dispatchers.IO) {
                 runCatching {
-                    printerOrderUseCase.printOrder(printer, orderData)
+                    printerOrderUseCase.print(printer, orderData).first
                 }.getOrElse {
                     if (it is Epos2Exception) it.errorStatus else -100
                 }.let {
@@ -131,9 +92,7 @@ class PrintIntentService : IntentService("PrintIntentService") {
     }
 
     inner class PrintBinder : Binder() {
-
         fun getService() = this@PrintIntentService
-
     }
 
     companion object {
@@ -148,6 +107,7 @@ class PrintIntentService : IntentService("PrintIntentService") {
 
         private fun getErrorTextFromCode(code: Int): String {
             return when (code) {
+                0 -> "Success job"
                 ERR_PARAM -> "An invalid parameter was specified"
                 ERR_CONNECT -> "Failed to open the device"
                 ERR_TIMEOUT -> "Failed to communicate with the devices within the specified time"

@@ -85,6 +85,29 @@ class ReportDayUseCase(
 
     }
 
+    suspend fun printTest(): Pair<Int, Unit?> {
+
+
+        return PrinterUtils.print(
+            "TCP:192.168.0.104",
+            Printer.TM_M30, Printer.MODEL_ANK, applicationContext
+        ) {
+            //==============================================
+            addTextFont(Printer.FONT_A)
+            addText("FONT_A\n")
+            addText("012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n")
+            //==============================================
+            addTextFont(Printer.FONT_B)
+            addText("FONT_B\n")
+            addText("012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n")
+            addTextFont(Printer.FONT_C)
+            addText("FONT_C\n")
+            addText("012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789\n")
+            addCut(Printer.CUT_FEED)
+        }
+
+    }
+
     suspend fun print(report: ReportDayData): Pair<Int, Unit?> {
 
         val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)

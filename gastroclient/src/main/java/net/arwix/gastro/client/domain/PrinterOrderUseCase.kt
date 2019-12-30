@@ -8,6 +8,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import net.arwix.gastro.client.common.createCharString
 import net.arwix.gastro.library.order.data.OrderData
 import net.arwix.gastro.library.order.data.OrderItem
+import net.arwix.gastro.library.print.data.PrinterAddress
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
@@ -20,6 +21,82 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
     //Bon Nr: 120555
 
     // return first bonNumber last code
+
+    suspend fun print(printerAddress: PrinterAddress, orderData: OrderData): Pair<Int, Unit?> {
+        return PrinterUtils.print(
+            printerAddress,
+            Printer.TM_M30,
+            Printer.MODEL_ANK,
+            applicationContext
+        ) {
+            val printTable =
+                orderData.table.toString() + "/" + String.format("%02d", orderData.tablePart)
+            val formatter = NumberFormat.getCurrencyInstance()
+            val data = ZonedDateTime.ofInstant(
+                Instant.ofEpochSecond(orderData.created!!.seconds), ZoneId.systemDefault()
+            )
+            val timeFormatter =
+                DateTimeFormatter.ofPattern("dd.MM. HH:mm:ss")
+
+            val bonNumbers = orderData.bonNumbers
+
+            orderData.orderItems.forEach { (type: String, items: List<OrderItem>) ->
+                val bonNumber = bonNumbers?.get(type)
+                //==============================================
+                addTextFont(Printer.FONT_A)
+                addTextSize(2, 2)
+                addText("Tisch: $printTable   ")
+                addTextSize(1, 1)
+                if (bonNumber == null) {
+                    addText("\n")
+                } else {
+                    addText("Bon Nr: $bonNumber\n")
+                }
+                //==============================================
+                addTextSize(2, 2)
+                addText(timeFormatter.format(data) + "\n")
+                //==============================================
+                addTextSize(1, 1)
+                addText("Kellner: Dmitriy Shtoh\n")
+                addText(createCharString(46, "_"))
+                addTextSize(2, 2)
+                addText("$type:\n")
+                addText("\n")
+                addTextFont(Printer.FONT_A)
+                addTextSize(1, 2)
+                //==============================================
+                // 38
+                // 42
+                items.forEach { item ->
+                    val lineSize = 42
+                    val priceTotal = item.price * item.count
+                    var itemString = createCharString(lineSize, " ")
+                    val nameString = "   ${item.count}x ${item.name}"
+                    val priceString = formatter.format(priceTotal / 100.0).dropLast(2)
+                    if (nameString.length > lineSize - priceString.length - 4) {
+                        addText("$nameString\n")
+                        itemString = itemString.replaceRange(
+                            itemString.length - priceString.length,
+                            itemString.length,
+                            priceString
+                        )
+                        addText("$itemString\n")
+                    } else {
+                        itemString = itemString.replaceRange(0, nameString.length, nameString)
+                        itemString = itemString.replaceRange(
+                            itemString.length - priceString.length,
+                            itemString.length,
+                            priceString
+                        )
+                        addText("$itemString\n")
+                    }
+                    addText(createCharString(46, "-"))
+                }
+                addCut(Printer.CUT_FEED)
+            }
+        }
+    }
+
     suspend fun printOrder(addressPrinter: String, orderData: OrderData) =
         suspendCancellableCoroutine<Int> { cont ->
 
