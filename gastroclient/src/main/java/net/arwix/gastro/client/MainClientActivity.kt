@@ -26,7 +26,13 @@ import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.crashlytics.android.Crashlytics
+import kotlinx.android.synthetic.main.activity_main_client.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import net.arwix.gastro.client.common.AppMenuHelper
+import net.arwix.gastro.client.feature.notification.ui.ActivityNotificationHelper
 import net.arwix.gastro.client.feature.print.ui.PrintIntentService
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.CustomToolbarActivity
@@ -35,11 +41,13 @@ import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainClientActivity : AppCompatActivity(),
     CustomToolbarActivity,
-    NavController.OnDestinationChangedListener {
+    NavController.OnDestinationChangedListener, CoroutineScope by MainScope() {
 
     private val profileViewModel by viewModel<ProfileViewModel>()
     private var printService: PrintIntentService? = null
     private var isBoundPrintService = false
+    private lateinit var notificationHelper: ActivityNotificationHelper
+
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navController: NavController
     private var isDestinationChanged = false
@@ -57,16 +65,33 @@ class MainClientActivity : AppCompatActivity(),
             }
             printService = (service as PrintIntentService.PrintBinder).getService()
 
-//            launch {
+            launch {
+                printService?.getResultAsFlow()?.collect {
+                    notificationHelper.showNotification(it)
+                }
+//                materialCardView.scaleY = 0f
+//                materialCardView.translationY = materialCardView.height.toFloat()
 //                printService?.getResultAsFlow()?.collect {
 //                    val text = when (it) {
 //                        is PrintIntentService.PrintResult.Success -> "Success"
 //                        is PrintIntentService.PrintResult.Error -> "Error ${it.printList}"
 //                    }
-//                    Snackbar.make(this@MainClientActivity.findViewById<View>(android.R.id.content),
-//                        text, Snackbar.LENGTH_LONG).show()
+//                    materialCardView.animate().withStartAction {
+//                        materialCardView.visible()
+//                    }
+//                        .translationY(0f)
+////                        .scaleY(1f)
+//                        .start()
+//                    delay(10000)
+//                    materialCardView.animate()
+////                        .scaleY(0f)
+//                        .translationY(materialCardView.height.toFloat())
+//                        .withEndAction { materialCardView.gone() }
+//                        .start()
+////                    Snackbar.make(this@MainClientActivity.findViewById<View>(android.R.id.content),
+////                        text, Snackbar.LENGTH_LONG).show()
 //                }
-//            }
+            }
 
             isBoundPrintService = true
         }
@@ -79,6 +104,7 @@ class MainClientActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_client)
+        notificationHelper = ActivityNotificationHelper(notification_container, this)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 //        setCustomToolbar(app_main_toolbar)
         navController = findNavController(this, R.id.nav_host_fragment)

@@ -10,4 +10,9 @@
     <color name="colorSecondary">#148889</color>
 
     <color name="colorItemGroup">#f8f7fc</color>
+    <color name="colorSuccess">#1B5E20</color>
+    <color name="colorOnSuccess">#FFFFFF</color>
+    <color name="colorError">#B71C1C</color>
+    <color name="colorOnError">#FFFFFF</color>
 </resources>
+
