@@ -78,7 +78,9 @@ class HistoryOrderDetailFragment : CustomToolbarFragment(), CoroutineScope by Ma
 
         test_print_3.setOnClickListener {
             launch(Dispatchers.IO) {
-                reportDayUseCase.printTest()
+                runCatching {
+                    reportDayUseCase.printTest()
+                }
             }
         }
 
