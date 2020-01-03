@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_open_tables.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.feature.order.ui.OrderViewModel
-import net.arwix.gastro.client.ui.pay.PayViewModel
+import net.arwix.gastro.client.feature.table.ui.OpenTableViewModel
 import net.arwix.gastro.library.common.CustomToolbarFragment
 import net.arwix.gastro.library.common.navigate
 import net.arwix.gastro.library.common.setToolbarTitle
@@ -24,7 +24,7 @@ class OpenTablesFragment : CustomToolbarFragment() {
 
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private val openTablesViewModel: OpenTablesViewModel by sharedViewModel()
-    private val payViewModel: PayViewModel by sharedViewModel()
+    private val openTableViewModel: OpenTableViewModel by sharedViewModel()
     private lateinit var adapter: OpenTablesAdapter
 
     override fun onCreateView(
@@ -45,7 +45,7 @@ class OpenTablesFragment : CustomToolbarFragment() {
 
         adapter = OpenTablesAdapter(
             onItemClick = {
-                payViewModel.setTable(it)
+                openTableViewModel.setTable(it)
                 findNavController().navigate(R.id.payListFragment)
             },
             onAddOrderClick = {

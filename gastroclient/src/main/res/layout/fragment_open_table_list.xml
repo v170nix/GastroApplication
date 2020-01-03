@@ -5,7 +5,7 @@
     android:id="@+id/pay_list_coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.pay.PayListFragment">
+    tools:context=".feature.table.ui.OpenTableListFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/pay_list_collapsing_app_bar_layout"
@@ -41,7 +41,7 @@
                 android:text="@string/pay_list_action_add_pay_items" />
 
             <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/pay_list_toolbar"
+                android:id="@+id/open_table_list_toolbar"
                 style="@style/AppCollapsingStyle.Toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize" />

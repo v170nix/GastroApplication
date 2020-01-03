@@ -1,4 +1,4 @@
-package net.arwix.gastro.client.ui.pay
+package net.arwix.gastro.client.feature.table.ui
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,15 +6,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.item_pay_default.view.*
-import kotlinx.android.synthetic.main.item_pay_type.view.*
+import kotlinx.android.synthetic.main.item_open_table_default.view.*
+import kotlinx.android.synthetic.main.item_open_table_type.view.*
 import net.arwix.extension.gone
 import net.arwix.extension.visible
 import net.arwix.gastro.client.R
 import java.text.NumberFormat
 
-class PayListItemAdapter(
-    private val onChangeCount: (type: String, payOrderItem: PayViewModel.PayOrderItem, delta: Int) -> Unit
+class OpenTableListAdapter(
+    private val onChangeCount: (type: String, openTableOrderItem: OpenTableViewModel.PayOrderItem, delta: Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items = mutableListOf<PayAdapterOrderItem>()
@@ -38,10 +38,14 @@ class PayListItemAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             TYPE_ID_ITEM_DEFAULT ->
-                ListItemHolder(inflater.inflate(R.layout.item_pay_default, parent, false))
+                ListItemHolder(
+                    inflater.inflate(R.layout.item_open_table_default, parent, false)
+                )
 
             TYPE_ID_ITEM_TYPE ->
-                TypeItemHolder(inflater.inflate(R.layout.item_pay_type, parent, false))
+                TypeItemHolder(
+                    inflater.inflate(R.layout.item_open_table_type, parent, false)
+                )
 
             else -> throw IllegalStateException()
         }
@@ -71,12 +75,20 @@ class PayListItemAdapter(
         return TYPE_ID_ITEM_DEFAULT
     }
 
-    fun setItems(payOrderData: MutableMap<String, MutableList<PayViewModel.PayOrderItem>>) {
+    fun setItems(openTableOrderData: MutableMap<String, MutableList<OpenTableViewModel.PayOrderItem>>) {
         val newList = mutableListOf<PayAdapterOrderItem>()
-        payOrderData.forEach { (type, list) ->
-            val typeItem = PayAdapterOrderItem.Type(type)
+        openTableOrderData.forEach { (type, list) ->
+            val typeItem =
+                PayAdapterOrderItem.Type(
+                    type
+                )
             newList.add(typeItem)
-            newList.addAll(list.map { PayAdapterOrderItem.Item(type, it) })
+            newList.addAll(list.map {
+                PayAdapterOrderItem.Item(
+                    type,
+                    it
+                )
+            })
         }
         val diffCallback =
             ItemDiffCallback(
@@ -134,7 +146,7 @@ class PayListItemAdapter(
 
     private sealed class PayAdapterOrderItem {
         data class Type(val name: String) : PayAdapterOrderItem()
-        data class Item(val type: String, val order: PayViewModel.PayOrderItem) :
+        data class Item(val type: String, val order: OpenTableViewModel.PayOrderItem) :
             PayAdapterOrderItem()
     }
 

@@ -1,4 +1,4 @@
-package net.arwix.gastro.client.ui.pay
+package net.arwix.gastro.client.feature.table.ui
 
 import android.util.Log
 import androidx.lifecycle.liveData
@@ -13,9 +13,9 @@ import net.arwix.gastro.library.order.data.OrderItem
 import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 
-class PayViewModel(
+class OpenTableViewModel(
     private val firestoreDbApp: FirestoreDbApp
-) : SimpleIntentViewModel<PayViewModel.Action, PayViewModel.Result, PayViewModel.State>() {
+) : SimpleIntentViewModel<OpenTableViewModel.Action, OpenTableViewModel.Result, OpenTableViewModel.State>() {
 
     private var tableUpdateJob: Job? = null
     override var internalViewState: State = State()
@@ -29,7 +29,13 @@ class PayViewModel(
                 .collect {
                     it.toObject(OpenTableData::class.java)?.run {
                         val summaryData = ordersToSum(this)
-                        notificationFromObserver(Result.TableData(tableGroup, this, summaryData))
+                        notificationFromObserver(
+                            Result.TableData(
+                                tableGroup,
+                                this,
+                                summaryData
+                            )
+                        )
                     }
                 }
         }
@@ -69,7 +75,9 @@ class PayViewModel(
                     if (isCloseTable) emit(Result.CloseTableGroup)
                 }
             }
-            Action.AddAllItemsToPay -> emit(Result.AddAllItemsToPay)
+            Action.AddAllItemsToPay -> emit(
+                Result.AddAllItemsToPay
+            )
         }
     }
 
@@ -83,7 +91,9 @@ class PayViewModel(
                 )
             }
             is Result.InitTable -> {
-                State(tableGroup = result.tableGroup)
+                State(
+                    tableGroup = result.tableGroup
+                )
             }
             is Result.ChangePayCount -> {
                 internalViewState.summaryData?.run {
@@ -166,10 +176,8 @@ class PayViewModel(
                     table = tableGroup.tableId,
                     tablePart = tableGroup.tablePart,
                     orders = currentOpenTableData.orders,
-                    checks = currentOpenTableData.checks?.run {
+                    checks = currentOpenTableData.checks.run {
                         this + checkDoc
-                    } ?: run {
-                        listOf(checkDoc)
                     },
                     summaryPrice = summaryPrice
                 )
@@ -193,77 +201,85 @@ class PayViewModel(
 
     private suspend fun ordersToSum(openTableData: OpenTableData): MutableMap<String, MutableList<PayOrderItem>> =
         supervisorScope {
-        val summaryOrder = mutableMapOf<String, MutableList<PayOrderItem>>()
+            val summaryOrder = mutableMapOf<String, MutableList<PayOrderItem>>()
 
-            val ordersAsync = openTableData.orders?.map { doc ->
+            val ordersAsync = openTableData.orders.map { doc ->
                 //            doc.firestore.collection("orders").whereIn(FieldPath.documentId(), )
                 async(Dispatchers.IO) { doc.get().await()!!.toObject(OrderData::class.java)!! }
             }
-            val checksAsync = openTableData.checks?.map { doc ->
+            val checksAsync = openTableData.checks.map { doc ->
                 async(Dispatchers.IO) { doc.get().await()!!.toObject(CheckData::class.java)!! }
             }
 
-            ordersAsync?.awaitAll()?.forEach { orderData ->
+            ordersAsync.awaitAll().forEach { orderData ->
                 //            val orderData = doc.get().await()!!.toObject(OrderData::class.java)!!
-            orderData.orderItems?.forEach { (type, orderItems) ->
-                val summaryOrderItemsOfCurrentType = summaryOrder[type]
-                if (summaryOrderItemsOfCurrentType == null) {
-                    summaryOrder[type] =
-                        orderItems.map { PayOrderItem(orderItem = it) }.toMutableList()
-                } else {
-                    orderItems.forEach { orderItem ->
-                        val summaryOrderItem = summaryOrderItemsOfCurrentType.find {
-                            it.orderItem.name == orderItem.name && it.orderItem.price == orderItem.price
-                        }
-                        if (summaryOrderItem != null) {
-                            val index = summaryOrderItemsOfCurrentType.indexOf(summaryOrderItem)
-                            summaryOrderItemsOfCurrentType[index] = summaryOrderItem.copy(
-                                orderItem = summaryOrderItem.orderItem.copy(
-                                    count = summaryOrderItem.orderItem.count + orderItem.count
+                orderData.orderItems.forEach { (type, orderItems) ->
+                    val summaryOrderItemsOfCurrentType = summaryOrder[type]
+                    if (summaryOrderItemsOfCurrentType == null) {
+                        summaryOrder[type] =
+                            orderItems.map {
+                                PayOrderItem(
+                                    orderItem = it
                                 )
-                            )
-                        } else {
-                            summaryOrderItemsOfCurrentType.add(PayOrderItem(orderItem = orderItem))
+                            }.toMutableList()
+                    } else {
+                        orderItems.forEach { orderItem ->
+                            val summaryOrderItem = summaryOrderItemsOfCurrentType.find {
+                                it.orderItem.name == orderItem.name && it.orderItem.price == orderItem.price
+                            }
+                            if (summaryOrderItem != null) {
+                                val index = summaryOrderItemsOfCurrentType.indexOf(summaryOrderItem)
+                                summaryOrderItemsOfCurrentType[index] = summaryOrderItem.copy(
+                                    orderItem = summaryOrderItem.orderItem.copy(
+                                        count = summaryOrderItem.orderItem.count + orderItem.count
+                                    )
+                                )
+                            } else {
+                                summaryOrderItemsOfCurrentType.add(
+                                    PayOrderItem(
+                                        orderItem = orderItem
+                                    )
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-            checksAsync?.awaitAll()?.forEach { checkData ->
+            checksAsync.awaitAll().forEach { checkData ->
                 //            val checkData = doc.get().await()!!.toObject(CheckData::class.java)!!
-            checkData.checkItems?.forEach { (type, checkItems) ->
-                //                if (checkData.isReturnOrder) {
+                checkData.checkItems.forEach { (type, checkItems) ->
+                    //                if (checkData.isReturnOrder) {
 //                      //TODO
 //                }
 
-                val summaryOrderItemsOfCurrentType = summaryOrder[type]
-                if (summaryOrderItemsOfCurrentType == null) {
-                    //ERROR
-                    throw IllegalStateException("pay order error sync")
-                    //      summaryOrder[type] = orderItems.map { PayOrderItem(orderItem = it) }.toMutableList()
-                } else {
-                    checkItems.forEach { checkItem ->
-                        val summaryOrderItem = summaryOrderItemsOfCurrentType.find {
-                            it.orderItem.name == checkItem.name && it.orderItem.price == checkItem.price
-                        }
-                        if (summaryOrderItem != null) {
-                            val index = summaryOrderItemsOfCurrentType.indexOf(summaryOrderItem)
-                            summaryOrderItemsOfCurrentType[index] = summaryOrderItem.copy(
-                                checkCount = summaryOrderItem.checkCount + checkItem.count,
-                                returnCount = if (checkData.isReturnOrder) {
-                                    summaryOrderItem.returnCount + checkItem.count
-                                } else summaryOrderItem.returnCount
-                            )
-                        } else {
-                            throw IllegalStateException("pay order error sync item")
+                    val summaryOrderItemsOfCurrentType = summaryOrder[type]
+                    if (summaryOrderItemsOfCurrentType == null) {
+                        //ERROR
+                        throw IllegalStateException("pay order error sync")
+                        //      summaryOrder[type] = orderItems.map { PayOrderItem(orderItem = it) }.toMutableList()
+                    } else {
+                        checkItems.forEach { checkItem ->
+                            val summaryOrderItem = summaryOrderItemsOfCurrentType.find {
+                                it.orderItem.name == checkItem.name && it.orderItem.price == checkItem.price
+                            }
+                            if (summaryOrderItem != null) {
+                                val index = summaryOrderItemsOfCurrentType.indexOf(summaryOrderItem)
+                                summaryOrderItemsOfCurrentType[index] = summaryOrderItem.copy(
+                                    checkCount = summaryOrderItem.checkCount + checkItem.count,
+                                    returnCount = if (checkData.isReturnOrder) {
+                                        summaryOrderItem.returnCount + checkItem.count
+                                    } else summaryOrderItem.returnCount
+                                )
+                            } else {
+                                throw IllegalStateException("pay order error sync item")
+                            }
                         }
                     }
                 }
             }
-        }
 
             summaryOrder
-    }
+        }
 
     sealed class Action {
         data class ChangePayCount(

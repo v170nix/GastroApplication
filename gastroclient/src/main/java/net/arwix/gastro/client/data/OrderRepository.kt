@@ -15,6 +15,10 @@ class OrderRepository(
     private val openTableRepository: OpenTableRepository
 ) {
 
+    suspend fun getOrder(documentPath: String): OrderData {
+        return firestoreDbApp.refs.orders.document(documentPath).get().await()?.toObject(OrderData::class.java)!!
+    }
+
     suspend fun submit(
         userId: Int,
         tableGroup: TableGroup,
@@ -25,21 +29,14 @@ class OrderRepository(
             table = tableGroup.tableId,
             tablePart = tableGroup.tablePart,
             bonNumbers = null,
-            orderItems = filterItems(
-                orderItems
-            ),
+            orderItems = filterItems(orderItems),
             created = null
         )
         val orderReference = firestoreDbApp.refs.orders.document()
         if (orderData.orderItems.isNullOrEmpty()) return null
         firestoreDbApp.firestore.runTransaction {
             val prefs = firestoreDbApp.getGlobalPrefs(it)
-            orderData = orderData.copy(
-                bonNumbers = getBons(
-                    prefs.orderBon,
-                    orderData.orderItems
-                )
-            )
+            orderData = orderData.copy(bonNumbers = getBons(prefs.orderBon, orderData.orderItems))
             val openTableUpdate =
                 openTableRepository.addOrder(it, tableGroup, orderReference, orderData.sum())
             firestoreDbApp.setGlobalPrefs(
@@ -76,18 +73,6 @@ class OrderRepository(
                     }
             }
             return result
-//            orderItems.filter {
-//                it.value.isNotEmpty()
-//            }.let { filterMap: Map<MenuGroupData, List<OrderItem>> ->
-//                mutableMapOf<String, List<OrderItem>>().apply {
-//                    filterMap.forEach { (key, list) ->
-//                        val filterList = list.filter { it.count > 0 }
-//                        if (filterList.isNotEmpty()) {
-//                            this[key.name] = filterList
-//                        }
-//                    }
-//                }
-//            }
         }
     }
 }

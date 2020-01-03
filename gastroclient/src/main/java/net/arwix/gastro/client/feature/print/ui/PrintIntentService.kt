@@ -17,11 +17,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.asFlow
 import net.arwix.gastro.client.R
+import net.arwix.gastro.client.data.OrderRepository
 import net.arwix.gastro.client.domain.PrinterOrderUseCase
-import net.arwix.gastro.library.await
 import net.arwix.gastro.library.common.notificationCompatBuilderChannel
-import net.arwix.gastro.library.data.FirestoreDbApp
-import net.arwix.gastro.library.menu.data.MenuGroupDoc
+import net.arwix.gastro.library.menu.data.MenuRepository
 import net.arwix.gastro.library.order.data.OrderData
 import net.arwix.gastro.library.order.domain.OrderPrintUtils
 import net.arwix.gastro.library.print.data.PrinterAddress
@@ -31,9 +30,11 @@ import org.koin.android.ext.android.inject
 class PrintIntentService : IntentService("PrintIntentService") {
 
     private val binder = PrintBinder()
-    private val firestoreDbApp: FirestoreDbApp by inject()
+    private val menuRepository: MenuRepository by inject()
+    private val orderRepository: OrderRepository by inject()
+    //    private val firestoreDbApp: FirestoreDbApp by inject()
     private val broadcastChannel = BroadcastChannel<PrintResult>(3)
-    private var isBinded = false
+    private var isBinder = false
 
     fun getResultAsFlow() = broadcastChannel.asFlow()
 
@@ -42,22 +43,20 @@ class PrintIntentService : IntentService("PrintIntentService") {
     }
 
     override fun onBind(intent: Intent?): IBinder {
-        isBinded = true
+        isBinder = true
         return binder
     }
 
     override fun unbindService(conn: ServiceConnection) {
         super.unbindService(conn)
-        isBinded = false
+        isBinder = false
     }
 
     override fun onHandleIntent(intent: Intent?) {
         when (intent?.action) {
             ACTION_PRINT_ORDER -> {
                 val orderRef = intent.getStringExtra(EXTRA_PRINT_ORDER_PARAMS) ?: return
-                val orderData = runBlocking {
-                    firestoreDbApp.refs.orders.document(orderRef).get().await()?.toObject(OrderData::class.java)!!
-                }
+                val orderData = runBlocking { orderRepository.getOrder(orderRef) }
                 val notification = notificationCompatBuilderChannel(
                     this, NOTIFICATION_FOREGROUND_PRINT_SERVICE_CHANNEL_ID,
                     "Print service", NotificationManagerCompat.IMPORTANCE_LOW
@@ -107,8 +106,7 @@ class PrintIntentService : IntentService("PrintIntentService") {
     }
 
     private suspend fun handlePrintOrder(orderData: OrderData): PrintResult = supervisorScope {
-        val menuGroups = firestoreDbApp.refs.menu
-            .get().await()!!.map { it.toObject(MenuGroupDoc::class.java).toMenuData(it.id) }
+        val menuGroups = menuRepository.getData()
 
         val printerOrderUseCase = PrinterOrderUseCase(applicationContext)
         val awaitPrinterResults = mutableListOf<Deferred<Pair<PrinterAddress, Int>>>()

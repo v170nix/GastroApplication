@@ -10,38 +10,31 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.arwix.gastro.client.data.OrderRepository
 import net.arwix.gastro.client.feature.print.ui.PrintIntentService
-import net.arwix.gastro.library.data.FirestoreDbApp
 import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.menu.data.MenuGridItem
 import net.arwix.gastro.library.menu.data.MenuGroupData
-import net.arwix.gastro.library.menu.data.MenuGroupDoc
+import net.arwix.gastro.library.menu.data.MenuRepository
 import net.arwix.gastro.library.order.data.OrderItem
-import net.arwix.gastro.library.toFlow
 import net.arwix.mvi.SimpleIntentViewModel
 
 class OrderViewModel(
-    private val firestoreDbApp: FirestoreDbApp,
     private val context: Context,
+    private val menuRepository: MenuRepository,
     private val orderRepository: OrderRepository
 ) :
     SimpleIntentViewModel<OrderViewModel.Action, OrderViewModel.Result, OrderViewModel.State>() {
 
     private var menuGroupData: List<MenuGroupData> = mutableListOf()
-    override var internalViewState: State =
-        State()
+    override var internalViewState: State = State()
 
     init {
         viewModelScope.launch {
-            firestoreDbApp.refs.menu.orderBy("order").toFlow()
-                .collect { docs ->
-                    val menus = docs.map { it.toObject(MenuGroupDoc::class.java).toMenuData(it.id) }
-                    menuGroupData = menus
-                    notificationFromObserver(
-                        Result.AddMenu(
-                            menus
-                        )
-                    )
+            menuRepository.getMenusFlow().collect { menus ->
+                menus.sortedBy { it.metadata.order }.let {
+                    menuGroupData = it
+                    notificationFromObserver(Result.AddMenu(menus))
                 }
+            }
         }
     }
 

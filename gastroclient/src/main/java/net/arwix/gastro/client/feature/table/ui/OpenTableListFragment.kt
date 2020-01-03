@@ -1,4 +1,4 @@
-package net.arwix.gastro.client.ui.pay
+package net.arwix.gastro.client.feature.table.ui
 
 
 import android.os.Bundle
@@ -12,7 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.fragment_pay_list.*
+import kotlinx.android.synthetic.main.fragment_open_table_list.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.CustomToolbarFragment
@@ -21,33 +21,34 @@ import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.text.NumberFormat
 
-class PayListFragment : CustomToolbarFragment() {
+class OpenTableListFragment : CustomToolbarFragment() {
 
-    override val idResToolbar: Int = R.id.pay_list_toolbar
+    override val idResToolbar: Int = R.id.open_table_list_toolbar
 
-    private val payViewModel: PayViewModel by sharedViewModel()
+    private val openTableViewModel: OpenTableViewModel by sharedViewModel()
     private val profileViewModel: ProfileViewModel by sharedViewModel()
-    private lateinit var adapter: PayListItemAdapter
+    private lateinit var adapter: OpenTableListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_pay_list, container, false)
+        return inflater.inflate(R.layout.fragment_open_table_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = PayListItemAdapter { type, payOrderItem, delta ->
-            payViewModel.nonCancelableIntent(
-                PayViewModel.Action.ChangePayCount(
-                    type,
-                    payOrderItem,
-                    delta
+        adapter =
+            OpenTableListAdapter { type, payOrderItem, delta ->
+                openTableViewModel.nonCancelableIntent(
+                    OpenTableViewModel.Action.ChangePayCount(
+                        type,
+                        payOrderItem,
+                        delta
+                    )
                 )
-            )
-            //  listener?.invoke(itemView, type, payOrderItem, delta)
-        }
+                //  listener?.invoke(itemView, type, payOrderItem, delta)
+            }
         val linearLayoutManager = LinearLayoutManager(requireContext())
         with(pay_list_order_recycler_view) {
             layoutManager = linearLayoutManager
@@ -58,17 +59,17 @@ class PayListFragment : CustomToolbarFragment() {
                     linearLayoutManager.orientation
                 )
             )
-            adapter = this@PayListFragment.adapter
+            adapter = this@OpenTableListFragment.adapter
         }
 
         pay_list_add_all_to_pay_button.setOnClickListener {
-            payViewModel.nonCancelableIntent(PayViewModel.Action.AddAllItemsToPay)
+            openTableViewModel.nonCancelableIntent(OpenTableViewModel.Action.AddAllItemsToPay)
         }
 
         pay_list_submit_button.setOnClickListener {
             val userId = profileViewModel.liveState.value?.userId ?: return@setOnClickListener
             setIsEnableButtons(false)
-            payViewModel.nonCancelableIntent(PayViewModel.Action.CheckOut(userId))
+            openTableViewModel.nonCancelableIntent(OpenTableViewModel.Action.CheckOut(userId))
         }
 
         pay_list_delete_button.setOnClickListener {
@@ -79,16 +80,20 @@ class PayListFragment : CustomToolbarFragment() {
                     setIsEnableButtons(false)
                     val userId =
                         profileViewModel.liveState.value?.userId ?: return@setPositiveButton
-                    payViewModel.nonCancelableIntent(PayViewModel.Action.DeleteCheckOut(userId))
+                    openTableViewModel.nonCancelableIntent(
+                        OpenTableViewModel.Action.DeleteCheckOut(
+                            userId
+                        )
+                    )
                 }
                 .show()
         }
-        payViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
+        openTableViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
     }
 
-    private fun render(state: PayViewModel.State) {
+    private fun render(state: OpenTableViewModel.State) {
         setIsEnableButtons(true)
-        updateTextAndVisiblePayButton(payViewModel.liveState.value)
+        updateTextAndVisiblePayButton(openTableViewModel.liveState.value)
         state.tableGroup?.run(this::setTitle)
         state.summaryData?.run {
             adapter.setItems(this)
@@ -129,7 +134,7 @@ class PayListFragment : CustomToolbarFragment() {
 //            "Table ${tableGroup.tableId}/${tableGroup.tablePart} "
     }
 
-    private fun getPayCountAndPrice(state: PayViewModel.State?): Pair<Long, Int>? {
+    private fun getPayCountAndPrice(state: OpenTableViewModel.State?): Pair<Long, Int>? {
         state ?: return null
         val payOrderItems = state.summaryData ?: return null
         var count = 0
@@ -145,7 +150,7 @@ class PayListFragment : CustomToolbarFragment() {
         return price to count
     }
 
-    private fun updateTextAndVisiblePayButton(state: PayViewModel.State?) {
+    private fun updateTextAndVisiblePayButton(state: OpenTableViewModel.State?) {
         getPayCountAndPrice(state)?.let { (price, count) ->
             if (price > 0) {
                 pay_list_submit_button.show()

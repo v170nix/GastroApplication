@@ -67,8 +67,8 @@
 
     <fragment
         android:id="@+id/payListFragment"
-        android:name="net.arwix.gastro.client.ui.pay.PayListFragment"
-        tools:layout="@layout/fragment_pay_list" />
+        android:name="net.arwix.gastro.client.feature.table.ui.OpenTableListFragment"
+        tools:layout="@layout/fragment_open_table_list" />
     <fragment
         android:id="@+id/historyCheckDetailFragment"
         android:name="net.arwix.gastro.client.ui.history.check.HistoryCheckDetailFragment"
