@@ -3,10 +3,12 @@ package net.arwix.gastro.client.di
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.ktx.app
+import net.arwix.gastro.client.data.OpenTableRepository
+import net.arwix.gastro.client.data.OrderRepository
 import net.arwix.gastro.client.domain.InnerFragmentStateViewModel
+import net.arwix.gastro.client.feature.order.ui.OrderViewModel
 import net.arwix.gastro.client.ui.history.check.HistoryCheckDetailViewModel
 import net.arwix.gastro.client.ui.history.order.HistoryOrderDetailViewModel
-import net.arwix.gastro.client.ui.order.OrderViewModel
 import net.arwix.gastro.client.ui.pay.PayViewModel
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.client.ui.report.day.ReportDayUseCase
@@ -27,13 +29,19 @@ val mainModule = module {
         FirestoreDbApp("test-", firebaseFirestore)
     }
 
-    single {
-        ReportDayUseCase(get(), androidContext())
-    }
+    single { ReportDayUseCase(get(), androidContext()) }
+    single { OpenTableRepository(get()) }
+    single { OrderRepository(get(), get()) }
 
     viewModel { InnerFragmentStateViewModel() }
     viewModel { OpenTablesViewModel(get()) }
-    viewModel { OrderViewModel(get(), androidContext()) }
+    viewModel {
+        OrderViewModel(
+            get(),
+            androidContext(),
+            get()
+        )
+    }
     viewModel { ProfileViewModel() }
     viewModel { PayViewModel(get()) }
     viewModel { HistoryCheckDetailViewModel(get()) }

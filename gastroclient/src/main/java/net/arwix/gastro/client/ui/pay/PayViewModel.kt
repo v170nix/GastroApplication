@@ -158,7 +158,7 @@ class PayViewModel(
         firestoreDbApp.firestore.runTransaction {
             val serverOrderData =
                 it.get(openTablesRef.document(tableGroup.toDocId())).toObject(OpenTableData::class.java)!!
-            if (serverOrderData.updated != currentOpenTableData.updated) return@runTransaction
+            if (serverOrderData.updatedTime != currentOpenTableData.updatedTime) return@runTransaction
             it.set(checkDoc, checkData)
             if (residualCount == 0) {
                 // closeTable
@@ -183,7 +183,7 @@ class PayViewModel(
                 )
                 it.update(
                     openTablesRef.document(tableGroup.toDocId()),
-                    "updated",
+                    "updatedTime",
                     FieldValue.serverTimestamp()
                 )
             }

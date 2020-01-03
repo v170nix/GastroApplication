@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import net.arwix.gastro.client.domain.InnerFragmentStateViewModel.InnerFragmentState.OrderListFragmentState
-import net.arwix.gastro.client.ui.order.OrderListFragment
+import net.arwix.gastro.client.feature.order.ui.OrderListFragment
 
 class InnerFragmentStateViewModel : ViewModel() {
 

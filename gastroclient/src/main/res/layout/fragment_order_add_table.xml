@@ -5,7 +5,7 @@
     android:id="@+id/order_add_table_coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.order.OrderAddTableFragment">
+    tools:context=".feature.order.ui.OrderAddTableFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/order_set_table_app_bar_layout"

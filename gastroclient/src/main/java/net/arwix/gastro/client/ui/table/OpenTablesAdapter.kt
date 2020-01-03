@@ -95,7 +95,7 @@ class OpenTablesAdapter(
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
-            return oldItem.tableGroup == newItem.tableGroup && oldItem.tableData.updated == newItem.tableData.updated
+            return oldItem.tableGroup == newItem.tableGroup && oldItem.tableData.updatedTime == newItem.tableData.updatedTime
         }
     }
 

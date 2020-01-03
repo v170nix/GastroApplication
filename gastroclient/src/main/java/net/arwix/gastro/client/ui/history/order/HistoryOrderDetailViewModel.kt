@@ -105,9 +105,7 @@ class HistoryOrderDetailViewModel(
             }
             if (printerAddress == null) throw IllegalStateException("menu error")
             val orderData = result.getOrPut(printerAddress!!) {
-                summaryOrderData.copy(
-                    orderItems = mutableMapOf()
-                )
+                summaryOrderData.copy(orderItems = mutableMapOf())
             }
             val orderItemsMap = orderData.orderItems as MutableMap
             val orderItemsList = orderItemsMap.getOrPut(menu) {

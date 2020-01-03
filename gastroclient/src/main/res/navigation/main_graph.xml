@@ -29,12 +29,12 @@
 
     <fragment
         android:id="@+id/orderAddTableFragment"
-        android:name="net.arwix.gastro.client.ui.order.OrderAddTableFragment"
+        android:name="net.arwix.gastro.client.feature.order.ui.OrderAddTableFragment"
         android:label="@string/title_order_add"
         tools:layout="@layout/fragment_order_add_table" />
     <fragment
         android:id="@+id/orderListFragment"
-        android:name="net.arwix.gastro.client.ui.order.OrderListFragment"
+        android:name="net.arwix.gastro.client.feature.order.ui.OrderListFragment"
         android:label="@string/title_order_add"
         tools:layout="@layout/fragment_order_list">
         <action
@@ -47,7 +47,7 @@
     </fragment>
     <fragment
         android:id="@+id/orderAddPreItemsFragment"
-        android:name="net.arwix.gastro.client.ui.order.OrderAddPreItemsFragment"
+        android:name="net.arwix.gastro.client.feature.order.ui.OrderAddPreItemsFragment"
         tools:layout="@layout/fragment_order_add_pre_items">
         <action
             android:id="@+id/action_to_orderListAddItemFragment"
@@ -58,7 +58,7 @@
     </fragment>
     <fragment
         android:id="@+id/orderListAddItemFragment"
-        android:name="net.arwix.gastro.client.ui.order.OrderAddItemFragment"
+        android:name="net.arwix.gastro.client.feature.order.ui.OrderAddItemFragment"
         tools:layout="@layout/fragment_order_add_item">
         <argument
             android:name="menuGroup"

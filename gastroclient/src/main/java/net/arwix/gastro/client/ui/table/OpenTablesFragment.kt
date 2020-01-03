@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_open_tables.*
 import net.arwix.gastro.client.R
-import net.arwix.gastro.client.ui.order.OrderViewModel
+import net.arwix.gastro.client.feature.order.ui.OrderViewModel
 import net.arwix.gastro.client.ui.pay.PayViewModel
 import net.arwix.gastro.library.common.CustomToolbarFragment
 import net.arwix.gastro.library.common.navigate

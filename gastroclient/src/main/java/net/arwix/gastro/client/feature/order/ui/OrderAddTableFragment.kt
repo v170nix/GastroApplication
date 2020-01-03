@@ -1,4 +1,4 @@
-package net.arwix.gastro.client.ui.order
+package net.arwix.gastro.client.feature.order.ui
 
 import android.os.Bundle
 import android.view.KeyEvent
@@ -59,8 +59,9 @@ class OrderAddTableFragment : CustomToolbarFragment() {
         orderViewModel.selectTable(tableGroup)
 
 
-        OrderAddTableFragmentDirections
-            .actionGlobalOrderListFragment(true)
+        OrderAddTableFragmentDirections.actionGlobalOrderListFragment(
+            true
+        )
             .navigate(this)
     }
 

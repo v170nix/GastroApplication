@@ -1,4 +1,4 @@
-package net.arwix.gastro.client.ui.order
+package net.arwix.gastro.client.feature.order.ui
 
 
 import android.os.Bundle
@@ -62,7 +62,11 @@ class OrderAddPreItemsFragment : CustomToolbarFragment() {
         order_add_pre_items_add_selected_button.setOnClickListener {
             val selectedItems = itemsAdapter.getSelectedItems()
             if (selectedItems.isEmpty()) return@setOnClickListener
-            orderViewModel.nonCancelableIntent(OrderViewModel.Action.AddItems(selectedItems))
+            orderViewModel.nonCancelableIntent(
+                OrderViewModel.Action.AddItems(
+                    selectedItems
+                )
+            )
             findNavController().popBackStack()
 //            OrderAddPreItemsFragmentDirections
 //                .actionGlobalOrderListFragment()
@@ -70,8 +74,9 @@ class OrderAddPreItemsFragment : CustomToolbarFragment() {
         }
         itemsAdapter.setItems(args.menuGroup)
         order_add_pre_items_to_custom_item_button.setOnClickListener {
-            OrderAddPreItemsFragmentDirections
-                .actionToOrderListAddItemFragment(args.menuGroup)
+            OrderAddPreItemsFragmentDirections.actionToOrderListAddItemFragment(
+                args.menuGroup
+            )
                 .navigate(this)
         }
         orderViewModel.liveState.value?.tableGroup?.run {
@@ -90,8 +95,7 @@ class OrderAddPreItemsFragment : CustomToolbarFragment() {
         if (state.orderItems.keys.indexOf(args.menuGroup) == -1) {
             // group delete
             itemsAdapter.setItems(listOf())
-            OrderAddPreItemsFragmentDirections
-                .actionGlobalOrderListFragment()
+            OrderAddPreItemsFragmentDirections.actionGlobalOrderListFragment()
                 .navigate(this)
         }
     }

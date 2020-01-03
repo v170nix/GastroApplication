@@ -13,4 +13,14 @@ data class OrderData constructor(
     var orderItems: Map<MenuGroupName, List<OrderItem>> = mapOf(),
     @ServerTimestamp var created: Timestamp? = null
 //    @field:JvmField var isPrinted: Boolean = false
-)
+) {
+    fun sum(): Long {
+        var sum = 0L
+        orderItems.values.forEach {
+            it.forEach { order ->
+                sum += order.count * order.price
+            }
+        }
+        return sum
+    }
+}

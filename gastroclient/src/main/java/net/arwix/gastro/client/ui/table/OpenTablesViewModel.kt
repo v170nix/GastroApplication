@@ -24,7 +24,7 @@ class OpenTablesViewModel(
         viewModelScope.launch {
             val query = firestoreDbApp.refs.openTables
             query
-                .orderBy("updated", Query.Direction.DESCENDING)
+                .orderBy("updatedTime", Query.Direction.DESCENDING)
                 .toFlow()
                 .collect { snapshot ->
                     val map = LinkedHashMap<TableGroup, OpenTableData>()

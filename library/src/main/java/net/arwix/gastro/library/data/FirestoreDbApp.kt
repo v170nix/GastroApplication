@@ -23,8 +23,8 @@ class FirestoreDbApp(
         )
     }
 
-    fun getGlobalPrefs(transaction: Transaction): PrefGlobalData? {
-        return transaction.get(refs.prefs.document("global")).toObject(PrefGlobalData::class.java)
+    fun getGlobalPrefs(transaction: Transaction): PrefGlobalData {
+        return transaction.get(refs.prefs.document("global")).toObject(PrefGlobalData::class.java)!!
     }
 
     fun setGlobalPrefs(transaction: Transaction, pref: PrefGlobalData) {

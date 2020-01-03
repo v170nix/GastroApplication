@@ -1,4 +1,4 @@
-package net.arwix.gastro.client.ui.order
+package net.arwix.gastro.client.feature.order.ui
 
 
 import android.os.Bundle
@@ -63,7 +63,11 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
             },
             onChangeCount = { type, orderItem, delta ->
                 orderViewModel.nonCancelableIntent(
-                    OrderViewModel.Action.ChangeCountItem(type, orderItem, delta)
+                    OrderViewModel.Action.ChangeCountItem(
+                        type,
+                        orderItem,
+                        delta
+                    )
                 )
             }
 

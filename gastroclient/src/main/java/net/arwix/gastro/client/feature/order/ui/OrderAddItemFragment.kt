@@ -1,4 +1,4 @@
-package net.arwix.gastro.client.ui.order
+package net.arwix.gastro.client.feature.order.ui
 
 
 import android.os.Bundle

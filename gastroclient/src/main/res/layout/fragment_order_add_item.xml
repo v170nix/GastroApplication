@@ -5,7 +5,7 @@
         android:id="@+id/order_add_item_coordinator"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-    tools:context=".ui.order.OrderAddItemFragment">
+    tools:context=".feature.order.ui.OrderAddItemFragment">
 
         <!--    https://stackoverflow.com/questions/55512896/collapsingtoolbarlayout-not-collapsing-when-softkeyboard-is-visible-->
 

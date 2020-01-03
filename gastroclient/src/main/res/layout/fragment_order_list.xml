@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.order.OrderListFragment">
+    tools:context=".feature.order.ui.OrderListFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/order_list_collapsing_app_bar_layout"
