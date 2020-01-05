@@ -40,6 +40,7 @@ class OpenTablesFragment : CustomToolbarFragment() {
         openTablesViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
         open_tables_add_order_button.setOnClickListener {
             orderViewModel.clear()
+            orderViewModel.isAnimateBigButton = true
             findNavController().navigate(R.id.orderAddTableFragment)
         }
 
@@ -50,6 +51,7 @@ class OpenTablesFragment : CustomToolbarFragment() {
             },
             onAddOrderClick = {
                 orderViewModel.selectTable(it)
+                orderViewModel.isAnimateBigButton = true
                 OpenTablesFragmentDirections.actionGlobalOrderListFragment(true)
                     .navigate(this)
             }

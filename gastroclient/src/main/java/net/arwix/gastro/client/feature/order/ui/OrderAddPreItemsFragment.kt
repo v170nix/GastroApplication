@@ -35,6 +35,7 @@ class OrderAddPreItemsFragment : CustomToolbarFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        orderViewModel.isAnimateBigButton = false
         itemsAdapter = MenuItemsGridAdapter(
             isViewMenuGroup = false,
             onChangeSelectedItems = { menus ->
@@ -68,9 +69,6 @@ class OrderAddPreItemsFragment : CustomToolbarFragment() {
                 )
             )
             findNavController().popBackStack()
-//            OrderAddPreItemsFragmentDirections
-//                .actionGlobalOrderListFragment()
-//                .navigate(this)
         }
         itemsAdapter.setItems(args.menuGroup)
         order_add_pre_items_to_custom_item_button.setOnClickListener {

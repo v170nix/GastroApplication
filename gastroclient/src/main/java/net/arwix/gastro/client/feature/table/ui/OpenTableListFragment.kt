@@ -13,10 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_open_table_list.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.CustomToolbarFragment
@@ -55,8 +52,8 @@ class OpenTableListFragment : CustomToolbarFragment(), CoroutineScope by MainSco
             }
         val linearLayoutManager = LinearLayoutManager(requireContext())
         with(pay_list_order_recycler_view) {
+            itemAnimator?.changeDuration = 60
             layoutManager = linearLayoutManager
-            itemAnimator = null
             addItemDecoration(
                 androidx.recyclerview.widget.DividerItemDecoration(
                     context,
@@ -93,6 +90,11 @@ class OpenTableListFragment : CustomToolbarFragment(), CoroutineScope by MainSco
                 .show()
         }
         openTableViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        cancel()
     }
 
     private fun render(state: OpenTableViewModel.State) {
@@ -133,7 +135,6 @@ class OpenTableListFragment : CustomToolbarFragment(), CoroutineScope by MainSco
                     R.color.mtrl_btn_bg_color_selector
                 )
         }
-
     }
 
 

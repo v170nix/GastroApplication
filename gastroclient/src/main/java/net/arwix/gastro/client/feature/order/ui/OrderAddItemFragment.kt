@@ -41,6 +41,7 @@ class OrderAddItemFragment : CustomToolbarFragment(), CoroutineScope by MainScop
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         order_list_add_item_name_layout.editText?.requestFocus()
+        orderViewModel.isAnimateBigButton = false
         showSoftKeyboard()
 //        order_add_items_app_bar_layout.setExpanded(false, true)
 //        requireActivity().window.decorView.viewTreeObserver.addOnGlobalLayoutListener {

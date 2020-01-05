@@ -50,6 +50,7 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        order_list_add_process_bar.gone()
         multilineButtonHelper = MultilineButtonHelper(view.order_list_submit_layout, false)
         animationViewHelper = AnimationViewHelper()
         adapterOrder = OrderListAdapter(
@@ -73,7 +74,7 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
         with(order_list_recycler_view) {
             val linearLayoutManager = LinearLayoutManager(context)
             layoutManager = linearLayoutManager
-            itemAnimator = null
+            itemAnimator?.changeDuration = 60
             addItemDecoration(DividerItemDecoration(context, linearLayoutManager.orientation))
             adapter = this@OrderListFragment.adapterOrder
         }
@@ -97,7 +98,6 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
 
     private fun render(state: OrderViewModel.State) {
         //lock
-//        Log.e("sub", state.toString())
         isSubmit = if (!isSubmit) state.isSubmit else true
         if (state.isSubmit) {
             orderViewModel.clear()
@@ -106,7 +106,7 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
                 .build()
             findNavController(this).navigate(R.id.openTablesFragment, null, options)
         } else if (!isSubmit) {
-            animationViewHelper.enableActions(args.clearInnerState)
+            if (!state.isLoadingMenu) animationViewHelper.enableActions(orderViewModel.isAnimateBigButton)
             adapterOrder.setItems(state.orderItems)
             state.tableGroup?.run(::setTitle)
             renderTotalPrice(state.orderItems)
@@ -154,10 +154,9 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
                     }
                 }
             } else {
-                multilineButtonHelper.visible()
+                if (!isShowAnimation) multilineButtonHelper.visible()
             }
             isFirstEnableActions = false
-            order_list_add_process_bar.gone()
         }
 
         suspend fun toSubmitAction(callback: () -> Unit) {

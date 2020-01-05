@@ -27,6 +27,8 @@ class OrderViewModel(
 ) :
     SimpleIntentViewModel<OrderViewModel.Action, OrderViewModel.Result, OrderViewModel.State>() {
 
+    var isAnimateBigButton = true
+
     private var menuGroupData: List<MenuGroupData> = mutableListOf()
     override var internalViewState: State = State()
 
@@ -219,7 +221,7 @@ class OrderViewModel(
             return toMutableMap().apply {
                 val orderItems = this[menuGroupData] ?: return@apply
                 this[menuGroupData] = orderItems.map {
-                    if (it.name == orderItem.name) it.copy(count = it.count + delta) else it
+                    if (it.name == orderItem.name && it.count + delta >= 0) it.copy(count = it.count + delta) else it
                 }
             }
         }

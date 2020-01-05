@@ -63,6 +63,8 @@ class OpenTableListAdapter(
             holder.plusItemButton.tag = item
             holder.minusItemButton.setOnClickListener(doMinusCountClick)
             holder.plusItemButton.setOnClickListener(doPlusCountClick)
+//            holder.itemView.tag = item
+//            holder.itemView.setOnClickListener(doPlusCountClick)
             holder.bindTo(item)
         }
         if (item is PayAdapterOrderItem.Type) {
@@ -93,10 +95,7 @@ class OpenTableListAdapter(
             })
         }
         val diffCallback =
-            ItemDiffCallback(
-                items,
-                newList
-            )
+            ItemDiffCallback(items, newList)
         val diffResult =
             DiffUtil.calculateDiff(diffCallback)
         items.clear()
@@ -112,6 +111,10 @@ class OpenTableListAdapter(
         val plusItemButton: View = view.item_pay_default_plus_one_button
         val minusItemButton: View = view.item_pay_default_minus_one_button
 
+//        init {
+//            itemView.setBackgroundDrawableCompat(R.drawable.selected_list_item)
+//        }
+
         fun bindTo(item: PayAdapterOrderItem.Item) {
             val formatter = NumberFormat.getCurrencyInstance()
             val currentMaxCount = item.order.orderItem.count - item.order.checkCount
@@ -123,6 +126,7 @@ class OpenTableListAdapter(
                 formatter.format(item.order.orderItem.price / 100.0).toString() // + "\u20ac"
             plusItemButton.isEnabled = item.order.payCount < currentMaxCount
             minusItemButton.isEnabled = item.order.payCount > 0
+            itemView.isEnabled = item.order.payCount < currentMaxCount
             payText.text = itemView.resources.getQuantityString(
                 R.plurals.pay_list_item_count_text,
                 item.order.payCount,
@@ -163,12 +167,19 @@ class OpenTableListAdapter(
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
-            return (oldItem == newItem)
+            if (oldItem is PayAdapterOrderItem.Type && newItem is PayAdapterOrderItem.Type) {
+                return oldItem.name == newItem.name
+            }
+            if (oldItem is PayAdapterOrderItem.Item && newItem is PayAdapterOrderItem.Item) {
+                return oldItem.order.orderItem.name == newItem.order.orderItem.name
+            }
+            return false
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
+//            return true
             if (oldItem is PayAdapterOrderItem.Type && newItem is PayAdapterOrderItem.Type) {
                 return oldItem.name == newItem.name
             }

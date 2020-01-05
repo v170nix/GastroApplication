@@ -48,7 +48,7 @@ class OrderListAdapter(
     private val doMinusCountClick = View.OnClickListener { view ->
         if (!isClickable) return@OnClickListener
         val orderItem = view.tag as AdapterOrderItems.Default
-        if (orderItem.order.count == 0) return@OnClickListener
+        if (orderItem.order.count <= 0) return@OnClickListener
         onChangeCount(orderItem.type.groupData, orderItem.order, -1)
     }
 
@@ -121,15 +121,18 @@ class OrderListAdapter(
             holder.plusItemButton.tag = item
             holder.minusItemButton.setOnClickListener(doMinusCountClick)
             holder.plusItemButton.setOnClickListener(doPlusCountClick)
-            if (isClickable) {
-                holder.minusItemButton.animate().alpha(1f).setDuration(75).start()
-                holder.plusItemButton.animate().alpha(1f).setDuration(75).start()
-            } else {
-                holder.minusItemButton.animate().alpha(0.4f).setDuration(75).start()
-                holder.plusItemButton.animate().alpha(0.4f).setDuration(75).start()
-            }
-            holder.minusItemButton.isEnabled = (item.order.count != 0) && isClickable
+//            holder.itemView.tag = item
+//            holder.itemView.setOnClickListener(doPlusCountClick)
+//            if (isClickable) {
+//                holder.minusItemButton.animate().alpha(1f).setDuration(75).start()
+//                holder.plusItemButton.animate().alpha(1f).setDuration(75).start()
+//            } else {
+//                holder.minusItemButton.animate().alpha(0.4f).setDuration(75).start()
+//                holder.plusItemButton.animate().alpha(0.4f).setDuration(75).start()
+//            }
+            holder.minusItemButton.isEnabled = (item.order.count > 0) && isClickable
             holder.plusItemButton.isEnabled = isClickable
+            holder.itemView.isEnabled = isClickable
             holder.bindTo(item)
         }
         if (item is AdapterOrderItems.Type) {
@@ -159,11 +162,13 @@ class OrderListAdapter(
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
-            return (oldItem == newItem).also {
-                //                if (it) {
-//                    Log.e("asSame", oldItem.toString())
-//                }
+            if (oldItem is AdapterOrderItems.Type && newItem is AdapterOrderItems.Type) {
+                return oldItem.groupData.name == newItem.groupData.name
             }
+            if (oldItem is AdapterOrderItems.Default && newItem is AdapterOrderItems.Default) {
+                return oldItem.order.name == newItem.order.name
+            }
+            return false
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -175,11 +180,7 @@ class OrderListAdapter(
             if (oldItem is AdapterOrderItems.Default && newItem is AdapterOrderItems.Default) {
                 return (oldItem.order.name == newItem.order.name &&
                         oldItem.order.count == newItem.order.count &&
-                        oldItem.order.price == newItem.order.price).also {
-                    //                    if (it) {
-//                        Log.e("asContentsSame", oldItem.order.toString())
-//                    }
-                }
+                        oldItem.order.price == newItem.order.price)
             }
             return false
         }
@@ -193,6 +194,10 @@ class OrderListAdapter(
             private val price: TextView = view.item_order_list_add_price_text
             val plusItemButton: View = view.item_order_list_add_plus_one_button
             val minusItemButton: View = view.item_order_list_add_minus_one_button
+
+//            init {
+//                itemView.setBackgroundDrawableCompat(R.drawable.selected_list_item)
+//            }
 
             fun bindTo(item: AdapterOrderItems.Default) {
                 val formatter = NumberFormat.getCurrencyInstance()
