@@ -15,15 +15,27 @@ import net.arwix.gastro.client.feature.table.domain.OpenTableUseCase
 import net.arwix.gastro.library.data.OpenTableData
 import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.menu.data.MenuGroupName
+import net.arwix.gastro.library.menu.data.MenuRepository
 import net.arwix.mvi.SimpleIntentViewModel
 
 class OpenTableViewModel(
+    private val menuRepository: MenuRepository,
     private val openTableRepository: OpenTableRepository,
     private val openTableUseCase: OpenTableUseCase
 ) : SimpleIntentViewModel<OpenTableViewModel.Action, OpenTableViewModel.Result, OpenTableViewModel.State>() {
 
     private var tableUpdateJob: Job? = null
     override var internalViewState: State = State()
+
+    private var menuGroups: List<MenuGroupName> = listOf()
+
+    init {
+        viewModelScope.launch {
+            menuRepository.getMenusAsFlow().collect { menus ->
+                menuGroups = menus.sortedBy { it.metadata.order }.map { it.name }
+            }
+        }
+    }
 
     fun setTable(tableGroup: TableGroup) {
         tableUpdateJob?.cancel()
@@ -39,7 +51,9 @@ class OpenTableViewModel(
                             Result.TableData(
                                 tableGroup,
                                 tableData,
-                                openTableUseCase.getItems(tableData)
+                                openTableUseCase.getItems(tableData).toSortedMap(Comparator { o1, o2 ->
+                                    menuGroups.indexOf(o1) - menuGroups.indexOf(o2)
+                                })
                             )
                         )
                     }
@@ -120,6 +134,7 @@ class OpenTableViewModel(
             val openTableItem: OpenTableItem,
             val delta: Int
         ) : Action()
+
         object AddAllItemsToPay : Action()
         data class Checkout(val waiterId: Int) : Action()
         data class DeleteCheckout(val waiterId: Int) : Action()

@@ -14,7 +14,7 @@ data class MenuGroupData(
     val printer: PrinterAddress?,
     val items: List<PreMenuItem>? = null,
     val metadata: Metadata
-) : Parcelable {
+) : Parcelable, Comparable<MenuGroupData> {
 
     fun toMenuDoc(): MenuGroupDoc =
         MenuGroupDoc(
@@ -46,6 +46,10 @@ data class MenuGroupData(
         fun toPreMenuItemValueDoc() = MenuGroupDoc.PreMenuItemValueDoc(
             price, printer, color, row, col
         )
+    }
+
+    override fun compareTo(other: MenuGroupData): Int {
+        return (this.metadata.order ?: 1) - (other.metadata.order ?: 1)
     }
 
 }

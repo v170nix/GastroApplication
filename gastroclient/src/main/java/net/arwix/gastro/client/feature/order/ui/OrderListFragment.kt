@@ -2,11 +2,9 @@ package net.arwix.gastro.client.feature.order.ui
 
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.observe
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment.findNavController
@@ -102,12 +100,6 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
 //        Log.e("sub", state.toString())
         isSubmit = if (!isSubmit) state.isSubmit else true
         if (state.isSubmit) {
-            if (state.resultPrint != null) {
-                Toast.makeText(requireContext(), "code: ${state.resultPrint}", Toast.LENGTH_LONG)
-                    .apply {
-                        this.setGravity(Gravity.CENTER, 0, 0)
-                    }.show()
-            }
             orderViewModel.clear()
             val options = NavOptions.Builder()
                 .setPopUpTo(R.id.openTablesFragment, true)

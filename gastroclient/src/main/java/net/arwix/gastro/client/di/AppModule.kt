@@ -7,6 +7,7 @@ import net.arwix.gastro.client.data.CheckRepository
 import net.arwix.gastro.client.data.OpenTableRepository
 import net.arwix.gastro.client.data.OrderRepository
 import net.arwix.gastro.client.domain.InnerFragmentStateViewModel
+import net.arwix.gastro.client.feature.order.domain.OrderUseCase
 import net.arwix.gastro.client.feature.order.ui.OrderViewModel
 import net.arwix.gastro.client.feature.table.domain.OpenTableUseCase
 import net.arwix.gastro.client.feature.table.ui.OpenTableViewModel
@@ -23,8 +24,6 @@ import org.koin.dsl.module
 
 val mainModule = module {
 
-    //    single { androidApplication().getSharedPreferences("AppPref", MODE_PRIVATE) }
-
     single {
         val firebaseFirestore = Firebase.firestore(Firebase.app).apply {
             clearPersistence()
@@ -35,7 +34,8 @@ val mainModule = module {
     single { MenuRepository(get<FirestoreDbApp>().refs.menu) }
     single { ReportDayUseCase(get(), androidContext()) }
     single { OpenTableRepository(get<FirestoreDbApp>().refs.openTables) }
-    single { OrderRepository(get(), get()) }
+    single { OrderRepository(get<FirestoreDbApp>().refs.orders) }
+    single { OrderUseCase(get(), get(), get()) }
     single { CheckRepository(get<FirestoreDbApp>().refs.checks) }
     single { OpenTableUseCase(get(), get(), get(), get()) }
 
@@ -43,7 +43,7 @@ val mainModule = module {
     viewModel { ProfileViewModel() }
     viewModel { OpenTablesViewModel(get()) }
     viewModel { OrderViewModel(androidContext(), get(), get()) }
-    viewModel { OpenTableViewModel(get(), get()) }
+    viewModel { OpenTableViewModel(get(), get(), get()) }
     viewModel { HistoryCheckDetailViewModel(get()) }
     viewModel { HistoryOrderDetailViewModel(get()) }
 }

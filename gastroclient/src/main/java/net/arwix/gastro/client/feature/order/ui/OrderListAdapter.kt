@@ -52,7 +52,7 @@ class OrderListAdapter(
         onChangeCount(orderItem.type.groupData, orderItem.order, -1)
     }
 
-    fun setItems(newMap: MutableMap<MenuGroupData, List<OrderItem>>) {
+    fun setItems(newMap: Map<MenuGroupData, List<OrderItem>>) {
         val newList = mutableListOf<AdapterOrderItems>()
         newMap.forEach { (type, list) ->
             val typeItem =

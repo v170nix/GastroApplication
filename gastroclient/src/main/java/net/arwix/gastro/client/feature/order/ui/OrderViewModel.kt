@@ -1,6 +1,7 @@
 package net.arwix.gastro.client.feature.order.ui
 
 import android.content.Context
+import androidx.annotation.UiThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
@@ -8,11 +9,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.arwix.gastro.client.data.OrderRepository
+import net.arwix.gastro.client.feature.order.domain.OrderUseCase
 import net.arwix.gastro.client.feature.print.ui.PrintIntentService
 import net.arwix.gastro.library.data.TableGroup
 import net.arwix.gastro.library.menu.data.MenuGridItem
 import net.arwix.gastro.library.menu.data.MenuGroupData
+import net.arwix.gastro.library.menu.data.MenuGroupName
 import net.arwix.gastro.library.menu.data.MenuRepository
 import net.arwix.gastro.library.order.data.OrderItem
 import net.arwix.mvi.SimpleIntentViewModel
@@ -20,7 +22,8 @@ import net.arwix.mvi.SimpleIntentViewModel
 class OrderViewModel(
     private val context: Context,
     private val menuRepository: MenuRepository,
-    private val orderRepository: OrderRepository
+    private val orderUseCase: OrderUseCase
+//    private val orderRepository: OrderRepository
 ) :
     SimpleIntentViewModel<OrderViewModel.Action, OrderViewModel.Result, OrderViewModel.State>() {
 
@@ -32,7 +35,7 @@ class OrderViewModel(
             menuRepository.getMenusAsFlow().collect { menus ->
                 menus.sortedBy { it.metadata.order }.let {
                     menuGroupData = it
-                    notificationFromObserver(Result.AddMenu(menus))
+                    notificationFromObserver(Result.SetMenu(menus))
                 }
             }
         }
@@ -46,7 +49,7 @@ class OrderViewModel(
                     action.item
                 )
             )
-//            is Action.EditItem -> emit(Result.EditItem(action.typeItem, action.item))
+
             is Action.ChangeCountItem -> emit(
                 Result.ChangeCountItem(
                     action.typeItem,
@@ -75,28 +78,26 @@ class OrderViewModel(
 
             is Action.SubmitOrder -> {
                 withContext(Dispatchers.Main) {
-                    val reference = orderRepository.submit(
+                    val reference = orderUseCase.submit(
                         action.userId,
                         internalViewState.tableGroup!!,
                         internalViewState.orderItems
                     ) ?: return@withContext
                     PrintIntentService.startPrintOrder(context, reference.id)
+                    emit(Result.SubmitOrder())
                 }
-                emit(Result.SubmitOrder())
             }
         }
     }
 
+    @UiThread
     fun clear() {
         notificationFromObserver(Result.Clear)
     }
 
+    @UiThread
     fun selectTable(tableGroup: TableGroup) {
-        notificationFromObserver(
-            Result.InitOrder(
-                tableGroup
-            )
-        )
+        notificationFromObserver(Result.InitOrder(tableGroup))
     }
 
     override fun reduce(result: Result): State {
@@ -105,77 +106,69 @@ class OrderViewModel(
                 internalViewState.copy(
                     tableGroup = result.tableGroup,
                     orderItems = mutableMapOf<MenuGroupData, List<OrderItem>>().apply {
-                        menuGroupData.forEach {
-                            this[it] = listOf()
-                        }
-//                        menuTypes?.forEach { menuType ->
-//                            this[menuType] = listOf()
-//                        }
-                    }
+                        menuGroupData.forEach { this[it] = listOf() }
+                    },
+                    isSubmit = false
                 )
             }
 
             Result.Clear -> internalViewState.copy(
-                orderItems = internalViewState.orderItems.apply {
+                orderItems = internalViewState.orderItems.toMutableMap().apply {
                     forEach { (menuType, _) -> this[menuType] = listOf() }
                 },
                 isSubmit = false
             )
-            is Result.AddMenu -> {
+
+            is Result.SetMenu -> {
                 internalViewState.copy(
                     isLoadingMenu = false,
                     orderItems = mutableMapOf<MenuGroupData, List<OrderItem>>().apply {
-                        result.list.forEach { menuGroup -> this[menuGroup] = listOf() }
+                        val map: Map<MenuGroupName, List<OrderItem>> =
+                            internalViewState.orderItems.mapKeys {
+                                it.key.name
+                            }
+                        result.list.forEach { menuGroup ->
+                            this[menuGroup] = map.getOrElse(menuGroup.name) { listOf() }
+                        }
                     }
                 )
 
             }
+
             is Result.AddItem -> {
-                internalViewState.copy(orderItems = internalViewState.orderItems.apply {
-                    val menuGroupData = this.keys.find {
-                        it.name == result.typeItem
-                    } ?: return@apply
-                    val orderItems = this[menuGroupData]
-                    if (orderItems == null) this[menuGroupData] = listOf(result.item)
-                    else {
-                        // проверка на одинаковость
-                        val listOrderItem = orderItems.find {
-                            it.name == result.item.name && it.price == result.item.price
-                        }
-                        if (listOrderItem == null) {
-                            this[menuGroupData] = orderItems + result.item
-                        } else {
-                            this[menuGroupData] = orderItems.toMutableList().also {
-                                val indexItem = it.indexOf(listOrderItem)
-                                it[indexItem] =
-                                    listOrderItem.copy(count = listOrderItem.count + result.item.count)
+                internalViewState.copy(orderItems = internalViewState.orderItems
+                    .toMutableMap().apply {
+                        val menuGroupData = keys.find { it.name == result.typeItem } ?: return@apply
+                        val orderItems = this[menuGroupData]
+                        if (orderItems == null) this[menuGroupData] = listOf(result.item)
+                        else {
+                            // проверка на одинаковость
+                            val listOrderItem = orderItems.find {
+                                it.name == result.item.name && it.price == result.item.price
+                            }
+                            if (listOrderItem == null) {
+                                this[menuGroupData] = orderItems + result.item
+                            } else {
+                                this[menuGroupData] = orderItems.toMutableList().also {
+                                    val indexItem = it.indexOf(listOrderItem)
+                                    it[indexItem] =
+                                        listOrderItem.copy(count = listOrderItem.count + result.item.count)
+                                }
                             }
                         }
-                    }
-                })
+                    })
             }
-//            is Result.EditItem -> {
-//                internalViewState.copy(orderItems = internalViewState.orderItems.apply {
-//                    val menuGroupData = this.keys.find {
-//                        it.name == result.typeItem
-//                    } ?: return@apply
-//                    val orderItems = this[menuGroupData] ?: return@apply
-//                    val current = orderItems.map {
-//                        if (it.name == result.item.name) result.item else it
-//                    }
-//                    this[menuGroupData] = current
-//                })
-//            }
             is Result.SubmitOrder -> {
-                internalViewState.copy(isSubmit = true, resultPrint = result.resultPrint)
+                internalViewState.copy(isSubmit = true)
             }
             is Result.ChangeCountItem -> {
-                internalViewState.copy(orderItems = internalViewState.orderItems.apply {
-                    val orderItems = this[result.typeItem] ?: return@apply
-                    this[result.typeItem] = orderItems.map {
-                        if (it.name == result.item.name) it.copy(count = it.count + result.delta) else it
-                    }
-                })
+                internalViewState.copy(
+                    orderItems = internalViewState.orderItems.changeCountItem(
+                        result.menuGroupData,
+                        result.item,
+                        result.delta
+                    )
+                )
             }
         }
     }
@@ -183,8 +176,6 @@ class OrderViewModel(
     sealed class Action {
         data class AddItem(val typeItem: String, val item: OrderItem) : Action()
         data class AddItems(val items: Set<MenuGridItem.Item>) : Action()
-//        data class EditItem(val typeItem: String, val item: OrderItem) :
-//            Action()
 
         data class ChangeCountItem(
             val typeItem: MenuGroupData,
@@ -198,13 +189,11 @@ class OrderViewModel(
     sealed class Result {
         object Clear : Result()
         data class InitOrder(val tableGroup: TableGroup) : Result()
-        data class AddMenu(val list: List<MenuGroupData>) : Result()
+        data class SetMenu(val list: List<MenuGroupData>) : Result()
         data class AddItem(val typeItem: String, val item: OrderItem) : Result()
-//        data class EditItem(val typeItem: String, val item: OrderItem) :
-//            Result()
 
         data class ChangeCountItem(
-            val typeItem: MenuGroupData,
+            val menuGroupData: MenuGroupData,
             val item: OrderItem,
             val delta: Int
         ) : Result()
@@ -216,9 +205,24 @@ class OrderViewModel(
     data class State(
         val isLoadingMenu: Boolean = true,
         val tableGroup: TableGroup? = null,
-        val orderItems: MutableMap<MenuGroupData, List<OrderItem>> = mutableMapOf(),
-        val resultPrint: List<Int>? = null,
+        val orderItems: Map<MenuGroupData, List<OrderItem>> = mapOf(),
         val isSubmit: Boolean = false
     )
+
+    private companion object {
+
+        private fun Map<MenuGroupData, List<OrderItem>>.changeCountItem(
+            menuGroupData: MenuGroupData,
+            orderItem: OrderItem,
+            delta: Int
+        ): Map<MenuGroupData, List<OrderItem>> {
+            return toMutableMap().apply {
+                val orderItems = this[menuGroupData] ?: return@apply
+                this[menuGroupData] = orderItems.map {
+                    if (it.name == orderItem.name) it.copy(count = it.count + delta) else it
+                }
+            }
+        }
+    }
 
 }

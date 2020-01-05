@@ -31,9 +31,9 @@ class CheckRepository(
     }
 
     fun submitCheck(checkData: CheckData): Pair<DocumentReference, (transaction: Transaction) -> Unit> {
-        val checkDoc = checkReference.document()
-        return checkDoc to { transaction ->
-            transaction.set(checkDoc, checkData)
+        val checkRef = checkReference.document()
+        return checkRef to { transaction ->
+            transaction.set(checkRef, checkData)
         }
     }
 

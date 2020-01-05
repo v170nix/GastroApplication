@@ -13,6 +13,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_open_table_list.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.CustomToolbarFragment
@@ -21,7 +25,7 @@ import net.arwix.gastro.library.data.TableGroup
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import java.text.NumberFormat
 
-class OpenTableListFragment : CustomToolbarFragment() {
+class OpenTableListFragment : CustomToolbarFragment(), CoroutineScope by MainScope() {
 
     override val idResToolbar: Int = R.id.open_table_list_toolbar
 
@@ -113,15 +117,22 @@ class OpenTableListFragment : CustomToolbarFragment() {
     }
 
     private fun setIsEnableButtons(isEnabled: Boolean) {
-
-        pay_list_delete_button.isEnabled = isEnabled
-        pay_list_submit_button.isEnabled = isEnabled
         adapter.isClickable = isEnabled
-
-        pay_list_delete_button.backgroundTintList = if (isEnabled)
-            ContextCompat.getColorStateList(requireContext(), R.color.design_default_color_error)
-        else
-            ContextCompat.getColorStateList(requireContext(), R.color.mtrl_btn_bg_color_selector)
+        launch {
+            delay(250L)
+            pay_list_delete_button.isEnabled = isEnabled
+            pay_list_submit_button.isEnabled = isEnabled
+            pay_list_delete_button.backgroundTintList = if (isEnabled)
+                ContextCompat.getColorStateList(
+                    requireContext(),
+                    R.color.design_default_color_error
+                )
+            else
+                ContextCompat.getColorStateList(
+                    requireContext(),
+                    R.color.mtrl_btn_bg_color_selector
+                )
+        }
 
     }
 
@@ -167,16 +178,5 @@ class OpenTableListFragment : CustomToolbarFragment() {
             pay_list_delete_button.hide()
         }
     }
-
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        when (item.itemId) {
-//            R.id.menu_pay_add_items -> {
-//                payViewModel.nonCancelableIntent(PayViewModel.Action.AddAllItemsToPay)
-//                return true
-//            }
-//        }
-//        return false
-//    }
-
 
 }

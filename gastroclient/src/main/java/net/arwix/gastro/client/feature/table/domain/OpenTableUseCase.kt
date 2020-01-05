@@ -29,10 +29,10 @@ class OpenTableUseCase(
         isReturnOrder: Boolean = false,
         isSplitOrder: Boolean = false
     ) {
-        val filterItems = tableItems.filterPayItems()
-        if (filterItems.isEmpty()) return
+        val filteredItems = tableItems.filterPayItems()
+        if (filteredItems.isEmpty()) return
 
-        val checkItems: CheckItems = filterItems.mapValues { (_, list) ->
+        val checkItems: CheckItems = filteredItems.mapValues { (_, list) ->
             list.map { it.orderItem.copy(count = it.payCount) }
         }
         val summaryPrice = checkItems.values.sumBy { list ->
