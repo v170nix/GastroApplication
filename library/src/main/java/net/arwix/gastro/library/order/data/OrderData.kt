@@ -10,9 +10,10 @@ data class OrderData constructor(
     var table: Int? = null,
     var tablePart: Int? = null,
     var bonNumbers: Map<MenuGroupName, Int>? = null,
-    var orderItems: Map<MenuGroupName, List<OrderItem>> = mapOf(),
+    var orderItems: OrderItems = mapOf(),
+    var fromSplitTable: Int? = null,
+    var fromSplitTablePart: Int? = null,
     @ServerTimestamp var created: Timestamp? = null
-//    @field:JvmField var isPrinted: Boolean = false
 ) {
     fun sum(): Long {
         var sum = 0L
@@ -24,3 +25,5 @@ data class OrderData constructor(
         return sum
     }
 }
+
+typealias OrderItems = Map<MenuGroupName, List<OrderItem>>

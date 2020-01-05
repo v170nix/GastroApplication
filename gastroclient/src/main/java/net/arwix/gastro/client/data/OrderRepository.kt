@@ -2,6 +2,11 @@ package net.arwix.gastro.client.data
 
 import androidx.collection.arrayMapOf
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldPath
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.supervisorScope
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.FirestoreDbApp
 import net.arwix.gastro.library.data.TableGroup
@@ -17,6 +22,22 @@ class OrderRepository(
 
     suspend fun getOrder(documentPath: String): OrderData {
         return firestoreDbApp.refs.orders.document(documentPath).get().await()?.toObject(OrderData::class.java)!!
+    }
+
+    suspend fun getOrders(ordersRef: List<DocumentReference>): List<OrderData> = supervisorScope {
+        ordersRef.chunked(10)
+            .map {
+                async(Dispatchers.IO) {
+                    firestoreDbApp.refs.orders.whereIn(
+                        FieldPath.documentId(),
+                        it
+                    ).get().await()
+                }
+            }
+            .awaitAll()
+            .filterNotNull()
+            .map { it.toObjects(OrderData::class.java) }
+            .flatten()
     }
 
     suspend fun submit(
@@ -51,7 +72,7 @@ class OrderRepository(
 
     companion object {
 
-        fun getBons(
+        private fun getBons(
             initBon: Int,
             orderItems: Map<MenuGroupName, List<OrderItem>>
         ): Map<String, Int> {
@@ -62,7 +83,7 @@ class OrderRepository(
             return bonNumbers
         }
 
-        fun filterItems(orderItems: Map<MenuGroupData, List<OrderItem>>): Map<MenuGroupName, List<OrderItem>> {
+        private fun filterItems(orderItems: Map<MenuGroupData, List<OrderItem>>): Map<MenuGroupName, List<OrderItem>> {
             val result = arrayMapOf<MenuGroupName, List<OrderItem>>()
             orderItems.forEach { (menu, orders) ->
                 orders

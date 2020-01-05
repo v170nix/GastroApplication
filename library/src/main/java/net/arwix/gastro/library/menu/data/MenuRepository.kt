@@ -16,8 +16,8 @@ class MenuRepository(val menuRef: CollectionReference) {
         }
 
 
-    fun getMenusFlow() = menuGroupAsFlow
-    fun getMenuFlow(name: String) = menuRef.document(name).toFlow().map {
+    fun getMenusAsFlow() = menuGroupAsFlow
+    fun getMenuAsFlow(name: String) = menuRef.document(name).toFlow().map {
         it.toObject(MenuGroupDoc::class.java)?.toMenuData(it.id)
     }.filterNotNull()
 

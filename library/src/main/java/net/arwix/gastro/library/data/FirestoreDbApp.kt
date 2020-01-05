@@ -1,5 +1,6 @@
 package net.arwix.gastro.library.data
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Transaction
@@ -29,6 +30,12 @@ class FirestoreDbApp(
 
     fun setGlobalPrefs(transaction: Transaction, pref: PrefGlobalData) {
         transaction.set(refs.prefs.document("global"), pref)
+    }
+
+    fun <TResult> runTransaction(block: (it: Transaction) -> TResult): Task<TResult> {
+        return firestore.runTransaction {
+            block(it)
+        }
     }
 
     data class CollectionRef(

@@ -11,10 +11,12 @@ import kotlinx.android.synthetic.main.item_open_table_type.view.*
 import net.arwix.extension.gone
 import net.arwix.extension.visible
 import net.arwix.gastro.client.R
+import net.arwix.gastro.client.feature.table.data.OpenTableItem
+import net.arwix.gastro.client.feature.table.data.TableItems
 import java.text.NumberFormat
 
 class OpenTableListAdapter(
-    private val onChangeCount: (type: String, openTableOrderItem: OpenTableViewModel.PayOrderItem, delta: Int) -> Unit
+    private val onChangeCount: (type: String, openTableOrderItem: OpenTableItem, delta: Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var items = mutableListOf<PayAdapterOrderItem>()
@@ -75,7 +77,7 @@ class OpenTableListAdapter(
         return TYPE_ID_ITEM_DEFAULT
     }
 
-    fun setItems(openTableOrderData: MutableMap<String, MutableList<OpenTableViewModel.PayOrderItem>>) {
+    fun setItems(openTableOrderData: TableItems) {
         val newList = mutableListOf<PayAdapterOrderItem>()
         openTableOrderData.forEach { (type, list) ->
             val typeItem =
@@ -146,7 +148,7 @@ class OpenTableListAdapter(
 
     private sealed class PayAdapterOrderItem {
         data class Type(val name: String) : PayAdapterOrderItem()
-        data class Item(val type: String, val order: OpenTableViewModel.PayOrderItem) :
+        data class Item(val type: String, val order: OpenTableItem) :
             PayAdapterOrderItem()
     }
 

@@ -69,7 +69,7 @@ class OpenTableListFragment : CustomToolbarFragment() {
         pay_list_submit_button.setOnClickListener {
             val userId = profileViewModel.liveState.value?.userId ?: return@setOnClickListener
             setIsEnableButtons(false)
-            openTableViewModel.nonCancelableIntent(OpenTableViewModel.Action.CheckOut(userId))
+            openTableViewModel.nonCancelableIntent(OpenTableViewModel.Action.Checkout(userId))
         }
 
         pay_list_delete_button.setOnClickListener {
@@ -81,7 +81,7 @@ class OpenTableListFragment : CustomToolbarFragment() {
                     val userId =
                         profileViewModel.liveState.value?.userId ?: return@setPositiveButton
                     openTableViewModel.nonCancelableIntent(
-                        OpenTableViewModel.Action.DeleteCheckOut(
+                        OpenTableViewModel.Action.DeleteCheckout(
                             userId
                         )
                     )
@@ -95,7 +95,7 @@ class OpenTableListFragment : CustomToolbarFragment() {
         setIsEnableButtons(true)
         updateTextAndVisiblePayButton(openTableViewModel.liveState.value)
         state.tableGroup?.run(this::setTitle)
-        state.summaryData?.run {
+        state.tableItems?.run {
             adapter.setItems(this)
         }
         if (state.isCloseTableGroup) {
@@ -136,7 +136,7 @@ class OpenTableListFragment : CustomToolbarFragment() {
 
     private fun getPayCountAndPrice(state: OpenTableViewModel.State?): Pair<Long, Int>? {
         state ?: return null
-        val payOrderItems = state.summaryData ?: return null
+        val payOrderItems = state.tableItems ?: return null
         var count = 0
         var price = 0L
         payOrderItems.values.forEach { payOrderItem ->

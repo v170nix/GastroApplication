@@ -18,9 +18,9 @@ class MenuUseCase(private val repository: MenuRepository) {
         }
     }
 
-    fun getMenusFlow() = repository.getMenusFlow()
+    fun getMenusFlow() = repository.getMenusAsFlow()
 
-    fun getMenuFlow(name: String) = repository.getMenuFlow(name)
+    fun getMenuFlow(name: String) = repository.getMenuAsFlow(name)
 
     suspend fun addMenuGroup(menuGroupData: MenuGroupData) {
         repository.menuRef.document(menuGroupData.name).set(menuGroupData.toMenuDoc()).await()

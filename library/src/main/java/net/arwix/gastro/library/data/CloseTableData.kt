@@ -9,6 +9,7 @@ data class CloseTableData constructor(
     var tablePart: Int? = null,
     var orders: List<DocumentReference> = listOf(),
     var checks: List<DocumentReference> = listOf(),
-    var summaryPrice: Long = 0L,
+    var summaryOrderPrice: Long = 0L,
+    var summaryPayPrice: Long = 0L,
     @ServerTimestamp var closedTime: Timestamp? = null
 )

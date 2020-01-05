@@ -29,7 +29,7 @@ class OrderViewModel(
 
     init {
         viewModelScope.launch {
-            menuRepository.getMenusFlow().collect { menus ->
+            menuRepository.getMenusAsFlow().collect { menus ->
                 menus.sortedBy { it.metadata.order }.let {
                     menuGroupData = it
                     notificationFromObserver(Result.AddMenu(menus))
