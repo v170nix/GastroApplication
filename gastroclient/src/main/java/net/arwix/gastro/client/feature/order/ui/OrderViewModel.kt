@@ -86,8 +86,8 @@ class OrderViewModel(
                         internalViewState.orderItems
                     ) ?: return@withContext
                     PrintIntentService.startPrintOrder(context, reference.id)
-                    emit(Result.SubmitOrder())
                 }
+                emit(Result.SubmitOrder())
             }
         }
     }

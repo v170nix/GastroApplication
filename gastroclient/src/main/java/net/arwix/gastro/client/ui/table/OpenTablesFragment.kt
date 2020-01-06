@@ -52,8 +52,7 @@ class OpenTablesFragment : CustomToolbarFragment() {
             onAddOrderClick = {
                 orderViewModel.selectTable(it)
                 orderViewModel.isAnimateBigButton = true
-                OpenTablesFragmentDirections.actionGlobalOrderListFragment(true)
-                    .navigate(this)
+                OpenTablesFragmentDirections.actionGlobalOrderListFragment().navigate(this)
             }
         )
         with(open_tables_recycler_view) {

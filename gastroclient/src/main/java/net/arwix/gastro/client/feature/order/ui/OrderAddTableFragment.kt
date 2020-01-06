@@ -57,12 +57,7 @@ class OrderAddTableFragment : CustomToolbarFragment() {
 
     private fun toOrderList(tableGroup: TableGroup) {
         orderViewModel.selectTable(tableGroup)
-
-
-        OrderAddTableFragmentDirections.actionGlobalOrderListFragment(
-            true
-        )
-            .navigate(this)
+        OrderAddTableFragmentDirections.actionGlobalOrderListFragment().navigate(this)
     }
 
 }

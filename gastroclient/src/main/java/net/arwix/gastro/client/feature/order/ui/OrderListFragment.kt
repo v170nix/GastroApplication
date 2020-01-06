@@ -6,9 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.observe
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.NavHostFragment.findNavController
-import androidx.navigation.fragment.navArgs
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_order_list.*
@@ -32,27 +30,18 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
 
     override val idResToolbar: Int = R.id.order_list_toolbar
 
-    private val args: OrderListFragmentArgs by navArgs()
     private val orderViewModel: OrderViewModel by sharedViewModel()
     private val profileViewModel: ProfileViewModel by sharedViewModel()
     private lateinit var adapterOrder: OrderListAdapter
     private lateinit var multilineButtonHelper: MultilineButtonHelper
     private lateinit var animationViewHelper: AnimationViewHelper
+    private var adapterJob: Job? = null
 
     private var isSubmit: Boolean = false
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_order_list, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        order_list_add_process_bar.gone()
-        multilineButtonHelper = MultilineButtonHelper(view.order_list_submit_layout, false)
-        animationViewHelper = AnimationViewHelper()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        orderViewModel.liveState.observe(this, ::render)
         adapterOrder = OrderListAdapter(
             onMenuGroupClick = {
                 OrderListFragmentDirections.actionToOrderAddPreItemsFragment(
@@ -71,17 +60,35 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
             }
 
         )
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        return inflater.inflate(R.layout.fragment_order_list, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        order_list_add_process_bar.gone()
+        multilineButtonHelper = MultilineButtonHelper(view.order_list_submit_layout, false)
+        animationViewHelper = AnimationViewHelper()
         with(order_list_recycler_view) {
             val linearLayoutManager = LinearLayoutManager(context)
+            this.setHasFixedSize(true)
             layoutManager = linearLayoutManager
-            itemAnimator?.changeDuration = 60
             addItemDecoration(DividerItemDecoration(context, linearLayoutManager.orientation))
             adapter = this@OrderListFragment.adapterOrder
         }
         multilineButtonHelper.setOnClickListener(View.OnClickListener {
             putToDb()
         })
-        orderViewModel.liveState.observe(viewLifecycleOwner, ::render)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        orderViewModel.liveState.value?.tableGroup?.run(::setTitle)
     }
 
     private fun putToDb() {
@@ -101,13 +108,18 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
         isSubmit = if (!isSubmit) state.isSubmit else true
         if (state.isSubmit) {
             orderViewModel.clear()
-            val options = NavOptions.Builder()
-                .setPopUpTo(R.id.openTablesFragment, true)
-                .build()
-            findNavController(this).navigate(R.id.openTablesFragment, null, options)
+//            val options = NavOptions.Builder()
+//                .setPopUpTo(R.id.openTablesFragment, true)
+//                .build()
+            findNavController().popBackStack(R.id.openTablesFragment, false)
+//            findNavController().navigate(R.id.openTablesFragment, null, options)
         } else if (!isSubmit) {
             if (!state.isLoadingMenu) animationViewHelper.enableActions(orderViewModel.isAnimateBigButton)
-            adapterOrder.setItems(state.orderItems)
+            adapterJob?.cancel()
+            adapterJob = launch {
+                delay(200)
+                adapterOrder.setItems(state.orderItems)
+            }
             state.tableGroup?.run(::setTitle)
             renderTotalPrice(state.orderItems)
         }

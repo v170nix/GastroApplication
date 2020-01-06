@@ -1,22 +1,12 @@
 package net.arwix.gastro.client.domain
 
-import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
-import net.arwix.gastro.client.domain.InnerFragmentStateViewModel.InnerFragmentState.OrderListFragmentState
-import net.arwix.gastro.client.feature.order.ui.OrderListFragment
 
 class InnerFragmentStateViewModel : ViewModel() {
 
     @PublishedApi
-    internal val map = mutableMapOf<Class<out Fragment>, InnerFragmentState>(
-        OrderListFragment::class.java to OrderListFragmentState(true, null)
-    )
-
-    sealed class InnerFragmentState {
-        data class OrderListFragmentState(val isExpandTitle: Boolean, val listState: Parcelable?) :
-            InnerFragmentState()
-    }
+    internal val map = mutableMapOf<Class<out Fragment>, InnerFragmentState>()
 
     inline fun <reified T : InnerFragmentState> setState(
         clazz: Class<out Fragment>,
@@ -32,6 +22,8 @@ class InnerFragmentStateViewModel : ViewModel() {
         require(s is T)
         return s
     }
+
+    abstract class InnerFragmentState
 
 
 }

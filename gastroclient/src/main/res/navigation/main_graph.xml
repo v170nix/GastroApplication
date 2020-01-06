@@ -40,10 +40,6 @@
         <action
             android:id="@+id/action_to_orderAddPreItemsFragment"
             app:destination="@id/orderAddPreItemsFragment" />
-        <argument
-            android:name="clearInnerState"
-            android:defaultValue="false"
-            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/orderAddPreItemsFragment"

@@ -3,6 +3,8 @@ package net.arwix.gastro.client.feature.order.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.TranslateAnimation
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -69,7 +71,7 @@ class OrderListAdapter(
         }
         val diffCallback =
             ItemDiffCallback(
-                items,
+                items.toMutableList(),
                 newList
             )
         val diffResult =
@@ -121,19 +123,17 @@ class OrderListAdapter(
             holder.plusItemButton.tag = item
             holder.minusItemButton.setOnClickListener(doMinusCountClick)
             holder.plusItemButton.setOnClickListener(doPlusCountClick)
-//            holder.itemView.tag = item
-//            holder.itemView.setOnClickListener(doPlusCountClick)
-//            if (isClickable) {
-//                holder.minusItemButton.animate().alpha(1f).setDuration(75).start()
-//                holder.plusItemButton.animate().alpha(1f).setDuration(75).start()
-//            } else {
-//                holder.minusItemButton.animate().alpha(0.4f).setDuration(75).start()
-//                holder.plusItemButton.animate().alpha(0.4f).setDuration(75).start()
-//            }
             holder.minusItemButton.isEnabled = (item.order.count > 0) && isClickable
             holder.plusItemButton.isEnabled = isClickable
             holder.itemView.isEnabled = isClickable
             holder.bindTo(item)
+//            holder.itemView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+//                override fun onGlobalLayout() {
+//                    holder.animateItem()
+//                    holder.itemView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+//                }
+//
+//            })
         }
         if (item is AdapterOrderItems.Type) {
             holder as AdapterItemHolder.TypeItemHolder
@@ -145,6 +145,7 @@ class OrderListAdapter(
             holder.bindTo(item)
         }
     }
+
 
     sealed class AdapterOrderItems {
         data class Type(val groupData: MenuGroupData) : AdapterOrderItems()
@@ -160,6 +161,7 @@ class OrderListAdapter(
         override fun getNewListSize(): Int = newList.size
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+//            return false
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
             if (oldItem is AdapterOrderItems.Type && newItem is AdapterOrderItems.Type) {
@@ -172,6 +174,7 @@ class OrderListAdapter(
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+//            return false
             val oldItem = oldList[oldItemPosition]
             val newItem = newList[newItemPosition]
             if (oldItem is AdapterOrderItems.Type && newItem is AdapterOrderItems.Type) {
@@ -203,6 +206,19 @@ class OrderListAdapter(
                 val formatter = NumberFormat.getCurrencyInstance()
                 name.text = "${item.order.count}x ${item.order.name}"
                 price.text = formatter.format(item.order.price / 100.0).toString() // + "\u20ac"
+            }
+
+            fun animateItem() {
+                val itemWidth: Float = itemView.width.toFloat()
+                val animator = TranslateAnimation(-itemWidth, 0f, 0f, 0f)
+
+                animator.repeatCount = 0
+                animator.interpolator = AccelerateInterpolator(1.0f)
+                animator.duration = 700
+                animator.fillAfter = true
+
+                itemView.animation = animator
+                itemView.startAnimation(animator)
             }
         }
 
