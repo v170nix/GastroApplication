@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">gastroClient</string>
 
+    <string name="transition_name_main_bar" translatable="false">transition_name_main_bar</string>
+
     <string name="menu_pay_add_items">Add all items to pay</string>
     <string name="menu_history_orders">View last order</string>
     <string name="menu_history_checks">View last check</string>

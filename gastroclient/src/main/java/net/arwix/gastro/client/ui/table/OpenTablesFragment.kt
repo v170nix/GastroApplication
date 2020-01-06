@@ -14,7 +14,6 @@ import net.arwix.gastro.client.R
 import net.arwix.gastro.client.feature.order.ui.OrderViewModel
 import net.arwix.gastro.client.feature.table.ui.OpenTableViewModel
 import net.arwix.gastro.library.common.CustomToolbarFragment
-import net.arwix.gastro.library.common.navigate
 import net.arwix.gastro.library.common.setToolbarTitle
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -52,7 +51,7 @@ class OpenTablesFragment : CustomToolbarFragment() {
             onAddOrderClick = {
                 orderViewModel.selectTable(it)
                 orderViewModel.isAnimateBigButton = true
-                OpenTablesFragmentDirections.actionGlobalOrderListFragment().navigate(this)
+                findNavController().navigate(OpenTablesFragmentDirections.actionGlobalOrderListFragment())
             }
         )
         with(open_tables_recycler_view) {

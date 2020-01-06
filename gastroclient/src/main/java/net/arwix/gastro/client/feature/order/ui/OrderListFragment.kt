@@ -66,8 +66,21 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+//        sharedElementEnterTransition = ChangeBounds().apply {
+////            duration = 7500
+//        }
+//        sharedElementReturnTransition = ChangeBounds().apply {
+////            duration = 7500
+//        }
         return inflater.inflate(R.layout.fragment_order_list, container, false)
     }
+
+//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation? {
+//        Log.e("onCreateAnimation", "1")
+//        return if (enter) {
+//            AnimationUtils.loadAnimation(requireContext(), R.anim.enter_anim)
+//        } else super.onCreateAnimation(transit, enter, nextAnim)
+//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
