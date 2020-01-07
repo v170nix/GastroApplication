@@ -41,10 +41,11 @@ data class MenuGroupData(
         val printer: String? = null,
         val color: Int? = null,
         val row: RowValue = 1,
-        val col: ColValue = 1
+        val col: ColValue = 1,
+        val printerFont: Int = 1
     ) : Parcelable {
         fun toPreMenuItemValueDoc() = MenuGroupDoc.PreMenuItemValueDoc(
-            price, printer, color, row, col
+            price, printer, color, row, col, printerFont
         )
     }
 

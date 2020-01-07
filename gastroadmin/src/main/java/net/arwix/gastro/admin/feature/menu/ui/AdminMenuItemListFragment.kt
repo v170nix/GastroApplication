@@ -179,6 +179,12 @@ class AdminMenuItemListFragment : Fragment() {
                     holder.order.setTextColor(getTextColor(cellOutRangeColor))
                 }
 
+                printerFont.text = when (item.printerFont) {
+                    2 -> "Font B"
+                    3 -> "Font C"
+                    else -> "Font A"
+                }
+
                 val color = item.color ?: menuGroup?.metadata?.color
                 color?.run {
                     colorView.setBackgroundColor(this)
@@ -197,6 +203,7 @@ class AdminMenuItemListFragment : Fragment() {
             val price: TextView = view.item_admin_menu_item_price_text
             val deleteButton: View = view.item_admin_menu_item_delete_button
             val colorView: View = view.item_admin_menu_item_color
+            val printerFont: TextView = view.item_admin_menu_item_printer_font_text
 
             override fun bindTo(item: MenuGroupData.PreMenuItem) {
                 name.text = item.name

@@ -97,7 +97,10 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
         }
     }
 
-    suspend fun printOrder(addressPrinter: String, orderData: OrderData) =
+    suspend fun printOrder(
+        addressPrinter: String,
+        orderData: OrderData
+    ) =
         suspendCancellableCoroutine<Int> { cont ->
 
             val printer = Printer(Printer.TM_M30, Printer.MODEL_ANK, applicationContext)
@@ -131,7 +134,7 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
 
             val bonNumbers = orderData.bonNumbers
 
-            orderData.orderItems?.forEach { (type: String, items: List<OrderItem>) ->
+            orderData.orderItems.forEach { (type: String, items: List<OrderItem>) ->
                 val bonNumber = bonNumbers?.get(type)
                 //==============================================
                 printer.addTextFont(Printer.FONT_A)
@@ -191,6 +194,12 @@ class PrinterOrderUseCase(private val applicationContext: Context) {
             val status = printer.status
             printer.sendData(Printer.PARAM_DEFAULT)
         }
+
+    companion object {
+        const val PRINT_LINE_SIZE_FONT_A = 48
+        const val PRINT_LINE_SIZE_FONT_B = 57
+        const val PRINT_LINE_SIZE_FONT_C = 64
+    }
 }
 
 

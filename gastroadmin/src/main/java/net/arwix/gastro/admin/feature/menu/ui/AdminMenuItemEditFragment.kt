@@ -154,7 +154,12 @@ class AdminMenuItemEditFragment : Fragment(), CoroutineScope by MainScope() {
             color = color,
             row = row,
             col = col,
-            price = (priceDouble!! * 100.0).roundToLong()
+            price = (priceDouble!! * 100.0).roundToLong(),
+            printerFont = when (admin_menu_item_edit_print_font_group.checkedChipId) {
+                R.id.admin_menu_item_edit_print_font_b -> 2
+                R.id.admin_menu_item_edit_print_font_c -> 3
+                else -> 1
+            }
         )
     }
 
@@ -163,6 +168,13 @@ class AdminMenuItemEditFragment : Fragment(), CoroutineScope by MainScope() {
         admin_menu_item_edit_row.editText?.setText(data.row.toString())
         admin_menu_item_edit_col.editText?.setText(data.col.toString())
         admin_menu_item_edit_printer_address.editText?.setText(data.printer ?: "")
+        admin_menu_item_edit_print_font_group.check(
+            when (data.printerFont) {
+                2 -> R.id.admin_menu_item_edit_print_font_b
+                3 -> R.id.admin_menu_item_edit_print_font_c
+                else -> R.id.admin_menu_item_edit_print_font_a
+            }
+        )
 //        admin_menu_item_edit_printer_address.editText?.isEnabled = false
 //        admin_menu_item_edit_printer_address.editText?.focusable = NOT_FOCUSABLE
 //        admin_menu_item_edit_printer_address.editText?.inputType = InputType.TYPE_NULL

@@ -10,6 +10,7 @@ data class MenuGroupDoc(
     val order: Int? = null,
     val color: Int? = null,
     val items: Map<MenuItemName, PreMenuItemValueDoc>? = null,
+    val printerFont: Int = 1,
     @ServerTimestamp val updatedTime: Timestamp? = null
 ) {
     fun toMenuData(name: String) =
@@ -28,10 +29,11 @@ data class MenuGroupDoc(
         val printer: String? = null,
         val color: Int? = null,
         val row: Int = 1,
-        val col: Int = 1
+        val col: Int = 1,
+        val printerFont: Int = 1
     ) {
         fun toPreMenuItem(name: String) =
-            MenuGroupData.PreMenuItem(name, price, printer, color, row, col)
+            MenuGroupData.PreMenuItem(name, price, printer, color, row, col, printerFont)
     }
 }
 

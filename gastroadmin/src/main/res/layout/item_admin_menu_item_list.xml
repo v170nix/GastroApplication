@@ -34,6 +34,16 @@
             app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_item_name_text"
             tools:text="TCP:123.231.232.232" />
 
+        <TextView
+            android:id="@+id/item_admin_menu_item_printer_font_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_item_printer_text"
+            tools:text="Font A" />
+
         <ImageButton
             android:id="@+id/item_admin_menu_item_delete_button"
             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -55,7 +65,7 @@
             android:text="@string/admin_menu_group_item_order"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_item_printer_text"
+            app:layout_constraintTop_toBottomOf="@+id/item_admin_menu_item_printer_font_text"
             tools:text="row:1; col 1" />
 
         <View
