@@ -47,7 +47,7 @@ class OrderAddTableFragment : CustomToolbarFragment() {
         val tableId = runCatching {
             order_table_custom_edit_text.editableText.toString().trim().toInt()
         }.getOrNull() ?: return
-        val tablePart = kotlin.runCatching {
+        val tablePart = runCatching {
             order_table_custom_part_input_layout.editText!!.editableText.toString().trim()
                 .toInt()
         }.getOrElse { 1 }

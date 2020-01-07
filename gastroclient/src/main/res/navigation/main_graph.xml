@@ -64,7 +64,11 @@
     <fragment
         android:id="@+id/payListFragment"
         android:name="net.arwix.gastro.client.feature.table.ui.OpenTableListFragment"
-        tools:layout="@layout/fragment_open_table_list" />
+        tools:layout="@layout/fragment_open_table_list">
+        <action
+            android:id="@+id/action_payListFragment_to_splitSelectTableFragment"
+            app:destination="@id/splitSelectTableFragment" />
+    </fragment>
     <fragment
         android:id="@+id/historyCheckDetailFragment"
         android:name="net.arwix.gastro.client.ui.history.check.HistoryCheckDetailFragment"
@@ -82,4 +86,9 @@
         app:destination="@id/orderListFragment"
         app:popUpTo="@+id/orderListFragment"
         app:popUpToInclusive="true" />
+    <fragment
+        android:id="@+id/splitSelectTableFragment"
+        android:name="net.arwix.gastro.client.feature.table.ui.SplitSelectTableFragment"
+        android:label="fragment_split_select_table"
+        tools:layout="@layout/fragment_split_select_table" />
 </navigation>

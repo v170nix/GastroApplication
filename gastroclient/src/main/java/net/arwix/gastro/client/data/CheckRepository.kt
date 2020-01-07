@@ -30,7 +30,7 @@ class CheckRepository(
             .flatten()
     }
 
-    fun submitCheck(checkData: CheckData): Pair<DocumentReference, (transaction: Transaction) -> Unit> {
+    fun submitCheckWorker(checkData: CheckData): Pair<DocumentReference, (transaction: Transaction) -> Unit> {
         val checkRef = checkReference.document()
         return checkRef to { transaction ->
             transaction.set(checkRef, checkData)

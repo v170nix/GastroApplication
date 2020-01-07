@@ -41,9 +41,9 @@ class ReportDayUseCase(
         var totalPrice = 0L
 
         query.toObjects(CheckData::class.java).forEach {
-            if (it.isReturnOrder) return@forEach
+            if (it.isReturnOrder || it.isSplitOrder) return@forEach
             totalChecks++
-            it.checkItems?.forEach { (_, checkItems) ->
+            it.checkItems.forEach { (_, checkItems) ->
                 checkItems.forEach { check ->
                     totalItems += check.count
                     totalPrice += check.count * check.price

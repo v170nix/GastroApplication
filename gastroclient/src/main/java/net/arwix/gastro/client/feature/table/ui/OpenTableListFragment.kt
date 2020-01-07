@@ -2,18 +2,17 @@ package net.arwix.gastro.client.feature.table.ui
 
 
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_open_table_list.*
 import kotlinx.coroutines.*
+import net.arwix.extension.invisible
+import net.arwix.extension.visible
 import net.arwix.gastro.client.R
 import net.arwix.gastro.client.ui.profile.ProfileViewModel
 import net.arwix.gastro.library.common.CustomToolbarFragment
@@ -29,6 +28,7 @@ class OpenTableListFragment : CustomToolbarFragment(), CoroutineScope by MainSco
     private val openTableViewModel: OpenTableViewModel by sharedViewModel()
     private val profileViewModel: ProfileViewModel by sharedViewModel()
     private lateinit var adapter: OpenTableListAdapter
+    private lateinit var fabAnimationHelper: FabAnimationHelper
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +39,7 @@ class OpenTableListFragment : CustomToolbarFragment(), CoroutineScope by MainSco
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        fabAnimationHelper = FabAnimationHelper()
         adapter =
             OpenTableListAdapter { type, payOrderItem, delta ->
                 openTableViewModel.nonCancelableIntent(
@@ -89,6 +90,10 @@ class OpenTableListFragment : CustomToolbarFragment(), CoroutineScope by MainSco
                 }
                 .show()
         }
+        open_table_list_split_button.setOnClickListener {
+            findNavController().navigate(R.id.splitSelectTableFragment)
+        }
+
         openTableViewModel.liveState.observe(viewLifecycleOwner, Observer(this::render))
     }
 
@@ -123,17 +128,18 @@ class OpenTableListFragment : CustomToolbarFragment(), CoroutineScope by MainSco
         launch {
             delay(250L)
             pay_list_delete_button.isEnabled = isEnabled
+            open_table_list_split_button.isEnabled = isEnabled
             pay_list_submit_button.isEnabled = isEnabled
-            pay_list_delete_button.backgroundTintList = if (isEnabled)
-                ContextCompat.getColorStateList(
-                    requireContext(),
-                    R.color.design_default_color_error
-                )
-            else
-                ContextCompat.getColorStateList(
-                    requireContext(),
-                    R.color.mtrl_btn_bg_color_selector
-                )
+//            pay_list_delete_button.backgroundTintList = if (isEnabled)
+//                ContextCompat.getColorStateList(
+//                    requireContext(),
+//                    R.color.design_default_color_error
+//                )
+//            else
+//                ContextCompat.getColorStateList(
+//                    requireContext(),
+//                    R.color.mtrl_btn_bg_color_selector
+//                )
         }
     }
 
@@ -166,17 +172,86 @@ class OpenTableListFragment : CustomToolbarFragment(), CoroutineScope by MainSco
         getPayCountAndPrice(state)?.let { (price, count) ->
             if (price > 0) {
                 pay_list_submit_button.show()
-                pay_list_delete_button.show()
+                fabAnimationHelper.show()
             } else {
                 pay_list_submit_button.hide()
-                pay_list_delete_button.hide()
+                fabAnimationHelper.hide()
                 return
             }
             val formatter = NumberFormat.getCurrencyInstance()
             pay_list_submit_button.text = "To pay: ${formatter.format(price / 100.0)}"
         } ?: run {
             pay_list_submit_button.hide()
-            pay_list_delete_button.hide()
+            fabAnimationHelper.hide()
+        }
+    }
+
+    private inner class FabAnimationHelper {
+
+        private var isOpen = false
+
+        init {
+            open_table_list_menu_button.setOnClickListener {
+                if (isOpen) showOut() else showIn()
+                isOpen = !isOpen
+            }
+        }
+
+        fun show() {
+            open_table_list_menu_button.show()
+            if (isOpen) showOut()
+            isOpen = false
+        }
+
+        fun hide() {
+            open_table_list_menu_button.hide()
+            if (isOpen) showOut()
+            isOpen = false
+        }
+
+        fun showIn() {
+            rotateFab(open_table_list_menu_button, true)
+            showIn(open_table_list_split_button).start()
+            showIn(pay_list_delete_button).setDuration(300).start()
+        }
+
+        fun showOut() {
+            rotateFab(open_table_list_menu_button, false)
+            showOut(open_table_list_split_button).setDuration(300).start()
+            showOut(pay_list_delete_button).start()
+        }
+    }
+
+    private companion object {
+        fun rotateFab(view: View, rotate: Boolean) {
+            view.animate()
+                .setDuration(200L)
+                .withEndAction {}
+                .rotation(if (rotate) 135f else 0f)
+                .start()
+        }
+
+        fun showIn(view: View): ViewPropertyAnimator {
+            view.visible()
+            view.alpha = 0f
+            view.translationY = view.height.toFloat()
+            return view.animate().setDuration(200)
+                .setInterpolator(DecelerateInterpolator())
+                .translationY(0f)
+                .alpha(1f)
+        }
+
+        fun showOut(view: View): ViewPropertyAnimator {
+            view.visible()
+            view.alpha = 1f
+            view.translationY = 0f
+            return view.animate().setDuration(200)
+                .translationY(view.height.toFloat())
+                .setInterpolator(DecelerateInterpolator())
+                .withEndAction {
+                    view.invisible()
+                }
+                .alpha(0f)
         }
     }
 

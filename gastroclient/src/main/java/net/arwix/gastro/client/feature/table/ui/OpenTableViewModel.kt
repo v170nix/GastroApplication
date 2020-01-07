@@ -61,6 +61,21 @@ class OpenTableViewModel(
         }
     }
 
+    fun split(userId: Int, toTableGroup: TableGroup) {
+        viewModelScope.launch {
+            val tableGroup = internalViewState.tableGroup ?: return@launch
+            val openTableData = internalViewState.tableData ?: return@launch
+            val tableItems = internalViewState.tableItems ?: return@launch
+            openTableUseCase.split(
+                waiterId = userId,
+                fromTableGroup = tableGroup,
+                openTableData = openTableData,
+                tableItems = tableItems,
+                toTableGroup = toTableGroup
+            )
+        }
+    }
+
     override fun dispatchAction(action: Action) = liveData {
         when (action) {
             is Action.ChangePayCount -> emit(

@@ -80,19 +80,23 @@ class OpenTableListAdapter(
     }
 
     fun setItems(openTableOrderData: TableItems) {
+
+//        val currentMaxCount = item.order.orderItem.count - item.order.checkCount == 0
+//        val orderCount = item.order.orderItem.count - item.order.returnCount - item.order.splitCount == 0
+
+
         val newList = mutableListOf<PayAdapterOrderItem>()
-        openTableOrderData.forEach { (type, list) ->
-            val typeItem =
-                PayAdapterOrderItem.Type(
-                    type
-                )
-            newList.add(typeItem)
-            newList.addAll(list.map {
-                PayAdapterOrderItem.Item(
-                    type,
-                    it
-                )
-            })
+        openTableOrderData.forEach { (menu, list) ->
+            val typeItem = PayAdapterOrderItem.Type(menu)
+            val filterList = list.filter {
+                val currentMaxCount = it.orderItem.count - it.checkCount
+                val orderCount = it.orderItem.count - it.returnCount - it.splitCount
+                currentMaxCount != 0 || orderCount != 0
+            }
+            if (filterList.isNotEmpty()) {
+                newList.add(typeItem)
+                newList.addAll(filterList.map { PayAdapterOrderItem.Item(menu, it) })
+            }
         }
         val diffCallback =
             ItemDiffCallback(items, newList)
@@ -118,8 +122,10 @@ class OpenTableListAdapter(
         fun bindTo(item: PayAdapterOrderItem.Item) {
             val formatter = NumberFormat.getCurrencyInstance()
             val currentMaxCount = item.order.orderItem.count - item.order.checkCount
-            val count = if (item.order.checkCount > 0) {
-                "(${item.order.orderItem.count - item.order.returnCount}) "
+            val orderCount =
+                item.order.orderItem.count - item.order.returnCount - item.order.splitCount
+            val count = if (orderCount != currentMaxCount) {
+                "($orderCount) "
             } else ""
             name.text = "$count${currentMaxCount}x ${item.order.orderItem.name}"
             price.text =

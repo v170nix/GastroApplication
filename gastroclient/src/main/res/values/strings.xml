@@ -41,6 +41,9 @@
     <string name="pay_list_title">Open table</string>
     <string name="pay_list_action_add_pay_items">select and pay</string>
 
+    <string name="title_split_table">Split table</string>
+    <string name="title_split_table_action_title">to table</string>
+
     <string name="handlingmsg_warn_receipt_near_end">Roll paper is nearly end</string>
     <string name="handlingmsg_warn_battery_near_end">Battery level of printer is low</string>
     <string name="handlingmsg_err_no_response">Please check the connection of the printer and the mobile terminal\nConnection get lost</string>

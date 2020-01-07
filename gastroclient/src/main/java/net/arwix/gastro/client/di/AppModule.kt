@@ -37,7 +37,7 @@ val mainModule = module {
     single { OrderRepository(get<FirestoreDbApp>().refs.orders) }
     single { OrderUseCase(get(), get(), get()) }
     single { CheckRepository(get<FirestoreDbApp>().refs.checks) }
-    single { OpenTableUseCase(get(), get(), get(), get()) }
+    single { OpenTableUseCase(get(), get(), get(), get(), get()) }
 
     viewModel { InnerFragmentStateViewModel() }
     viewModel { ProfileViewModel() }

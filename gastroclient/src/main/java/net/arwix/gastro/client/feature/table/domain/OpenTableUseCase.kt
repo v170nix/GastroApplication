@@ -1,11 +1,11 @@
 package net.arwix.gastro.client.feature.table.domain
 
 import androidx.collection.arrayMapOf
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Transaction
 import net.arwix.gastro.client.data.CheckRepository
 import net.arwix.gastro.client.data.OpenTableRepository
 import net.arwix.gastro.client.data.OrderRepository
+import net.arwix.gastro.client.feature.order.domain.OrderUseCase
 import net.arwix.gastro.client.feature.table.data.MutableTableItems
 import net.arwix.gastro.client.feature.table.data.OpenTableItem
 import net.arwix.gastro.client.feature.table.data.TableItems
@@ -13,24 +13,62 @@ import net.arwix.gastro.client.feature.table.data.filterPayItems
 import net.arwix.gastro.library.await
 import net.arwix.gastro.library.data.*
 import net.arwix.gastro.library.menu.data.MenuGroupName
+import net.arwix.gastro.library.order.data.OrderItems
 
 class OpenTableUseCase(
     private val firestoreDbApp: FirestoreDbApp,
     private val openTableRepository: OpenTableRepository,
     private val orderRepository: OrderRepository,
-    private val checkRepository: CheckRepository
+    private val checkRepository: CheckRepository,
+    private val orderUseCase: OrderUseCase
 ) {
 
-    suspend fun checkout(
+    suspend fun split(
+        waiterId: Int,
+        openTableData: OpenTableData,
+        fromTableGroup: TableGroup,
+        tableItems: TableItems,
+        toTableGroup: TableGroup
+    ) {
+        val filteredItems: Map<MenuGroupName, List<OpenTableItem>> = tableItems.filterPayItems()
+        if (filteredItems.isEmpty()) return
+        val orderItems: OrderItems = filteredItems.mapValues { (_, list) ->
+            list.map { it.orderItem.copy(count = it.payCount) }
+        }
+        firestoreDbApp.runTransaction {
+            val checkoutWorker = checkoutWorker(
+                it, waiterId, openTableData, fromTableGroup, tableItems,
+                isReturnOrder = false,
+                isSplitOrder = true,
+                splitToTableGroup = toTableGroup
+            )
+            val (_, orderWorker) = orderUseCase.submitWorker(
+                transaction = it,
+                userId = waiterId,
+                tableGroup = toTableGroup,
+                orderItems = orderItems,
+                fromTableGroup = fromTableGroup
+            )
+            checkoutWorker(it)
+            orderWorker(it)
+        }.await()
+    }
+
+    fun checkoutWorker(
+        transaction: Transaction,
         waiterId: Int,
         openTableData: OpenTableData,
         tableGroup: TableGroup,
         tableItems: TableItems,
         isReturnOrder: Boolean = false,
-        isSplitOrder: Boolean = false
-    ) {
+        isSplitOrder: Boolean = false,
+        splitToTableGroup: TableGroup? = null
+    ): (transaction: Transaction) -> Unit {
         val filteredItems = tableItems.filterPayItems()
-        if (filteredItems.isEmpty()) return
+        if (filteredItems.isEmpty()) return { _ -> }
+
+        if (!openTableRepository.isLatestData(transaction, tableGroup, openTableData.updatedTime)
+        ) return { _ -> }
 
         val checkItems: CheckItems = filteredItems.mapValues { (_, list) ->
             list.map { it.orderItem.copy(count = it.payCount) }
@@ -39,7 +77,7 @@ class OpenTableUseCase(
             list.sumBy { (it.count * it.price).toInt() }
         }
         val residualCount = tableItems.values.sumBy { list ->
-            list.sumBy { it.orderItem.count - it.payCount - it.checkCount - it.splitCount }
+            list.sumBy { it.orderItem.count - it.checkCount - it.payCount }
         }
 
         val checkData = CheckData(
@@ -48,19 +86,23 @@ class OpenTableUseCase(
             tablePart = tableGroup.tablePart,
             checkItems = checkItems,
             isReturnOrder = isReturnOrder,
-            isSplitOrder = isSplitOrder
+            isSplitOrder = isSplitOrder,
+            splitToTable = splitToTableGroup?.tableId,
+            splitToTablePart = splitToTableGroup?.tablePart
         )
 
-        firestoreDbApp.runTransaction {
-            if (!openTableRepository.isLatestData(
-                    it,
-                    tableGroup,
-                    openTableData.updatedTime
-                )
-            ) return@runTransaction
-            val (checkRef: DocumentReference, checkSubmitWork: (transaction: Transaction) -> Unit) =
-                checkRepository.submitCheck(checkData)
+        val (checkRef, submitCheckWork) = checkRepository.submitCheckWorker(checkData)
+        val openTableAddCheckWorker = if (residualCount != 0) openTableRepository.applyCheck(
+            transaction,
+            tableGroup,
+            checkRef,
+            summaryPrice.toLong(),
+            isReturnOrder,
+            isSplitOrder
+        ) else null
 
+        return { it: Transaction ->
+            submitCheckWork(it)
             if (residualCount == 0) {
                 // close table
                 val closeTableData = CloseTableData(
@@ -76,18 +118,31 @@ class OpenTableUseCase(
                 it.set(firestoreDbApp.refs.closeTables.document(), closeTableData)
                 openTableRepository.deleteTable(it, tableGroup)
             } else {
-                val openTableAddCheckWork: (transaction: Transaction) -> Unit =
-                    openTableRepository.addCheck(
-                        it,
-                        tableGroup,
-                        checkRef,
-                        summaryPrice.toLong(),
-                        isReturnOrder,
-                        isSplitOrder
-                    )
-                openTableAddCheckWork(it)
+                require(openTableAddCheckWorker != null)
+                openTableAddCheckWorker(it)
             }
-            checkSubmitWork(it)
+        }
+    }
+
+    suspend fun checkout(
+        waiterId: Int,
+        openTableData: OpenTableData,
+        tableGroup: TableGroup,
+        tableItems: TableItems,
+        isReturnOrder: Boolean = false,
+        isSplitOrder: Boolean = false
+    ) {
+        firestoreDbApp.runTransaction {
+            val worker = checkoutWorker(
+                it,
+                waiterId,
+                openTableData,
+                tableGroup,
+                tableItems,
+                isReturnOrder,
+                isSplitOrder
+            )
+            worker(it)
         }.await()
     }
 

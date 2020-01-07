@@ -83,7 +83,7 @@ class OrderViewModel(
                     val reference = orderUseCase.submit(
                         action.userId,
                         internalViewState.tableGroup!!,
-                        internalViewState.orderItems
+                        internalViewState.orderItems.mapKeys { it.key.name }
                     ) ?: return@withContext
                     PrintIntentService.startPrintOrder(context, reference.id)
                 }

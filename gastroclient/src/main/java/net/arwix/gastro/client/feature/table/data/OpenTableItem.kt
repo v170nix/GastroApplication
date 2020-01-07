@@ -6,9 +6,9 @@ import net.arwix.gastro.library.order.data.OrderItem
 data class OpenTableItem(
     // выбранное число для оплаты
     val payCount: Int = 0,
-    // сумма исходного оредера
+    // сумма исходного ордера
     val orderItem: OrderItem,
-    // колличество уже оплаченых чеков
+    // колличество уже офрмленных чеков включает в себя сумму предыдуших оплачены + удаленых + переведенных
     val checkCount: Int = 0,
     // колличество удаленных чеков
     val returnCount: Int = 0,

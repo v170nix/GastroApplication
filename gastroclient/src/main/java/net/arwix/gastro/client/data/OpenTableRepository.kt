@@ -32,7 +32,7 @@ class OpenTableRepository(private val openTables: CollectionReference) {
         return serverOrderData.updatedTime == updatedTime
     }
 
-    fun addCheck(
+    fun applyCheck(
         transaction: Transaction,
         tableGroup: TableGroup,
         checkReference: DocumentReference,

@@ -7,11 +7,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.item_open_tables.view.*
+import net.arwix.extension.gone
 import net.arwix.gastro.client.R
 import net.arwix.gastro.library.data.OpenTableData
 import net.arwix.gastro.library.data.TableGroup
 
 class OpenTablesAdapter(
+    private val isShowAddButton: Boolean = true,
     onItemClick: (tableGroup: TableGroup) -> Unit,
     onAddOrderClick: (tableGroup: TableGroup) -> Unit
 ) : RecyclerView.Adapter<OpenTablesAdapter.ItemsHolder>() {
@@ -43,8 +45,12 @@ class OpenTablesAdapter(
         holder.bindTo(items[position])
         holder.itemView.tag = items[position]
         holder.itemView.setOnClickListener(doItemClick)
-        holder.addOrderButton.tag = items[position]
-        holder.addOrderButton.setOnClickListener(doAddOrderClick)
+        if (isShowAddButton) {
+            holder.addOrderButton.tag = items[position]
+            holder.addOrderButton.setOnClickListener(doAddOrderClick)
+        } else {
+            holder.addOrderButton.gone()
+        }
     }
 
     fun setData(data: Map<TableGroup, OpenTableData>) {
