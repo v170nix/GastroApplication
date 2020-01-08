@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_order_list.*
@@ -36,6 +37,7 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
     private lateinit var multilineButtonHelper: MultilineButtonHelper
     private lateinit var animationViewHelper: AnimationViewHelper
     private var adapterJob: Job? = null
+    private var isFirstAfterResume = true
 
     private var isSubmit: Boolean = false
 
@@ -90,6 +92,11 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
         with(order_list_recycler_view) {
             val linearLayoutManager = LinearLayoutManager(context)
             this.setHasFixedSize(true)
+            (itemAnimator as? DefaultItemAnimator)?.supportsChangeAnimations = false
+            itemAnimator?.moveDuration = 150
+            itemAnimator?.changeDuration = 150
+            itemAnimator?.addDuration = 80
+            itemAnimator?.removeDuration = 80
             layoutManager = linearLayoutManager
             addItemDecoration(DividerItemDecoration(context, linearLayoutManager.orientation))
             adapter = this@OrderListFragment.adapterOrder
@@ -101,7 +108,13 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
 
     override fun onResume() {
         super.onResume()
+        isFirstAfterResume = true
         orderViewModel.liveState.value?.tableGroup?.run(::setTitle)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isFirstAfterResume = true
     }
 
     private fun putToDb() {
@@ -128,10 +141,12 @@ class OrderListFragment : CustomToolbarFragment(), CoroutineScope by MainScope()
 //            findNavController().navigate(R.id.openTablesFragment, null, options)
         } else if (!isSubmit) {
             if (!state.isLoadingMenu) animationViewHelper.enableActions(orderViewModel.isAnimateBigButton)
+            val delayTime = if (isFirstAfterResume) 200L else 0L
             adapterJob?.cancel()
             adapterJob = launch {
-                delay(200)
+                delay(delayTime)
                 adapterOrder.setItems(state.orderItems)
+                isFirstAfterResume = false
             }
             state.tableGroup?.run(::setTitle)
             renderTotalPrice(state.orderItems)

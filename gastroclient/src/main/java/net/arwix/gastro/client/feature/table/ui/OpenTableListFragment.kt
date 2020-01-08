@@ -7,6 +7,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.fragment_open_table_list.*
@@ -53,7 +54,11 @@ class OpenTableListFragment : CustomToolbarFragment(), CoroutineScope by MainSco
             }
         val linearLayoutManager = LinearLayoutManager(requireContext())
         with(pay_list_order_recycler_view) {
-            itemAnimator?.changeDuration = 60
+            itemAnimator?.moveDuration = 150
+            itemAnimator?.changeDuration = 150
+            itemAnimator?.addDuration = 80
+            itemAnimator?.removeDuration = 80
+            (itemAnimator as? DefaultItemAnimator)?.supportsChangeAnimations = false
             layoutManager = linearLayoutManager
             addItemDecoration(
                 androidx.recyclerview.widget.DividerItemDecoration(
