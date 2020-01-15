@@ -106,16 +106,17 @@ class PrintIntentService : IntentService("PrintIntentService") {
     }
 
     private suspend fun handlePrintOrder(orderData: OrderData): PrintResult = supervisorScope {
-        val menuGroups = menuRepository.getData()
+        val menuGroups = menuRepository.getMenus()
 
         val printerOrderUseCase = PrinterOrderUseCase(applicationContext)
         val awaitPrinterResults = mutableListOf<Deferred<Pair<PrinterAddress, Int>>>()
-        val prePrinterData = OrderPrintUtils.splitOrderData(menuGroups, orderData)
+        val prePrinterData: Map<PrinterAddress?, OrderData> =
+            OrderPrintUtils.splitOrderData(menuGroups, orderData)
         prePrinterData.forEach { (printer, orderData) ->
             printer ?: return@forEach
             val job = async(Dispatchers.IO) {
                 runCatching {
-                    printerOrderUseCase.print(printer, orderData).first
+                    printerOrderUseCase.print(printer, orderData, menuGroups).first
                 }.getOrElse {
                     if (it is Epos2Exception) it.errorStatus else -100
                 }.let {

@@ -1,5 +1,6 @@
 package net.arwix.gastro.library.order.domain
 
+import androidx.collection.arrayMapOf
 import net.arwix.gastro.library.menu.data.MenuGroupData
 import net.arwix.gastro.library.menu.data.MenuGroupName
 import net.arwix.gastro.library.order.data.OrderData
@@ -30,11 +31,11 @@ object OrderPrintUtils {
         summaryOrderData: OrderData
     ): Map<PrinterAddress?, OrderData> {
 
-        val result = mutableMapOf<PrinterAddress?, OrderData>()
+        val result = arrayMapOf<PrinterAddress?, OrderData>()
         summaryOrderData.orderItems.forEach { (menuGroupName, listOrders) ->
             val printer = printerMap.findPrinter(menuGroupName)
             val orderData =
-                result.getOrPut(printer) { summaryOrderData.copy(orderItems = mutableMapOf()) }
+                result.getOrPut(printer) { summaryOrderData.copy(orderItems = arrayMapOf()) }
             val orderItemsMap = orderData.orderItems as MutableMap
             val orderItemsList = orderItemsMap.getOrPut(menuGroupName) {
                 mutableListOf()

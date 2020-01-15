@@ -67,8 +67,8 @@ class HistoryOrderDetailViewModel(
         partsOrders.forEach { (printerAddress, orderData) ->
             val result = internalViewState.orderData?.run {
                 runCatching {
-                    PrinterOrderUseCase(context).printOrder(printerAddress, orderData)
-                }.getOrNull()
+                    PrinterOrderUseCase(context).print(printerAddress, orderData, menuGroupTypes)
+                }.getOrNull()?.first
             } ?: 2
 //            orderBonNumber = result.first
             resultCodes.add(result)

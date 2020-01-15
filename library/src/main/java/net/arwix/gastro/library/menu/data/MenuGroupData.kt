@@ -21,11 +21,14 @@ data class MenuGroupData(
             printer,
             metadata.order,
             metadata.color,
-//            items.groupBy {  }
             items?.associateBy(
                 keySelector = { it.name as MenuItemName },
                 valueTransform = { it.toPreMenuItemValueDoc() }
             ))
+
+    fun findPrintFont(menuName: String, defaultFont: Int = 1): Int? {
+        return items?.firstOrNull { it.name == menuName }?.printerFont ?: defaultFont
+    }
 
     @Parcelize
     data class Metadata(

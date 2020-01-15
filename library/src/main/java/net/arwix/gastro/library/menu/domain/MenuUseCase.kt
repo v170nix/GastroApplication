@@ -13,7 +13,7 @@ class MenuUseCase(private val repository: MenuRepository) {
 
     suspend fun getMenus(isForce: Boolean = false): List<MenuGroupData> {
         val innerMenu = if (isForce) null else menuGroups
-        return innerMenu ?: repository.getData().also {
+        return innerMenu ?: repository.getMenus().also {
             menuGroups = innerMenu
         }
     }

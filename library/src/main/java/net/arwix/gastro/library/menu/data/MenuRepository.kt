@@ -21,7 +21,7 @@ class MenuRepository(val menuRef: CollectionReference) {
         it.toObject(MenuGroupDoc::class.java)?.toMenuData(it.id)
     }.filterNotNull()
 
-    suspend fun getData() = transformData(menuRef.orderBy("order").get().await()!!)
+    suspend fun getMenus() = transformData(menuRef.orderBy("order").get().await()!!)
 
     private fun transformData(snapshot: QuerySnapshot) =
         snapshot.map { it.toObject(MenuGroupDoc::class.java).toMenuData(it.id) }
